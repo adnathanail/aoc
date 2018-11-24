@@ -3,8 +3,6 @@ tot = 0
 step = int(len(inp)/2)
 for i in range(len(inp)):
     comp = i + step
-    if comp > (len(inp)-1):
-        comp -= len(inp)
-    if inp[i] == inp[comp]:
-        tot += int(inp[i])
+    if comp >= len(inp): comp -= len(inp)
+    if inp[i] == inp[comp]: tot += int(inp[i])
 print(tot)
