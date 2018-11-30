@@ -1,0 +1,33 @@
+from aocd import get_data
+
+inp = get_data(day=16).split(",")
+
+def spin(l,x):
+  return l [-x:] + l [:-x]
+
+def exchange(l, a, b):
+  c = l[a]
+  l[a] = l[b]
+  l[b] = c
+  return l
+
+def partner(l, a, b):
+  i = l.index(a)
+  j = l.index(b)
+  c = l[i]
+  l[i] = l[j]
+  l[j] = c
+  return l
+
+l = list("abcdefghijklmnop")
+for c in inp: # Command
+  if c[0] == "s":
+    l = spin(l,int(c[1:]))
+  elif c[0] == "x":
+    a,b = [int(x) for x in c[1:].split('/')]
+    l = exchange(l, a, b)
+  elif c[0] == "p":
+    a,b = c[1:].split('/')
+    l = partner(l, a, b)
+
+print(''.join(l))
