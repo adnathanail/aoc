@@ -1,51 +1,42 @@
 from aocd import get_data
 inp = get_data(day=18).split("\n")
-# inp = """set a 1
-# add a 2
-# mul a a
-# mod a 5
-# snd a
-# set a 0
-# rcv a
-# jgz a -1
-# set a 1
-# jgz a -2""".split("\n")
 
-def gv(x): # Get value
-  try:
-    return int(x)
-  except ValueError:
-    return regs[x]
+class Program:
+  regs = {}
+  played = 0
+  i = 0
 
-regs = {}
-played = 0
-i = 0
-done = False
-while i >= 0 and i < len(inp) and not done:
-  row = inp[i]
-  print(row)
-  op = row[:3]
-  if op in ["snd", "rcv"]:
-    v = gv(row[4:])
-    if op == "snd":
-      played = v
-    elif v != 0:
-      done = True
-  else:
-    v1,v2 = row[4:].split(" ")
-    v2 = gv(v2)
-    if v1 not in regs:
-      regs[v1] = 0
-    if op == "jgz" and regs[v1] != 0:
-      i += v2 -1
-    elif op == "set":
-      regs[v1] = v2
-    elif op == "add":
-      regs[v1] += v2
-    elif op == "mul":
-      regs[v1] *= v2
-    elif op == "mod":
-      regs[v1] %= v2
-  i += 1
+  def ro(self): # Run operation
+    gv = lambda x : int(x) if x.lstrip('-').isdigit() else self.regs[x] # Get value
+    o = inp[self.i]
+    op = o[:3]
+    if op in ["snd", "rcv"]:
+      v = gv(o[4:])
+      if op == "snd":
+        self.played = v
+      elif v != 0:
+        return False
+    else:
+      v1,v2 = o[4:].split(" ")
+      v2 = gv(v2)
+      if v1 not in self.regs:
+        self.regs[v1] = 0
+      if op == "jgz" and self.regs[v1] != 0:
+        self.i += v2 -1
+      elif op == "set":
+        self.regs[v1] = v2
+      elif op == "add":
+        self.regs[v1] += v2
+      elif op == "mul":
+        self.regs[v1] *= v2
+      elif op == "mod":
+        self.regs[v1] %= v2
+    self.i += 1
+    return True
+  def run(self):
+    while self.i >= 0 and self.i < len(inp) and self.ro():
+      pass
+    print(self.played)
 
-print(played)
+p = Program()
+p.run()
