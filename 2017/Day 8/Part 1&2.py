@@ -1,5 +1,5 @@
 from aocd import get_data
-inp = get_data(day=8).split('\n')
+inp = get_data(day=8, year=2017).split('\n')
 
 regs = {}
 highest = 0

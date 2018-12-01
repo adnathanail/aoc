@@ -1,7 +1,7 @@
 from aocd import get_data
 import itertools
 
-inp = get_data(day=13).split("\n")
+inp = get_data(day=13, year=2017).split("\n")
 fw = {int(row.split(": ")[0]):int(row.split(": ")[1]) for row in inp}
 
 def score(o):

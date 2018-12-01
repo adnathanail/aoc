@@ -1,5 +1,5 @@
 from aocd import get_data
-inp = get_data(day=12).split('\n')
+inp = get_data(day=12, year=2017).split('\n')
 dic = {}
 for r in inp:
   pid, cs = r.split(" <-> ") # Program id, childs (children)

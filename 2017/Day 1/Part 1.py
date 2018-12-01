@@ -1,5 +1,5 @@
 from aocd import get_data
-inp = get_data(day=1)
+inp = get_data(day=1, year=2017)
 tot = 0
 step = 1
 for i in range(len(inp)):

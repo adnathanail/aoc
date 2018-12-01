@@ -1,7 +1,7 @@
-inp = """Generator A starts with 883
-Generator B starts with 879"""
+from aocd import get_data
+inp = get_data(day=15, year=2017)
+
 a,b = [int(x[24:]) for x in inp.split('\n')]
-# a,b = 65,8921
 x = 0
 for i in range(40000000):
   a *= 16807

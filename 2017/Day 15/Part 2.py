@@ -1,5 +1,6 @@
-inp = """Generator A starts with 883
-Generator B starts with 879"""
+from aocd import get_data
+inp = get_data(day=15, year=2017)
+
 a,b = [int(x[24:]) for x in inp.split('\n')]
 
 def judge(a,b):
@@ -18,7 +19,6 @@ while judged < 5000000:
     judged += 1
     if judge(a,b):
       x += 1
-      print(judged)
     a *= 16807
     a %= 2147483647
     b *= 48271

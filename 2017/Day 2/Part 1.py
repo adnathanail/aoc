@@ -1,5 +1,5 @@
 from aocd import get_data
-inp = get_data(day=2)
+inp = get_data(day=2, year=2017)
 tot = 0
 for row in inp.split("\n"):
     procrow = [int(x) for x in row.split("\t")]

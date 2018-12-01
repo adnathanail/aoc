@@ -1,5 +1,5 @@
 from aocd import get_data
-inp = list(get_data(day=10).encode()) + [17, 31, 73, 47, 23]
+inp = list(get_data(day=10, year=2017).encode()) + [17, 31, 73, 47, 23]
 
 l = [i for i in range(256)]
 i = 0

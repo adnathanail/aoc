@@ -1,6 +1,5 @@
 from aocd import get_data
-# inp = get_data(day=14)
-inp = "wenycdww"
+inp = get_data(day=14, year=2017)
 
 def xor(l):
   tot = l[0]

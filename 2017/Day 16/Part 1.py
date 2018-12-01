@@ -1,6 +1,5 @@
 from aocd import get_data
-
-inp = get_data(day=16).split(",")
+inp = get_data(day=16, year=2017).split(",")
 
 def spin(l,x):
   return l [-x:] + l [:-x]

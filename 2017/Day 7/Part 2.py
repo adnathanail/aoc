@@ -1,6 +1,6 @@
 from aocd import get_data
 inp = {}
-for p in get_data(day=7).split('\n'):
+for p in get_data(day=7, year=2017).split('\n'):
     n = p.split(" ")[0]
     w = int(p.split("(")[1].split(")")[0])
     try:

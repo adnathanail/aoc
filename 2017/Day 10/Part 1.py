@@ -1,5 +1,5 @@
 from aocd import get_data
-inp = [int(x) for x in get_data(day=10).split(',')]
+inp = [int(x) for x in get_data(day=10, year=2017).split(',')]
 
 l = [i for i in range(256)]
 i = 0

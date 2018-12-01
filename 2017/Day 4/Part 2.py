@@ -1,5 +1,5 @@
 from aocd import get_data
-inp = [x.split() for x in get_data(day=4).split('\n')]
+inp = [x.split() for x in get_data(day=4, year=2017).split('\n')]
 
 def tally_word(word):
     d = {}

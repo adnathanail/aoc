@@ -1,7 +1,7 @@
 from aocd import get_data
 import re
 
-inp = get_data(day=9)
+inp = get_data(day=9, year=2017)
 inp = re.sub('!.', '', inp)
 inp = re.sub('<[^>]*>', '', inp)
 inp = re.sub(',', '', inp)

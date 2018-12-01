@@ -1,5 +1,5 @@
 from aocd import get_data
-inp = get_data(day=4)
+inp = get_data(day=4, year=2017)
 
 count = 0
 for p in inp.split('\n'):

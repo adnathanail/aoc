@@ -1,5 +1,5 @@
 from aocd import get_data
-inp = get_data(day=11).split(',')
+inp = get_data(day=11, year=2017).split(',')
 
 x = y = z = 0
 for a in inp:

@@ -1,5 +1,5 @@
 from aocd import get_data
-inp = [int(x) for x in get_data(day=6).split('\t')]
+inp = [int(x) for x in get_data(day=6, year=2017).split('\t')]
 l = inp
 
 prevs = []

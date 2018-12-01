@@ -1,5 +1,5 @@
 from aocd import get_data
-inp = int(get_data(day=3))
+inp = int(get_data(day=3, year=2017))
 x = 1
 while (x+2)**2 < inp:
     x += 2

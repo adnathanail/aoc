@@ -1,4 +1,6 @@
-inp = 301
+from aocd import get_data
+inp = int(get_data(day=17, year=2017))
+
 l = [0]
 p = 0
 for i in range(1,2017+1):
