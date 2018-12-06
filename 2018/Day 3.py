@@ -3,7 +3,6 @@ from aocd import get_data
 inp = get_data(day=3, year=2018).split('\n')
 start = time.time()
 
-# Part 1
 import re
 
 grid = []
@@ -28,6 +27,7 @@ for row in inp:
           grid[x][y] = 'X'
         overlapped.add(str(cid))
 
+# Part 1
 t = 0
 for i in range(1000):
   for j in range(1000):

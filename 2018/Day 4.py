@@ -3,8 +3,8 @@ from aocd import get_data
 inp = get_data(day=4, year=2018).split('\n')
 start = time.time()
 
-# Part 1
 import datetime, operator, re
+
 inp = sorted(inp, key = lambda x: re.match(r"\[1518\-(\d+)\-(\d+) (\d+):(\d+).*", x).groups()) # Sort by month, date, hour, minute
 guards = {}
 for row in inp:
@@ -23,6 +23,7 @@ for row in inp:
           guards[current_guard][i] = 0
         guards[current_guard][i] += 1
 
+# Part 1
 tots = {g:sum(guards[g].values()) for g in guards} # Total sleeping times for each guard
 sg = max(tots.items(), key=operator.itemgetter(1))[0] # Sleepiest guard
 sgst = max(guards[sg].items(), key=operator.itemgetter(1))[0] # Sleepiest guard sleepiest time

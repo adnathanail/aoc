@@ -5,6 +5,7 @@ start = time.time()
 
 # Part 1
 from collections import Counter
+
 tt = [[1 if 2 in c else 0, 1 if 3 in c else 0] for c in (Counter(dict(Counter(row)).values()) for row in inp)]
 print(sum([z[0] for z in tt]) * sum([z[1] for z in tt]))
 

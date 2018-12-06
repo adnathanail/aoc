@@ -4,6 +4,7 @@ inp = get_data(day=5, year=2018)
 start = time.time()
 
 import re
+
 s = ""
 for l in "abcdefghijklmnopqrstuvwxyz":
   s += l+l.upper() + "|" + l.upper()+l + "|"
