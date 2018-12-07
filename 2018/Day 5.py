@@ -20,11 +20,11 @@ def lorp(pol): # Length of reacted polymer
 print(lorp(inp))
 
 # Part 2
-bl = 0 # Best length
+bl = len(inp) # Best length
 bc = "" # Best character
 for char in set([x.lower() for x in set(inp)]):
   l = lorp(re.sub("(" + char + "|" + char.upper() + ")+","",inp))
-  if l > bl:
+  if l < bl:
     bl = l
     bc = char
 print(bl)
