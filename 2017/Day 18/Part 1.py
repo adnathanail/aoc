@@ -1,5 +1,5 @@
 from aocd import get_data
-inp = get_data(day=18).split("\n")
+inp = get_data(day=18, year=2017).split("\n")
 
 class Program:
   regs = {}
@@ -32,11 +32,9 @@ class Program:
       elif op == "mod":
         self.regs[v1] %= v2
     self.i += 1
-    return True
-  def run(self):
-    while self.i >= 0 and self.i < len(inp) and self.ro():
-      pass
-    print(self.played)
+    return self.i >= 0 and self.i < len(inp)
 
-p = Program()
-p.run()
+p1 = Program()
+while p1.ro():
+  pass
+print(p1.played)
