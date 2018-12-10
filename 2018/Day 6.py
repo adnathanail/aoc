@@ -1,12 +1,6 @@
 import time
 from aocd import get_data
 inp = get_data(day=6, year=2018).split('\n')
-# inp = """1, 1
-# 1, 6
-# 8, 3
-# 3, 4
-# 5, 5
-# 8, 9""".split('\n')
 start = time.time()
 
 # Part 1
