@@ -10,6 +10,11 @@ for row in inp:
   l1, l2 = re.match("Step (.) must be finished before step (.) can begin.", row).groups()
   required[l2].append(l1)
 
+completed = set()
+working = []
+o = ""
+x = 0
+
 class Worker:
   def __init__(self):
     self.current_letter = ""
@@ -34,11 +39,7 @@ class Worker:
     self.time_left -= 1
 
 # Part 1
-completed = set()
-working = []
-o = ""
 w = Worker()
-x = 0
 while len(completed) < len(required.keys()):
   x += 1
   w.tick_clock()

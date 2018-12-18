@@ -9,9 +9,9 @@ inp = sorted(inp, key = lambda x: re.match(r"\[1518\-(\d+)\-(\d+) (\d+):(\d+).*"
 guards = {}
 for row in inp:
   if "Guard" in row:
-    current_guard = re.match(".*#(\d+).*",row).groups()[0]
+    current_guard = re.match(r".*#(\d+).*",row).groups()[0]
   else:
-    dt = datetime.datetime.strptime(re.match('\[(.*)\].*', row).groups()[0], '%Y-%m-%d %H:%M')
+    dt = datetime.datetime.strptime(re.match(r'\[(.*)\].*', row).groups()[0], '%Y-%m-%d %H:%M')
     if 'falls asleep' in row:
       fallen_asleep = dt
     else:
