@@ -1,4 +1,5 @@
-inputstring = "yzbqklnj"
+from aocd import get_data
+inputstring = get_data(day=4, year=2015)
 import hashlib
 index = 0
 running = True
