@@ -1,6 +1,7 @@
-from aocd import get_data
-inp = int(get_data(day=3, year=2017))
-print(inp)
+# from aocd import get_data
+# inp = int(get_data(day=3, year=2017))
+# print(inp)
+inp = 100
 
 class Grid:
     grid = [
