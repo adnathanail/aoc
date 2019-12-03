@@ -7,9 +7,9 @@ class SomethingWentWrong(Exception):
 class Interpreter:
   def __init__(self, program):
     self.program = [int(x) for x in program.split(",")]
-  def pa1202(self):  # Program Alarm 1202
-    self.program[1] = 12
-    self.program[2] = 2
+  def set_noun_verb(self, noun, verb):
+    self.program[1] = noun
+    self.program[2] = verb
   def run(self):
     i = 0
     running = True
@@ -32,6 +32,21 @@ class Interpreter:
         raise SomethingWentWrong
     return last_written
 
-interp = Interpreter(inp)
-interp.pa1202()
-print(interp.run())
+# # From the below I determine
+# # For 0,0 the output is 29,848
+# # Increasing the noun increases the output by 307,200
+# # Increasing the verb increases the output by 1
+# for noun in range(0, 10):
+#   for verb in range(0, 10):
+#     interp = Interpreter(inp)
+#     interp.set_noun_verb(noun=noun, verb=verb)
+#     print(noun, verb, interp.run())
+
+noun = (19690720-29848) // 307200
+verb = (19690720-29848) % 307200
+
+# # Just to check
+# interp = Interpreter(inp)
+# interp.set_noun_verb(noun=noun, verb=verb)
+
+print(100*noun + verb)
