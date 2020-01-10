@@ -1,6 +1,8 @@
 import numpy as np
 from aocd import get_data
 inp = get_data(day=3, year=2019)
+inp = """R75,D30,R83,U83,L12,D49,R71,U7,L72
+U62,R66,U55,R34,D71,R55,D58,R83"""
 
 class Grid:
   def __init__(self, *args):
@@ -15,9 +17,11 @@ class Grid:
     self.width = max_far_right - min_far_left + 1
     self.center = (-far_left, -far_down)
     self.grid = np.zeros(shape=(self.height, self.width), dtype="U2")
+    self.distance_grids = []
 
     for line in args:
-      self.add_line(line)
+      distance_grid = self.add_line(line)
+      self.distance_grids.append(distance_grid)
   def get_bounds_of_line(self, line):
     far_up = far_down = 0
     far_left = far_right = 0
@@ -39,34 +43,36 @@ class Grid:
         far_right = max(x, far_right)
     return far_up, far_down, far_left, far_right
   def add_line(self, line):
-    center = self.center
+    distance_grid = np.zeros(shape=(self.height, self.width))
+
+    loc = self.center
+    i = 0  # Distance from start
     for segment in line:
       direction = segment[0]
       distance = int(segment[1:])
       for _ in range(distance):
+        i += 1
         if direction == "U":
-          center = (center[0], center[1]+1)
+          loc = (loc[0], loc[1]+1)
         elif direction == "D":
-          center = (center[0], center[1]-1)
+          loc = (loc[0], loc[1]-1)
         elif direction == "L":
-          center = (center[0]-1, center[1])
+          loc = (loc[0]-1, loc[1])
         elif direction == "R":
-          center = (center[0]+1, center[1])
-        self.grid[center[1]][center[0]] += "X"
+          loc = (loc[0]+1, loc[1])
+        self.grid[loc[1]][loc[0]] += "X"
+        if distance_grid[loc[1]][loc[0]] == 0:
+          distance_grid[loc[1]][loc[0]] = i
+    return distance_grid
   def get_crossovers(self):
     points = np.where(self.grid == "XX")
     return list(zip(points[1], points[0]))
-  @staticmethod
-  def get_manhattan_distance(p1, p2):
-    x1, y1 = p1
-    x2, y2 = p2
-    return abs(x1-x2) + abs(y1-y2)
-  def get_distance_to_crossover_closest_to_center(self):
-    return min([self.get_manhattan_distance(p, self.center) for p in self.get_crossovers()])
+  def get_fewest_combined_steps_to_crossover(self):
+    return min([sum([dg[co[1]][co[0]] for dg in self.distance_grids]) for co in self.get_crossovers()])
   def print_grid(self):
     for row in self.grid[::-1]:
       print("".join([(x+"  ")[:2] for x in row]))
 
 line1, line2 = [x.split(",") for x in inp.split("\n")]
 g = Grid(line1, line2)
-print(g.get_distance_to_crossover_closest_to_center())
+print(g.get_fewest_combined_steps_to_crossover())
