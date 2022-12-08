@@ -17,26 +17,18 @@ def check_tree_visibility(
 ) -> set[tuple[int, int]]:
     visible_trees = set()
     for coord_list in coords:
-        last_tree_height = -1
+        last_highest_tree_height = -1
         for coord in coord_list:
             i, j = coord
-            if tree_height_grid[i][j] < last_tree_height:
-                break
-            if tree_height_grid[i][j] > last_tree_height:
-                visible_trees.add((i, j))
-            last_tree_height = tree_height_grid[i][j]
+            if tree_height_grid[i][j] > last_highest_tree_height:
+                visible_trees.add(coord)
+                last_highest_tree_height = tree_height_grid[i][j]
     return visible_trees
 
 
 def main() -> None:
     puzzle = Puzzle(year=2022, day=8)
-    inp = puzzle.input_data
-    inp = """30373
-25512
-65332
-33549
-35390"""
-    grid: list[list[int]] = [[int(cell) for cell in row] for row in inp.split("\n")]
+    grid: list[list[int]] = [[int(cell) for cell in row] for row in puzzle.input_data.split("\n")]
     coord_generators = [
         coord_list_generator(0, len(grid), 1, 0, len(grid[0]), 1, False),
         coord_list_generator(0, len(grid), 1, len(grid[0]) - 1, -1, -1, False),
@@ -46,7 +38,6 @@ def main() -> None:
     visible_trees: set[tuple[int, int]] = set()
     for cg in coord_generators:
         visible_trees = visible_trees.union(check_tree_visibility(grid, cg))
-        # print(visible_trees)
     print(len(visible_trees))
 
 
