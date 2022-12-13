@@ -46,3 +46,25 @@ def get_operation_function(op_type: OperationType, op_input: int) -> Callable[[i
                 return x ** op_input
 
             return exp
+
+
+def parse_monkey_data(inp: str) -> tuple[dict[int, Monkey], int]:
+    monkeys = {}
+    product_of_divisor_tests = 1
+    for monkey_data in inp.split("\n\n"):
+        monkey_data_lines = monkey_data.split("\n")
+        monkey_id = int(monkey_data_lines[0][7])
+        items = [int(x) for x in monkey_data_lines[1][18:].split(", ")]
+        if monkey_data_lines[2][23] == "+":
+            operation = get_operation_function(OperationType.ADDITION, int(monkey_data_lines[2][25:]))
+        elif monkey_data_lines[2][25:] != "old":
+            operation = get_operation_function(OperationType.MULTIPLICATION, int(monkey_data_lines[2][25:]))
+        else:
+            operation = get_operation_function(OperationType.EXPONENTIATION, 2)
+
+        divisble_test_number = int(monkey_data_lines[3][21:])
+        product_of_divisor_tests *= divisble_test_number
+        true_monkey = int(monkey_data_lines[4][29:])
+        false_monkey = int(monkey_data_lines[5][30:])
+        monkeys[monkey_id] = Monkey(monkey_id, items, operation, divisble_test_number, true_monkey, false_monkey)
+    return monkeys, product_of_divisor_tests

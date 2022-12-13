@@ -1,29 +1,12 @@
 from aocd.models import Puzzle  # type: ignore[import]
 
-from utils import Monkey, get_operation_function, OperationType
+from utils import parse_monkey_data
 
 
 def main() -> None:
     puzzle = Puzzle(year=2022, day=11)
-    # Parse input
-    monkeys: dict[int, Monkey] = {}
-    for monkey_data in puzzle.input_data.split("\n\n"):
-        monkey_data_lines = monkey_data.split("\n")
-        monkey_id = int(monkey_data_lines[0][7])
-        items = [int(x) for x in monkey_data_lines[1][18:].split(", ")]
-        if monkey_data_lines[2][23] == "+":
-            operation = get_operation_function(OperationType.ADDITION, int(monkey_data_lines[2][25:]))
-        elif monkey_data_lines[2][25:] != "old":
-            operation = get_operation_function(OperationType.MULTIPLICATION, int(monkey_data_lines[2][25:]))
-        else:
-            operation = get_operation_function(OperationType.EXPONENTIATION, 2)
 
-        divisble_test_number = int(monkey_data_lines[3][21:])
-        true_monkey = int(monkey_data_lines[4][29:])
-        false_monkey = int(monkey_data_lines[5][30:])
-        monkeys[monkey_id] = Monkey(monkey_id, items, operation, divisble_test_number, true_monkey, false_monkey)
-
-    # Do simulation
+    monkeys, _ = parse_monkey_data(puzzle.input_data)
     num_inspections = {monkey_id: 0 for monkey_id in monkeys}
     for _ in range(20):
         for monkey in monkeys.values():
