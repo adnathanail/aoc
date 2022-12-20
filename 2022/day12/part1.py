@@ -1,3 +1,52 @@
+"""
+This is not necessarily an optimal approach, we just run the same greedy algorithm repeatedly until nothing is changed
+In fact, there are 2 nested greedy loops!
+
+This could have been mapped onto Dijkstra and solved (probably?) quicker
+
+But this solution is completely original, and also raises the interesting question of what the worst case path could
+  look like
+
+For the inner loop, going round a square of radius X repeatedly, I think the worst case path would be a clockwise
+  spiral, because we search clockwise
+
+e.g.
+.....
+.>>v.
+.>.v.
+.^<<.
+.....
+
+1st pass
+
+.....
+.....
+.10..
+.....
+.....
+
+2nd pass
+
+.....
+.....
+.10..
+.2...
+.....
+
+3rd pass
+
+.....
+.....
+.10..
+.23..
+.....
+
+etc.
+
+Then for the outer loop, because we resolve from the inside out, paths heading from the outside in would be very slow
+  to resolve
+So a path that goes all the way from S to near E, then back near S, then near E etc. would take a long time
+"""
 from typing import Generator, TypeVar, Optional
 
 from aocd.models import Puzzle  # type: ignore[import]
@@ -81,53 +130,54 @@ T = TypeVar("T")
 
 
 def generate_grid(height: int, width: int, default_value: T) -> list[list[T]]:
-    return [[width * height for _ in range(width)] for _ in range(height)]
+    return [[default_value for _ in range(width)] for _ in range(height)]
 
 
-def can_reach_square(start_square: str, end_square: str) -> bool:
-    if start_square == "S":
+def can_reach_square(start_elevation: str, end_elevation: str) -> bool:
+    """
+    Given letters of 2 points (which map to elevations)
+     return a boolean denoting if you can travel from the start elevation to the end elevation
+    """
+    if start_elevation == "S":
+        start_elevation = "a"
+    if end_elevation == "E":
+        end_elevation = "z"
+    if ord(end_elevation) - ord(start_elevation) <= 1:
         return True
-    if end_square == "E":
-        return start_square == "z"
-    if ord(end_square) - ord(start_square) <= 1:
-        return True
-    return ord(start_square) > ord(end_square)
+    return ord(start_elevation) > ord(end_elevation)
 
 
 def main() -> None:
     puzzle = Puzzle(year=2022, day=12)
     grid = puzzle.input_data.split("\n")
-    grid = """Sabqponm
-abcryxxl
-accszExk
-acctuvwj
-abdefghi""".split("\n")
 
-    start = find_character(grid, "S")
-    end = find_character(grid, "E")
+    start_point = find_character(grid, "S")
+    end_end_point = find_character(grid, "E")
 
-    min_distance_grid = generate_grid(len(grid), len(grid[0]), len(grid) * len(grid[0]))
-    min_distance_grid[end[0]][end[1]] = 0  # The end square is 0 steps away from itself
+    # 2D array with same dimensions as the grid, holding the current known minimum number of steps to E
+    #  initialise to width * height as this is theoretically the longest possible trail
+    min_distance_grid: list[list[int]] = generate_grid(len(grid), len(grid[0]), len(grid) * len(grid[0]))
+    min_distance_grid[end_end_point[0]][end_end_point[1]] = 0  # The end square is 0 steps away from itself
 
-    # next_step_grid: list[list[Optional[tuple[int, int]]]] = generate_grid(
-    #     len(grid), len(grid[0]), None
-    # )
+    next_step_grid: list[list[Optional[tuple[int, int]]]] = generate_grid(
+        len(grid), len(grid[0]), None
+    )
 
     distances_changed_this_iteration = True
     while distances_changed_this_iteration:
-        print("Iteration")
+        # print("Iteration")
         distances_changed_this_iteration = False
         update_radius = 1
         squares_checked_this_radius = True
         while squares_checked_this_radius:
-            print(f"\tUpdate radius {update_radius}")
+            # print(f"\tUpdate radius {update_radius}")
             squares_checked_this_radius = False
             distances_changed_this_square = True
             while distances_changed_this_square:
-                print("\t\tSquare")
+                # print("\t\tSquare")
                 distances_changed_this_square = False
                 for coord in generate_square_around_point(
-                        end, update_radius, len(grid) - 1, len(grid[0]) - 1
+                        end_end_point, update_radius, len(grid) - 1, len(grid[0]) - 1
                 ):
                     squares_checked_this_radius = True
                     for neighbour in generate_movements_around_point(
@@ -146,15 +196,35 @@ abdefghi""".split("\n")
                             min_distance_grid[coord[0]][coord[1]] = (
                                     min_distance_grid[neighbour[0]][neighbour[1]] + 1
                             )
-                            # next_step_grid[coord[0]][coord[1]] = neighbour
+                            next_step_grid[coord[0]][coord[1]] = neighbour
             update_radius += 1
-    # for row in min_distance_grid:
-    #     print("".join("." if x == -1 else str(x % 10) for x in row))
-    #
-    # for row in next_step_grid:
-    #     print("".join(f"{v}\t" for v in row))
 
-    print(min_distance_grid[start[0]][start[1]])
+    show_grid_path(grid, next_step_grid, start_point, end_end_point)
+
+    print(min_distance_grid[start_point[0]][start_point[1]])
+
+
+def show_grid_path(grid, next_step_grid, start_point: tuple[int, int], end_point: tuple[int, int]):
+    spiral_map = [list(row) for row in grid]
+    spiral_map[end_point[0]][end_point[1]] = "E"
+
+    current_point = start_point
+    while current_point != end_point:
+        next_point = next_step_grid[current_point[0]][current_point[1]]
+        if current_point[0] - next_point[0] == 1:
+            spiral_map[current_point[0]][current_point[1]] = "^"
+        elif current_point[0] - next_point[0] == -1:
+            spiral_map[current_point[0]][current_point[1]] = "v"
+        elif current_point[1] - next_point[1] == 1:
+            spiral_map[current_point[0]][current_point[1]] = "<"
+        elif current_point[1] - next_point[1] == -1:
+            spiral_map[current_point[0]][current_point[1]] = ">"
+        else:
+            raise Exception("Discontinuity")
+        current_point = next_point
+
+    for row in spiral_map:
+        print("".join(row))
 
 
 if __name__ == "__main__":
