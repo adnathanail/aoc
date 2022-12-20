@@ -1,4 +1,4 @@
-from typing import Generator
+from typing import Generator, Optional
 
 
 def get_scan_size(inp):
@@ -60,8 +60,11 @@ def set_on_grid(grid: list[list[str]], coord: tuple[int, int], value: str, min_x
     grid[norm_coord[1]][norm_coord[0]] = value
 
 
-def scan_rock(inp: str, min_x: int, max_x: int, min_y: int, max_y: int) -> list[list[str]]:
+def scan_rock(inp: str, min_x: int, max_x: int, min_y: int, max_y: int, floor: Optional[int] = None) -> list[list[str]]:
     scan: list[list[str]] = [["." for _ in range(min_x, max_x + 1)] for _ in range(min_y, max_y + 1)]
+    if floor is not None:
+        scan.extend([["." for _ in range(min_x, max_x + 1)] for _ in range(floor - max_y - 1)])
+        scan.append(["#" for _ in range(min_x, max_x + 1)])
 
     for row in inp.split("\n"):
         for rock in get_rocks_from_path(
@@ -83,6 +86,9 @@ def drop_sand(scan: list[list[str]], sand_coord: tuple[int, int], min_x: int, mi
     """
     at_rest = False
     while not at_rest:
+        # There is already sand at the source, so all other sand is blocked
+        if get_from_grid(scan, sand_coord, min_x, min_y) == "o":
+            return False
         for potential_new_coord in get_potential_new_sand_positions(sand_coord):
             try:
                 if get_from_grid(scan, potential_new_coord, min_x, min_y) == ".":
