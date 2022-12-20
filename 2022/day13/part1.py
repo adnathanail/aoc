@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Optional
 
 from aocd.models import Puzzle  # type: ignore[import]
 
@@ -66,33 +66,39 @@ def parse_input(inp: str) -> list[tuple[Packet, Packet]]:
     return [(parse_packet(pair[0]), parse_packet(pair[1])) for pair in get_line_pairs(inp)]
 
 
+def packets_correctly_ordered(left_packet: Packet, right_packet: Packet) -> Optional[bool]:
+    for i in range(min(len(left_packet), len(right_packet))):
+        left_val = left_packet[i]
+        right_val = right_packet[i]
+        if type(left_val) == int and type(right_val) == list:
+            left_val = [left_val]
+        elif type(left_val) == list and type(right_val) == int:
+            right_val = [right_val]
+
+        if type(left_val) == int and type(right_val) == int:
+            if left_val < right_val:
+                return True
+            elif left_val > right_val:
+                return False
+            else:
+                continue
+        elif type(left_val) == list and type(right_val) == list:
+            cmp_result = packets_correctly_ordered(left_val, right_val)
+            if cmp_result is True:
+                return True
+            elif cmp_result is False:
+                return False
+            else:
+                continue
+    # If all input up to the common length of the two inputs was comparably the same, check lengths of packet
+    if len(left_packet) != len(right_packet):
+        return len(left_packet) < len(right_packet)
+
+
 def main() -> None:
-    # puzzle = Puzzle(year=2022, day=13)
-    pairs: list[tuple[Packet, Packet]] = parse_input("""[1,1,3,1,1]
-[1,1,5,1,1]
-
-[[1],[2,3,4]]
-[[1],4]
-
-[9]
-[[8,7,6]]
-
-[[4,4],4,4]
-[[4,4],4,4,4]
-
-[7,7,7,7]
-[7,7,7]
-
-[]
-[3]
-
-[[[]]]
-[[]]
-
-[1,[2,[3,[4,[5,6,7]]]],8,9]
-[1,[2,[3,[4,[5,6,0]]]],8,9]""")
-    for pair in pairs:
-        print(pair)
+    puzzle = Puzzle(year=2022, day=13)
+    pairs: list[tuple[Packet, Packet]] = parse_input(puzzle.input_data)
+    print(sum(i + 1 for i, pair in enumerate(pairs) if packets_correctly_ordered(*pair)))
 
 
 if __name__ == "__main__":
