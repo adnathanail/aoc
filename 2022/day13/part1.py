@@ -24,27 +24,49 @@ def parse_input(inp: str) -> list[tuple[Packet, Packet]]:
     return line_pairs
 
 
-def parse_packet_ints(inp: str):
-    pass
+def parse_packet_int(inp: str, curr: int) -> tuple[int, int]:
+    out_str = ""
+    while inp[curr] not in [",", "]"]:
+        if inp[curr].isdigit():
+            out_str += inp[curr]
+            curr += 1
+        else:
+            raise SyntaxError(f"Value in position {curr} should be a digit")
+    return int(out_str), curr
 
 
-def parse_packet_list(inp: str, curr: int):
+def parse_packet_list(inp: str, curr: int, depth: int) -> tuple[Packet, int]:
+    print("\t" * depth, depth, curr, inp[curr])
     if inp[curr] != "[":
-        raise SyntaxError(f"Value position {curr} should be '['")
-    # Move past first [
+        raise SyntaxError(f"Value in position {curr} should be '['")
     curr += 1
-    out = []
-    while inp[curr] != "]":
-        if inp[curr] == "[":
-            new_list, curr = parse_packet_list(inp, curr)
-            out.append(new_list)
 
-        curr += 1
+    out = []
+    while curr < len(inp) and inp[curr] != "]":
+        print("\t" * depth, f"A{depth}", curr, inp[curr])
+        if inp[curr] == "[":
+            new_list, curr = parse_packet_list(inp, curr, depth + 1)
+            out.append(new_list)
+        else:
+            new_int, curr = parse_packet_int(inp, curr)
+            out.append(new_int)
+        print("\t" * depth, f"B{depth}", curr, inp[curr])
+        if inp[curr] == ",":
+            curr += 1
+        elif inp[curr] == "]":
+            break
+        else:
+            raise SyntaxError(f"Value in position {curr} should be ',' or ']'")
+
+    print("\t" * depth, f"C{depth} return{out} {curr}")
+    if inp[curr] != "]":
+        raise SyntaxError(f"Value in position {curr} should be ']'")
+    curr += 1
     return out, curr
 
 
-def parse_packet(inp: str):
-    return parse_packet_list(inp, 0)[0]
+def parse_packet(inp: str) -> Packet:
+    return parse_packet_list(inp.replace(" ", ""), 0, 0)[0]
 
 
 def main() -> None:
@@ -74,7 +96,13 @@ def main() -> None:
     # [1,[2,[3,[4,[5,6,0]]]],8,9]""")
     #     for pair in pairs:
     #         print(pair)
-    print(parse_packet("[[], [[], []]]"))
+    assert parse_packet("[]") == []
+    assert parse_packet("[[]]") == [[]]
+    assert parse_packet("[[],[]]") == [[], []]
+    assert parse_packet("[[], [[], []]]") == [[], [[], []]]
+    assert parse_packet("[[], [[], []]]") == [[], [[], []]]
+    # assert parse_packet("[1]") == [1]
+    # print(parse_packet("[1]"))
     # parse_packet("[[4,4],4,4]")
 
 
