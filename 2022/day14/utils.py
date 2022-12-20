@@ -1,5 +1,5 @@
 from typing import Generator, Optional
-from project_utils import get_from_grid, set_on_grid
+from project_utils import get_from_grid, set_on_grid, Coord, StrGrid
 
 
 def get_scan_size(inp):
@@ -22,7 +22,7 @@ def get_scan_size(inp):
     return min_x, max_x, min_y, max_y
 
 
-def get_rocks_from_path(path: list[tuple[int, int]]) -> Generator[tuple[int, int], None, None]:
+def get_rocks_from_path(path: list[Coord]) -> Generator[Coord, None, None]:
     current_point = path.pop(0)
     yield current_point
     while len(path) > 0:
@@ -47,8 +47,8 @@ def get_rocks_from_path(path: list[tuple[int, int]]) -> Generator[tuple[int, int
             yield current_point
 
 
-def scan_rock(inp: str, min_x: int, max_x: int, min_y: int, max_y: int, floor: Optional[int] = None) -> list[list[str]]:
-    scan: list[list[str]] = [["." for _ in range(min_x, max_x + 1)] for _ in range(min_y, max_y + 1)]
+def scan_rock(inp: str, min_x: int, max_x: int, min_y: int, max_y: int, floor: Optional[int] = None) -> StrGrid:
+    scan: StrGrid = [["." for _ in range(min_x, max_x + 1)] for _ in range(min_y, max_y + 1)]
     if floor is not None:
         scan.extend(
             [["." for _ in range(min_x, max_x + 1)] for _ in range(floor - max_y - 1)]
@@ -57,23 +57,23 @@ def scan_rock(inp: str, min_x: int, max_x: int, min_y: int, max_y: int, floor: O
 
     for row in inp.split("\n"):
         for rock in get_rocks_from_path(
-            [
-                (int(point.split(",")[0]), int(point.split(",")[1]))
-                for point in row.split(" -> ")
-            ]
+                [
+                    (int(point.split(",")[0]), int(point.split(",")[1]))
+                    for point in row.split(" -> ")
+                ]
         ):
             set_on_grid(scan, rock, "#", min_x, min_y)
 
     return scan
 
 
-def get_potential_new_sand_positions(sand_coord) -> Generator[tuple[int, int], None, None]:
+def get_potential_new_sand_positions(sand_coord) -> Generator[Coord, None, None]:
     yield sand_coord[0], sand_coord[1] + 1
     yield sand_coord[0] - 1, sand_coord[1] + 1
     yield sand_coord[0] + 1, sand_coord[1] + 1
 
 
-def drop_sand(scan: list[list[str]], sand_coord: tuple[int, int], min_x: int, min_y: int) -> bool:
+def drop_sand(scan: StrGrid, sand_coord: Coord, min_x: int, min_y: int) -> bool:
     """
     Returns True when sand successfully rested on something
     """
