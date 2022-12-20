@@ -36,21 +36,20 @@ def parse_packet_int(inp: str, curr: int) -> tuple[int, int]:
 
 
 def parse_packet_list(inp: str, curr: int, depth: int) -> tuple[Packet, int]:
-    print("\t" * depth, depth, curr, inp[curr])
     if inp[curr] != "[":
         raise SyntaxError(f"Value in position {curr} should be '['")
     curr += 1
 
     out = []
     while curr < len(inp) and inp[curr] != "]":
-        print("\t" * depth, f"A{depth}", curr, inp[curr])
         if inp[curr] == "[":
             new_list, curr = parse_packet_list(inp, curr, depth + 1)
             out.append(new_list)
         else:
             new_int, curr = parse_packet_int(inp, curr)
             out.append(new_int)
-        print("\t" * depth, f"B{depth}", curr, inp[curr])
+        if curr >= len(inp):
+            raise SyntaxError("Input ended too soon")
         if inp[curr] == ",":
             curr += 1
         elif inp[curr] == "]":
@@ -58,7 +57,6 @@ def parse_packet_list(inp: str, curr: int, depth: int) -> tuple[Packet, int]:
         else:
             raise SyntaxError(f"Value in position {curr} should be ',' or ']'")
 
-    print("\t" * depth, f"C{depth} return{out} {curr}")
     if inp[curr] != "]":
         raise SyntaxError(f"Value in position {curr} should be ']'")
     curr += 1
@@ -101,9 +99,8 @@ def main() -> None:
     assert parse_packet("[[],[]]") == [[], []]
     assert parse_packet("[[], [[], []]]") == [[], [[], []]]
     assert parse_packet("[[], [[], []]]") == [[], [[], []]]
-    # assert parse_packet("[1]") == [1]
-    # print(parse_packet("[1]"))
-    # parse_packet("[[4,4],4,4]")
+    assert parse_packet("[1]") == [1]
+    assert parse_packet("[[[],[1],[],[1,[[1]],7],[44,4],4,4]]") == [[[], [1], [], [1, [[1]], 7], [44, 4], 4, 4]]
 
 
 if __name__ == "__main__":
