@@ -9,7 +9,9 @@ class FileTreeNode(TypedDict):
     size: int
 
 
-def get_folder_tree_from_path(current_path: list[str], file_tree: FileTreeNode) -> FileTreeNode:
+def get_folder_tree_from_path(
+    current_path: list[str], file_tree: FileTreeNode
+) -> FileTreeNode:
     current_folder = file_tree
     for folder_name in current_path:
         current_folder = current_folder["directories"][folder_name]
@@ -42,11 +44,19 @@ def main() -> None:
                 dir_or_size, file_or_folder_name = lines[i + 1].split(" ")
                 current_folder = get_folder_tree_from_path(current_path, file_tree)
                 if dir_or_size == "dir":
-                    current_folder["directories"][file_or_folder_name] = {"files": [], "directories": {}, "size": 0}
+                    current_folder["directories"][file_or_folder_name] = {
+                        "files": [],
+                        "directories": {},
+                        "size": 0,
+                    }
                 else:
-                    current_folder["files"].append((file_or_folder_name, int(dir_or_size)))
+                    current_folder["files"].append(
+                        (file_or_folder_name, int(dir_or_size))
+                    )
                     for j in range(len(current_path) + 1):
-                        folder_tree = get_folder_tree_from_path(current_path[:j], file_tree)
+                        folder_tree = get_folder_tree_from_path(
+                            current_path[:j], file_tree
+                        )
                         folder_tree["size"] += int(dir_or_size)
                         folder_totals["/".join(current_path[:j])] = folder_tree["size"]
                 i += 1

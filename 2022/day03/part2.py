@@ -13,7 +13,7 @@ input_len = len(input_data_lines)
 priorities_sum = 0
 i = 0
 while i < input_len // 3:
-    elf1, elf2, elf3 = input_data_lines[i * 3:(i + 1) * 3]
+    elf1, elf2, elf3 = input_data_lines[i * 3 : (i + 1) * 3]
     shared_character = set(elf1).intersection(set(elf2)).intersection(set(elf3))
     priorities_sum += character_ranking_string.index(list(shared_character)[0])
     i += 1

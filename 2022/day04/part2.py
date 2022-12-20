@@ -6,7 +6,9 @@ puzzle = Puzzle(year=2022, day=4)
 def partiallycovers(elfa, elfb):
     elfastart, elfaend = elfa.split("-")
     elfbstart, elfbend = elfb.split("-")
-    return (int(elfbstart) <= int(elfastart) <= int(elfbend)) or (int(elfbstart) <= int(elfaend) <= int(elfbend))
+    return (int(elfbstart) <= int(elfastart) <= int(elfbend)) or (
+        int(elfbstart) <= int(elfaend) <= int(elfbend)
+    )
 
 
 total = 0

@@ -8,7 +8,11 @@ score_map = {"R": 1, "P": 2, "S": 3}
 
 
 def p1_wins(p1, p2):
-    return (p2 == "R" and p1 == "P") or (p2 == "P" and p1 == "S") or (p2 == "S" and p1 == "R")
+    return (
+        (p2 == "R" and p1 == "P")
+        or (p2 == "P" and p1 == "S")
+        or (p2 == "S" and p1 == "R")
+    )
 
 
 def get_total_score(inp):
@@ -26,7 +30,11 @@ def get_total_score(inp):
     return total_score
 
 
-print(get_total_score("""A Y
+print(
+    get_total_score(
+        """A Y
 B X
-C Z"""))
+C Z"""
+    )
+)
 print(get_total_score(puzzle.input_data))

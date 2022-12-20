@@ -4,13 +4,13 @@ from typing import Callable
 
 class Monkey:
     def __init__(
-            self,
-            monkey_id: int,
-            items: list[int],
-            operation: Callable[[int], int],
-            divisble_test_number: int,
-            true_monkey: int,
-            false_monkey: int
+        self,
+        monkey_id: int,
+        items: list[int],
+        operation: Callable[[int], int],
+        divisble_test_number: int,
+        true_monkey: int,
+        false_monkey: int,
     ):
         self.monkey_id = monkey_id
         self.items = items
@@ -29,21 +29,26 @@ class OperationType(Enum):
     EXPONENTIATION = "exponentiation"
 
 
-def get_operation_function(op_type: OperationType, op_input: int) -> Callable[[int], int]:
+def get_operation_function(
+    op_type: OperationType, op_input: int
+) -> Callable[[int], int]:
     match op_type:
         case OperationType.ADDITION:
+
             def add(x):
                 return x + op_input
 
             return add
         case OperationType.MULTIPLICATION:
+
             def mult(x):
                 return x * op_input
 
             return mult
         case OperationType.EXPONENTIATION:
+
             def exp(x):
-                return x ** op_input
+                return x**op_input
 
             return exp
 
@@ -56,9 +61,13 @@ def parse_monkey_data(inp: str) -> tuple[dict[int, Monkey], int]:
         monkey_id = int(monkey_data_lines[0][7])
         items = [int(x) for x in monkey_data_lines[1][18:].split(", ")]
         if monkey_data_lines[2][23] == "+":
-            operation = get_operation_function(OperationType.ADDITION, int(monkey_data_lines[2][25:]))
+            operation = get_operation_function(
+                OperationType.ADDITION, int(monkey_data_lines[2][25:])
+            )
         elif monkey_data_lines[2][25:] != "old":
-            operation = get_operation_function(OperationType.MULTIPLICATION, int(monkey_data_lines[2][25:]))
+            operation = get_operation_function(
+                OperationType.MULTIPLICATION, int(monkey_data_lines[2][25:])
+            )
         else:
             operation = get_operation_function(OperationType.EXPONENTIATION, 2)
 
@@ -66,5 +75,7 @@ def parse_monkey_data(inp: str) -> tuple[dict[int, Monkey], int]:
         product_of_divisor_tests *= divisble_test_number
         true_monkey = int(monkey_data_lines[4][29:])
         false_monkey = int(monkey_data_lines[5][30:])
-        monkeys[monkey_id] = Monkey(monkey_id, items, operation, divisble_test_number, true_monkey, false_monkey)
+        monkeys[monkey_id] = Monkey(
+            monkey_id, items, operation, divisble_test_number, true_monkey, false_monkey
+        )
     return monkeys, product_of_divisor_tests

@@ -61,10 +61,14 @@ def get_line_pairs(inp: str) -> list[tuple[str, str]]:
 
 
 def parse_input(inp: str) -> list[tuple[Packet, Packet]]:
-    return [(parse_packet(pair[0]), parse_packet(pair[1])) for pair in get_line_pairs(inp)]
+    return [
+        (parse_packet(pair[0]), parse_packet(pair[1])) for pair in get_line_pairs(inp)
+    ]
 
 
-def packets_correctly_ordered(left_packet: Packet, right_packet: Packet) -> Optional[bool]:
+def packets_correctly_ordered(
+    left_packet: Packet, right_packet: Packet
+) -> Optional[bool]:
     for i in range(min(len(left_packet), len(right_packet))):
         left_val = left_packet[i]
         right_val = right_packet[i]

@@ -10,7 +10,7 @@ def find_character(grid: list[str], char: str):
 
 
 def generate_square_around_point(
-        point: tuple[int, int], radius: int, max_i: int, max_j: int
+    point: tuple[int, int], radius: int, max_i: int, max_j: int
 ) -> Generator[tuple[int, int], None, None]:
     """
     Given a point e.g. (2, 5) and a radius e.g. 1
@@ -56,7 +56,7 @@ def generate_square_around_point(
 
 
 def generate_movements_around_point(
-        point: tuple[int, int], max_i: int, max_j: int
+    point: tuple[int, int], max_i: int, max_j: int
 ) -> Generator[tuple[int, int], None, None]:
     """
     Given a point e.g. (2, 5) find the possible squares (u/d/l/r) we can go to,
@@ -97,7 +97,7 @@ def can_reach_square(start_elevation: str, end_elevation: str) -> bool:
 
 
 def show_grid_path(
-        grid, next_step_grid, start_point: tuple[int, int], end_point: tuple[int, int]
+    grid, next_step_grid, start_point: tuple[int, int], end_point: tuple[int, int]
 ):
     # spiral_map = [list(row) for row in grid]
     spiral_map = [["." for _ in row] for row in grid]
@@ -123,7 +123,7 @@ def show_grid_path(
 
 
 def traverse_grid(
-        grid: list[str], end_point: tuple[int, int]
+    grid: list[str], end_point: tuple[int, int]
 ) -> tuple[list[list[int]], list[list[Optional[tuple[int, int]]]]]:
     # 2D array with same dimensions as the grid, holding the current known minimum number of steps to E
     #  initialise to width * height as this is theoretically the longest possible trail
@@ -151,24 +151,24 @@ def traverse_grid(
             while distances_changed_this_square:
                 distances_changed_this_square = False
                 for coord in generate_square_around_point(
-                        end_point, update_radius, len(grid) - 1, len(grid[0]) - 1
+                    end_point, update_radius, len(grid) - 1, len(grid[0]) - 1
                 ):
                     squares_checked_this_radius = True
                     for neighbour in generate_movements_around_point(
-                            coord, len(grid) - 1, len(grid[0]) - 1
+                        coord, len(grid) - 1, len(grid[0]) - 1
                     ):
                         if (
-                                can_reach_square(
-                                    grid[coord[0]][coord[1]],
-                                    grid[neighbour[0]][neighbour[1]],
-                                )
-                                and min_distance_grid[coord[0]][coord[1]]
-                                > min_distance_grid[neighbour[0]][neighbour[1]] + 1
+                            can_reach_square(
+                                grid[coord[0]][coord[1]],
+                                grid[neighbour[0]][neighbour[1]],
+                            )
+                            and min_distance_grid[coord[0]][coord[1]]
+                            > min_distance_grid[neighbour[0]][neighbour[1]] + 1
                         ):
                             distances_changed_this_square = True
                             distances_changed_this_iteration = True
                             min_distance_grid[coord[0]][coord[1]] = (
-                                    min_distance_grid[neighbour[0]][neighbour[1]] + 1
+                                min_distance_grid[neighbour[0]][neighbour[1]] + 1
                             )
                             next_step_grid[coord[0]][coord[1]] = neighbour
             update_radius += 1
