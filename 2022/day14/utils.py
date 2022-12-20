@@ -50,13 +50,49 @@ def normalise_coord(coord: tuple[int, int], min_x: int, min_y: int) -> tuple[int
     return coord[0] - min_x, coord[1] - min_y
 
 
+def get_from_grid(grid: list[list[str]], coord: tuple[int, int], min_x: int, min_y: int):
+    norm_coord = normalise_coord(coord, min_x, min_y)
+    return grid[norm_coord[1]][norm_coord[0]]
+
+
+def set_on_grid(grid: list[list[str]], coord: tuple[int, int], value: str, min_x: int, min_y: int):
+    norm_coord = normalise_coord(coord, min_x, min_y)
+    grid[norm_coord[1]][norm_coord[0]] = value
+
+
 def scan_rock(inp: str, min_x: int, max_x: int, min_y: int, max_y: int) -> list[list[str]]:
     scan: list[list[str]] = [["." for _ in range(min_x, max_x + 1)] for _ in range(min_y, max_y + 1)]
 
     for row in inp.split("\n"):
         for rock in get_rocks_from_path(
                 [(int(point.split(",")[0]), int(point.split(",")[1])) for point in row.split(" -> ")]):
-            norm_rock = normalise_coord(rock, min_x, min_y)
-            scan[norm_rock[1]][norm_rock[0]] = "#"
+            set_on_grid(scan, rock, "#", min_x, min_y)
 
     return scan
+
+
+def get_potential_new_sand_positions(sand_coord) -> Generator[tuple[int, int], None, None]:
+    yield sand_coord[0], sand_coord[1] + 1
+    yield sand_coord[0] - 1, sand_coord[1] + 1
+    yield sand_coord[0] + 1, sand_coord[1] + 1
+
+
+def drop_sand(scan: list[list[str]], sand_coord: tuple[int, int], min_x: int, min_y: int) -> bool:
+    """
+    Returns True when sand successfully rested on something
+    """
+    at_rest = False
+    while not at_rest:
+        for potential_new_coord in get_potential_new_sand_positions(sand_coord):
+            try:
+                if get_from_grid(scan, potential_new_coord, min_x, min_y) == ".":
+                    sand_coord = potential_new_coord
+                    break
+            except IndexError:
+                # Tried to access outside of the minimally sized 2D array, therefore sand will never hit another rock
+                return False
+        else:
+            at_rest = True
+
+    set_on_grid(scan, sand_coord, "o", min_x, min_y)
+    return True
