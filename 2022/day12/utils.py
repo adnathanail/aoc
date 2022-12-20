@@ -1,4 +1,4 @@
-from typing import Generator, TypeVar
+from typing import Generator, TypeVar, Optional
 
 
 def find_character(grid: list[str], char: str):
@@ -62,7 +62,7 @@ def generate_movements_around_point(
     Given a point e.g. (2, 5) find the possible squares (u/d/l/r) we can go to,
       respecting the edges of the grid
     """
-    if point[0] - 1 >= 0:
+    if point[0] >= 1:
         yield point[0] - 1, point[1]
 
     if point[1] + 1 <= max_j:
@@ -71,7 +71,7 @@ def generate_movements_around_point(
     if point[0] + 1 <= max_i:
         yield point[0] + 1, point[1]
 
-    if point[1] - 1 >= 0:
+    if point[1] >= 1:
         yield point[0], point[1] - 1
 
 
@@ -96,8 +96,11 @@ def can_reach_square(start_elevation: str, end_elevation: str) -> bool:
     return ord(start_elevation) > ord(end_elevation)
 
 
-def show_grid_path(grid, next_step_grid, start_point: tuple[int, int], end_point: tuple[int, int]):
-    spiral_map = [list(row) for row in grid]
+def show_grid_path(
+        grid, next_step_grid, start_point: tuple[int, int], end_point: tuple[int, int]
+):
+    # spiral_map = [list(row) for row in grid]
+    spiral_map = [["." for _ in row] for row in grid]
     spiral_map[end_point[0]][end_point[1]] = "E"
 
     current_point = start_point
@@ -117,3 +120,56 @@ def show_grid_path(grid, next_step_grid, start_point: tuple[int, int], end_point
 
     for row in spiral_map:
         print("".join(row))
+
+
+def traverse_grid(
+        grid: list[str], end_point: tuple[int, int]
+) -> tuple[list[list[int]], list[list[Optional[tuple[int, int]]]]]:
+    # 2D array with same dimensions as the grid, holding the current known minimum number of steps to E
+    #  initialise to width * height as this is theoretically the longest possible trail
+    min_distance_grid: list[list[int]] = generate_grid(
+        len(grid), len(grid[0]), len(grid) * len(grid[0])
+    )
+    min_distance_grid[end_point[0]][
+        end_point[1]
+    ] = 0  # The end square is 0 steps away from itself
+
+    # 2D array with same dimensions as the grid, holding the coordinate of the next step in the shortest path
+    #  from a given location to E
+    next_step_grid: list[list[Optional[tuple[int, int]]]] = generate_grid(
+        len(grid), len(grid[0]), None
+    )
+
+    distances_changed_this_iteration = True
+    while distances_changed_this_iteration:
+        distances_changed_this_iteration = False
+        update_radius = 1
+        squares_checked_this_radius = True
+        while squares_checked_this_radius:
+            squares_checked_this_radius = False
+            distances_changed_this_square = True
+            while distances_changed_this_square:
+                distances_changed_this_square = False
+                for coord in generate_square_around_point(
+                        end_point, update_radius, len(grid) - 1, len(grid[0]) - 1
+                ):
+                    squares_checked_this_radius = True
+                    for neighbour in generate_movements_around_point(
+                            coord, len(grid) - 1, len(grid[0]) - 1
+                    ):
+                        if (
+                                can_reach_square(
+                                    grid[coord[0]][coord[1]],
+                                    grid[neighbour[0]][neighbour[1]],
+                                )
+                                and min_distance_grid[coord[0]][coord[1]]
+                                > min_distance_grid[neighbour[0]][neighbour[1]] + 1
+                        ):
+                            distances_changed_this_square = True
+                            distances_changed_this_iteration = True
+                            min_distance_grid[coord[0]][coord[1]] = (
+                                    min_distance_grid[neighbour[0]][neighbour[1]] + 1
+                            )
+                            next_step_grid[coord[0]][coord[1]] = neighbour
+            update_radius += 1
+    return min_distance_grid, next_step_grid
