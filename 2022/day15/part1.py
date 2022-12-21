@@ -43,23 +43,12 @@ def get_min_max_x_y(coords: list[tuple[int, int]]):
 
 
 def get_grid(
-        sensors: list[Coord],
-        beacons: list[Coord],
         min_x: int,
         max_x: int,
         min_y: int,
         max_y: int,
-) -> NDArray[str]:
-    print("s")
-    grid: NDArray[str] = np.full(((max_y - min_y) + 1, (max_x - min_x) + 1), ".")
-    print("e")
-
-    for s in sensors:
-        set_on_np_grid(grid, s, "S", min_x, min_y)
-    for b in beacons:
-        set_on_np_grid(grid, b, "B", min_x, min_y)
-
-    return grid
+) -> NDArray[int]:
+    return np.zeros(((max_y - min_y) + 1, (max_x - min_x) + 1))
 
 
 def generate_diamond_around_point_without_bounds_checking(point: Coord, radius: int) -> Generator[Coord, None, None]:
@@ -92,7 +81,7 @@ def main() -> None:
     print("Calc min/max x/y")
     min_x, max_x, min_y, max_y = get_min_max_x_y(beacons + sensors)
     print("Load grid")
-    grid = get_grid(sensors, beacons, min_x, max_x, min_y, max_y)
+    grid = get_grid(min_x, max_x, min_y, max_y)
 
     for s in sensors:
         print("Sensor", s)
@@ -102,15 +91,12 @@ def main() -> None:
             for p in generate_diamond_around_point(s, radius, min_x, max_x, min_y, max_y):
                 if p in beacons:
                     not_hit_beacon = False
-                elif get_from_np_grid(grid, p, min_x, min_y) == ".":
+                elif p not in sensors:
                     # Don't overwrite a B/P on the grid!
-                    set_on_np_grid(grid, p, "#", min_x, min_y)
+                    set_on_np_grid(grid, p, 1, min_x, min_y)
             radius += 1
 
-    for row in grid:
-        print("".join(row))
-
-    print(sum(char in ["#", "S"] for char in grid[10 - min_y]))
+    print(sum(grid[10 - min_y]))
 
 
 if __name__ == "__main__":
