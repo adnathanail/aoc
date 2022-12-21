@@ -47,8 +47,17 @@ def get_rocks_from_path(path: list[Coord]) -> Generator[Coord, None, None]:
             yield current_point
 
 
-def scan_rock(inp: str, min_x: int, max_x: int, min_y: int, max_y: int, floor: Optional[int] = None) -> StrGrid:
-    scan: StrGrid = [["." for _ in range(min_x, max_x + 1)] for _ in range(min_y, max_y + 1)]
+def scan_rock(
+    inp: str,
+    min_x: int,
+    max_x: int,
+    min_y: int,
+    max_y: int,
+    floor: Optional[int] = None,
+) -> StrGrid:
+    scan: StrGrid = [
+        ["." for _ in range(min_x, max_x + 1)] for _ in range(min_y, max_y + 1)
+    ]
     if floor is not None:
         scan.extend(
             [["." for _ in range(min_x, max_x + 1)] for _ in range(floor - max_y - 1)]
@@ -57,10 +66,10 @@ def scan_rock(inp: str, min_x: int, max_x: int, min_y: int, max_y: int, floor: O
 
     for row in inp.split("\n"):
         for rock in get_rocks_from_path(
-                [
-                    (int(point.split(",")[0]), int(point.split(",")[1]))
-                    for point in row.split(" -> ")
-                ]
+            [
+                (int(point.split(",")[0]), int(point.split(",")[1]))
+                for point in row.split(" -> ")
+            ]
         ):
             set_on_grid(scan, rock, "#", min_x, min_y)
 
