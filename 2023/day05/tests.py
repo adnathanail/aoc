@@ -1,4 +1,4 @@
-from .utils import combine_maps, do_map_lookup
+from .utils import combine_maps
 
 
 def test_combine_maps():
