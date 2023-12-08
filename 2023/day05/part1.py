@@ -1,12 +1,26 @@
 from aocd.models import Puzzle
-from utils import do_map_lookup
 
 puzzle = Puzzle(year=2023, day=5)
 
-seeds_split, seed_soil_split, soil_fert_split, fert_water_split, water_light_split, light_temp_split, temp_humid_split, humid_loc_split = puzzle.input_data.split(
-    "\n\n")
+(
+    seeds_split,
+    seed_soil_split,
+    soil_fert_split,
+    fert_water_split,
+    water_light_split,
+    light_temp_split,
+    temp_humid_split,
+    humid_loc_split,
+) = puzzle.input_data.split("\n\n")
 
 seed_ids = [int(sid) for sid in seeds_split[7:].split(" ")]
+
+
+def do_map_lookup(mmap, key):
+    for m in mmap:
+        if m[0] <= key < m[1]:
+            return key + m[2]
+    return key
 
 
 def proc_str_to_map(proc_str):

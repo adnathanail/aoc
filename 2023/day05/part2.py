@@ -1,12 +1,21 @@
 import math
 
 from aocd.models import Puzzle
-from utils import combine_maps, do_map_lookup
+
+from utils import combine_maps
 
 puzzle = Puzzle(year=2023, day=5)
 
-seeds_split, seed_soil_split, soil_fert_split, fert_water_split, water_light_split, light_temp_split, temp_humid_split, humid_loc_split = \
-    puzzle.examples[0].input_data.split("\n\n")
+(
+    seeds_split,
+    seed_soil_split,
+    soil_fert_split,
+    fert_water_split,
+    water_light_split,
+    light_temp_split,
+    temp_humid_split,
+    humid_loc_split,
+) = puzzle.input_data.split("\n\n")
 
 seed_id_strs = seeds_split[7:].split(" ")
 
@@ -14,11 +23,8 @@ seed_ids = []
 
 for i in range(int(len(seed_id_strs) / 2)):
     start_id = int(seed_id_strs[i * 2])
-    l = int(seed_id_strs[i * 2 + 1])
-    for j in range(start_id, start_id + l):
-        seed_ids.append(j)
-
-seed_ids = [int(sid) for sid in seeds_split[7:].split(" ")]
+    range_len = int(seed_id_strs[i * 2 + 1])
+    seed_ids.append([start_id, start_id + range_len, 0])
 
 
 def proc_str_to_map(proc_str):
@@ -68,15 +74,13 @@ seed_loc_map = combine_maps(seed_humid_map, humid_loc_map)
 
 locs = []
 
-for seed in seed_ids:
-    soil = do_map_lookup(seed_soil_map, seed)
-    fert = do_map_lookup(seed_fert_map, seed)
-    water = do_map_lookup(seed_water_map, seed)
-    light = do_map_lookup(seed_light_map, seed)
-    temp = do_map_lookup(seed_temp_map, seed)
-    humid = do_map_lookup(seed_humid_map, seed)
-    loc = do_map_lookup(seed_loc_map, seed)
-    print(seed, soil, fert, water, light, temp, humid, loc)
-    locs.append(loc)
+seed_id_loc_offset_map = combine_maps(seed_ids, seed_loc_map)
 
-print(min(locs))
+lowest_loc = math.inf
+
+for m in seed_id_loc_offset_map:
+    min_proc_value_in_range = m[0] + m[2]
+    if min_proc_value_in_range < lowest_loc:
+        lowest_loc = min_proc_value_in_range
+
+print(lowest_loc)
