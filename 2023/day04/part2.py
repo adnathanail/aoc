@@ -2,11 +2,13 @@ from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2023, day=4)
 
+
 def get_card_score(num_str):
     winning_num_str, got_num_str = num_str.split(" | ")
     winning_nums = {int(num) for num in winning_num_str.split(" ") if num != ""}
     got_nums = {int(num) for num in got_num_str.split(" ") if num != ""}
     return len(winning_nums.intersection(got_nums))
+
 
 game_tallies = {}
 

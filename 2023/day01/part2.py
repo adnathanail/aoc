@@ -6,6 +6,7 @@ NUMBER_STRINGS = ["one", "two", "three", "four", "five", "six", "seven", "eight"
 
 total = 0
 
+
 def find_num_string(line):
     current_num_index = None
     current_num = None
@@ -15,6 +16,7 @@ def find_num_string(line):
                 current_num_index = num_index
                 current_num = str(index + 1)
     return current_num
+
 
 def find_num_string_reverse(line):
     current_num_index = None
@@ -26,6 +28,7 @@ def find_num_string_reverse(line):
                 current_num = str(index + 1)
     return current_num
 
+
 for line in puzzle.input_data.splitlines():
     first_num = last_num = last_num_index = None
     for index, char in enumerate(line):
@@ -36,7 +39,7 @@ for line in puzzle.input_data.splitlines():
                     first_num = str_num
             last_num = char
             last_num_index = index
-    if (str_num := find_num_string_reverse(line[last_num_index + 1:])) is not None:
+    if (str_num := find_num_string_reverse(line[last_num_index + 1 :])) is not None:
         last_num = str_num
     total += int(first_num + last_num)
 

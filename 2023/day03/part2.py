@@ -2,6 +2,7 @@ from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2023, day=3)
 
+
 def scan_for_gear(grid, row, col):
     minx = maxx = row
     miny = maxy = col
@@ -18,6 +19,7 @@ def scan_for_gear(grid, row, col):
             if grid[i][j] == "*":
                 return (i, j)
     return None
+
 
 input_data = puzzle.input_data.splitlines()
 

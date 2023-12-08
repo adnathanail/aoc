@@ -2,8 +2,10 @@ from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2023, day=3)
 
+
 def is_symbol(char):
     return (not char.isdigit()) and char != "."
+
 
 def scan_for_symbols(grid, row, col):
     minx = maxx = row
@@ -21,6 +23,7 @@ def scan_for_symbols(grid, row, col):
             if is_symbol(grid[i][j]):
                 return True
     return False
+
 
 input_data = puzzle.input_data.splitlines()
 
