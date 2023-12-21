@@ -12,11 +12,11 @@ for line in puzzle.input_data.splitlines():
         for i in range(len(sequences[-1]) - 1):
             new_seq.append(sequences[-1][i + 1] - sequences[-1][i])
         sequences.append(new_seq)
- 
+
     while len(sequences) != 1:
         seq = sequences.pop()
         sequences[-1].append(sequences[-1][-1] + seq[-1])
- 
+
     extrapolated_values_sum += sequences[-1][-1]
 
 print(extrapolated_values_sum)

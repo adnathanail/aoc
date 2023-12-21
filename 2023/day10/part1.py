@@ -12,6 +12,7 @@ for i in range(len(grid)):
         if grid[i][j] == "S":
             start = (i, j)
 
+
 def get_potential_nexts(loc):
     char = grid[loc[0]][loc[1]]
 
@@ -30,6 +31,7 @@ def get_potential_nexts(loc):
 
     return []
 
+
 def get_next_location(loc, prev_loc):
     potential_nexts = get_potential_nexts(loc)
 
@@ -39,6 +41,7 @@ def get_next_location(loc, prev_loc):
         raise Exception(f"Invalid number of nexts: {potential_nexts}")
 
     return potential_nexts[0]
+
 
 curr = start
 

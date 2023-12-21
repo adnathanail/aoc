@@ -10,7 +10,7 @@ distance = int("".join(x for x in sp[1].split(" ")[1:] if x != ""))
 
 
 def quad_form(a, b, c):
-    pm = (b ** 2 - 4 * a * c) ** 0.5
+    pm = (b**2 - 4 * a * c) ** 0.5
     return [(-b + pm) / (2 * a), (-b - pm) / (2 * a)]
 
 

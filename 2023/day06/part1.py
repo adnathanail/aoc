@@ -23,7 +23,7 @@ races = list(zip(times, distances))
 
 
 def quad_form(a, b, c):
-    pm = (b ** 2 - 4 * a * c) ** 0.5
+    pm = (b**2 - 4 * a * c) ** 0.5
     return [(-b + pm) / (2 * a), (-b - pm) / (2 * a)]
 
 
