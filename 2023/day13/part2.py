@@ -3,6 +3,7 @@ from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2023, day=13)
 
+
 def get_vertical_mirror_index(grid, ignore_num=-1):
     for split_point in range(1, len(grid[0])):
         is_mirror = True
@@ -10,9 +11,9 @@ def get_vertical_mirror_index(grid, ignore_num=-1):
             first_half, second_half = row[:split_point], row[split_point:]
 
             if len(first_half) > len(second_half):
-                first_half = first_half[len(first_half) - len(second_half):]
+                first_half = first_half[len(first_half) - len(second_half) :]
             elif len(second_half) > len(first_half):
-                second_half = second_half[:len(first_half)]
+                second_half = second_half[: len(first_half)]
 
             second_half = second_half[::-1]
             if first_half != second_half:
@@ -20,7 +21,7 @@ def get_vertical_mirror_index(grid, ignore_num=-1):
                 break
         if is_mirror and split_point != ignore_num:
             return split_point
-    
+
     return None
 
 
@@ -29,9 +30,9 @@ def get_horizontal_mirror_index(grid, ignore_num=-1):
         first_half = grid[:split_point]
         second_half = grid[split_point:]
         if len(first_half) > len(second_half):
-            first_half = first_half[len(first_half) - len(second_half):]
+            first_half = first_half[len(first_half) - len(second_half) :]
         elif len(second_half) > len(first_half):
-            second_half = second_half[:len(first_half)]
+            second_half = second_half[: len(first_half)]
         if first_half == second_half[::-1] and split_point != ignore_num:
             return split_point
 
@@ -42,7 +43,6 @@ def mutate_grid(grid):
             newgrid = deepcopy(grid)
             newgrid[i][j] = "#" if newgrid[i][j] == "." else "."
             yield newgrid
-
 
 
 grids = puzzle.input_data.split("\n\n")

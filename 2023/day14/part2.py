@@ -3,15 +3,17 @@ from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2023, day=14)
 
+
 def next_cell(i, j, direction):
-    if direction == 'north':
+    if direction == "north":
         return i + 1, j
-    elif direction == 'south':
+    elif direction == "south":
         return i - 1, j
-    elif direction == 'east':
+    elif direction == "east":
         return i, j - 1
-    elif direction == 'west':
+    elif direction == "west":
         return i, j + 1
+
 
 def roll_rock(rocks, i, j, direction):
     if rocks[i][j] == ".":
@@ -28,23 +30,24 @@ def roll_rock(rocks, i, j, direction):
             else:
                 break
 
+
 def roll_rocks(rocks, direction: Literal["north", "south", "east", "west"]):
     height = len(rocks)
     width = len(rocks[0])
 
-    if direction == 'north':
+    if direction == "north":
         for i in range(height):
             for j in range(width):
                 roll_rock(rocks, i, j, direction)
-    elif direction == 'east':
+    elif direction == "east":
         for j in range(width - 1, -1, -1):
             for i in range(height):
                 roll_rock(rocks, i, j, direction)
-    elif direction == 'south':
+    elif direction == "south":
         for i in range(height - 1, -1, -1):
             for j in range(width - 1, -1, -1):
                 roll_rock(rocks, i, j, direction)
-    elif direction == 'west':
+    elif direction == "west":
         for j in range(width):
             for i in range(height - 1, -1, -1):
                 roll_rock(rocks, i, j, direction)

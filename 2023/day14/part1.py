@@ -2,6 +2,7 @@ from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2023, day=14)
 
+
 def roll_north(rocks):
     for i in range(len(rocks)):
         for j in range(len(rocks[i])):
@@ -13,6 +14,7 @@ def roll_north(rocks):
                         break
                     elif rocks[i2][j] == "#":
                         break
+
 
 grid = [list(r) for r in puzzle.input_data.split("\n")]
 
