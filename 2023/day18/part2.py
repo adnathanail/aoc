@@ -1,12 +1,20 @@
 from aocd.models import Puzzle
 
 
+def process_instructions(inp):
+    out = []
+    for row in inp.split("\n"):
+        direc, num, col = row.split(" ")
+        out.append((direc, int(num), col))
+    return out
+
+
 def check_instructions_alternate_x_y(instructions):
     direc = None
 
-    for row in instructions:
+    for instr in instructions:
         last_direc = direc
-        direc, num, col = row.split(" ")
+        direc, _, _ = instr
         if last_direc is not None:
             if last_direc in ["L", "R"]:
                 assert direc in ["U", "D"]
@@ -18,8 +26,8 @@ def get_horizontal_lines(instructions):
     loc = (0, 0)
     out = []
 
-    for row in instructions:
-        direc, num, _col = row.split(" ")
+    for instr in instructions:
+        direc, num, _ = instr
         num = int(num)
 
         last_loc = loc
@@ -44,8 +52,8 @@ def get_horizontal_lines(instructions):
 
 def get_trench_length(instructions):
     out = 0
-    for row in instructions:
-        _direc, num, _col = row.split(" ")
+    for instr in instructions:
+        _, num, _ = instr
         out += int(num)
     return out
 
@@ -59,8 +67,7 @@ def dist_to_line(lines, location):
 
 puzzle = Puzzle(year=2023, day=18)
 
-inp = puzzle.input_data
-instrs = inp.split("\n")
+instrs = process_instructions(puzzle.input_data)
 
 check_instructions_alternate_x_y(instrs)
 
@@ -72,8 +79,7 @@ filled = 0
 
 for x in range(len(instrs)):
     print(instrs[x])
-    direc, num, col = instrs[x].split(" ")
-    num = int(num)
+    direc, num, col = instrs[x]
 
     if direc == "R" and x > 0 and instrs[x - 1][0] == "D":
         print("\t", loc, dist_to_line(ls, loc))
