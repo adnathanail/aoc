@@ -47,7 +47,7 @@ while beams:
 
         print("\t", loc)
 
-        if not(0 <= loc[0] < len(grid) and 0 <= loc[1] < len(grid[0])):
+        if not (0 <= loc[0] < len(grid) and 0 <= loc[1] < len(grid[0])):
             break
 
         visited[loc[0]][loc[1]] = "#"

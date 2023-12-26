@@ -4,6 +4,7 @@ puzzle = Puzzle(year=2023, day=16)
 
 grid = puzzle.input_data.split("\n")
 
+
 def get_energised_tiles(grid, initial):
     visited = [["." for _ in range(len(grid[0]))] for _ in range(len(grid))]
     visited_deltas = [[[] for _ in range(len(grid[0]))] for _ in range(len(grid))]
@@ -48,7 +49,7 @@ def get_energised_tiles(grid, initial):
 
             # print("\t", loc)
 
-            if not(0 <= loc[0] < len(grid) and 0 <= loc[1] < len(grid[0])):
+            if not (0 <= loc[0] < len(grid) and 0 <= loc[1] < len(grid[0])):
                 break
 
             visited[loc[0]][loc[1]] = "#"
@@ -60,7 +61,8 @@ def get_energised_tiles(grid, initial):
     # for row in visited:
     #     print("".join(row))
 
-    return[char for x in visited for char in x].count("#")
+    return [char for x in visited for char in x].count("#")
+
 
 energised_tiles = []
 
