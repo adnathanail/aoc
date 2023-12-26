@@ -1,6 +1,15 @@
 from aocd.models import Puzzle
 
 
+"""
+Optimisation based on the idea that if we just draw straight lines down from each horizontal line,
+    stopping when we hit another horizontal line, we will count all the squares.
+When we're travelling right, the lines below us are inside the pool, when we're travelling left, they're outside.
+Instead of storing the entire grid, instead we store a list of the horizontal line segments we're going to hit.
+Then, given a point, we look for the first line we will hit, and find the distance from the point to the line.
+"""
+
+
 DIR_MAP = ("R", "D", "L", "U")
 
 def process_instructions(inp):
@@ -69,7 +78,7 @@ def dist_to_line(lines, location):
 
 puzzle = Puzzle(year=2023, day=18)
 
-instrs = process_instructions(puzzle.examples[0].input_data)
+instrs = process_instructions(puzzle.input_data)
 
 check_instructions_alternate_x_y(instrs)
 
