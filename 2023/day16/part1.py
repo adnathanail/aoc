@@ -20,47 +20,43 @@ while beams:
         continue
     visited_deltas[loc[0]][loc[1]].append(delta)
 
-    next_loc = (loc[0] + delta[0], loc[1] + delta[1])
-    while 0 <= next_loc[0] < len(grid) and 0 <= next_loc[1] < len(grid[0]):
-        visited[next_loc[0]][next_loc[1]] = "#"
-        if delta in visited_deltas[next_loc[0]][next_loc[1]]:
-            break
-        visited_deltas[next_loc[0]][next_loc[1]].append(delta)
-
-        print("\t", next_loc)
-
-        match grid[next_loc[0]][next_loc[1]]:
+    while True:
+        match grid[loc[0]][loc[1]]:
             case "|":
                 if abs(delta[1]) == 1:
-                    beams.append((next_loc, (-1, 0)))
-                    beams.append((next_loc, (1, 0)))
+                    beams.append((loc, (-1, 0)))
+                    beams.append((loc, (1, 0)))
                     break
             case "-":
                 if abs(delta[0]) == 1:
-                    beams.append((next_loc, (0, -1)))
-                    beams.append((next_loc, (0, 1)))
+                    beams.append((loc, (0, -1)))
+                    beams.append((loc, (0, 1)))
                     break
             case "/":
                 if delta[0] == 0:
-                    beams.append((next_loc, (-delta[1], 0)))
-                    break
+                    delta = (-delta[1], 0)
                 else:
-                    beams.append((next_loc, (0, -delta[0])))
-                    break
+                    delta = (0, -delta[0])
             case "\\":
                 if delta[0] == 0:
-                    beams.append((next_loc, (delta[1], 0)))
-                    break
+                    delta = (delta[1], 0)
                 else:
-                    beams.append((next_loc, (0, delta[0])))
-                    break
+                    delta = (0, delta[0])
 
-        # "." or "-"/"|" the wrong way
+        loc = (loc[0] + delta[0], loc[1] + delta[1])
+
+        print("\t", loc)
+
+        if not(0 <= loc[0] < len(grid) and 0 <= loc[1] < len(grid[0])):
+            break
+
         visited[loc[0]][loc[1]] = "#"
-        loc = next_loc
-        next_loc = (loc[0] + delta[0], loc[1] + delta[1])
+        if delta in visited_deltas[loc[0]][loc[1]]:
+            break
+
+        visited_deltas[loc[0]][loc[1]].append(delta)
 
 for row in visited:
     print("".join(row))
 
-# print([char for x in visited for char in x].count("#"))
+print([char for x in visited for char in x].count("#"))
