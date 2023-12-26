@@ -12,6 +12,7 @@ Then, given a point, we look for the first line we will hit, and find the distan
 
 DIR_MAP = ("R", "D", "L", "U")
 
+
 def process_instructions(inp):
     out = []
     for row in inp.split("\n"):
