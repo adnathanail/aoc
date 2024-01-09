@@ -3,9 +3,16 @@ import re
 
 puzzle = Puzzle(year=2023, day=20)
 
+inp = puzzle.examples[0].input_data
+inp = """broadcaster -> a
+%a -> inv, con
+&inv -> b
+%b -> con
+&con -> output"""
+
 modules = {}
 
-for row in puzzle.examples[0].input_data.split("\n"):
+for row in inp.split("\n"):
     module_details, destinations_str = row.split(" -> ")
     if module_details == "broadcaster":
         module_type = "broadcaster"
@@ -20,10 +27,21 @@ for row in puzzle.examples[0].input_data.split("\n"):
         module_type = "none"
         module_name = module_details
     destinations = destinations_str.split(", ")
-    if module_type in ["flipflop", "conjunction", "none"]:
+    if module_type in ["conjunction", "none"]:
         assert len(destinations) == 1
     modules[module_name] = {"type": module_type, "dests": destinations}
 
+# Deal with modules that are only mentioned as a destination
+modules_to_add = []
+for m in modules:
+    for d in modules[m]["dests"]:
+        if d not in modules:
+            modules_to_add.append(d)
+
+for m in modules_to_add:
+    modules[m] = {"type": "none", "dests": []}
+
+# Set initial states of modules (done separately, because we don't know what states a conjunction might need until all modules are loaded)
 for m in modules:
     if modules[m]["type"] == "flipflop":
         modules[m]["state"] = "low"
@@ -33,6 +51,8 @@ for m in modules:
             if m in modules[m2]["dests"]:
                 states[m2] = "low"
         modules[m]["states"] = states
+    elif modules[m]["type"] == "none":
+        modules[m]["state"] = ""
 
 pulses = [{"origin": "button", "dest": "broadcaster", "signal": "low"}]
 
@@ -47,7 +67,8 @@ while pulses:
     elif pulse_module["type"] == "flipflop":
         if pulse["signal"] == "low":
             pulse_module["state"] = "low" if pulse_module["state"] == "high" else "high"
-            pulses.append({"origin": pulse["dest"], "dest": pulse_module["dests"][0], "signal": pulse_module["state"]})
+            for dest in pulse_module["dests"]:
+                pulses.append({"origin": pulse["dest"], "dest": dest, "signal": pulse_module["state"]})
     elif pulse_module["type"] == "conjunction":
         pulse_module["states"][pulse["origin"]] = pulse["signal"]
         all_high = True
@@ -57,4 +78,6 @@ while pulses:
                 break
         pulses.append({"origin": pulse["dest"], "dest": pulse_module["dests"][0], "signal": "low" if all_high else "high"})
     else:
-        break
+        pulse_module["state"] = pulse["signal"]
+
+print(modules["output"]["state"])
