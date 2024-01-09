@@ -3,6 +3,7 @@ import re
 
 puzzle = Puzzle(year=2023, day=20)
 
+
 def parse_modules(module_str):
     out = {}
 
@@ -21,7 +22,7 @@ def parse_modules(module_str):
             module_type = "none"
             module_name = module_details
         destinations = destinations_str.split(", ")
-        if module_type in ["conjunction", "none"]:
+        if module_type == "none":
             assert len(destinations) == 1
         out[module_name] = {"type": module_type, "dests": destinations}
 
@@ -50,11 +51,19 @@ def parse_modules(module_str):
 
     return out
 
+
 def press_button(ms, ps):
+    num_low = 0
+    num_high = 0
+
     while ps:
         # Get next pulse
         pulse = ps.pop(0)
-        print(f"{pulse['origin']} -{pulse['signal']}-> {pulse['dest']}")
+        if pulse["signal"] == "low":
+            num_low += 1
+        else:
+            num_high += 1
+        # print(f"{pulse['origin']} -{pulse['signal']}-> {pulse['dest']}")
         pulse_module = ms[pulse["dest"]]
 
         # Broadcast pulse
@@ -75,22 +84,23 @@ def press_button(ms, ps):
                 if pulse_module["states"][state] == "low":
                     all_high = False
                     break
-            ps.append({"origin": pulse["dest"], "dest": pulse_module["dests"][0], "signal": "low" if all_high else "high"})
+            for dest in pulse_module["dests"]:
+                ps.append({"origin": pulse["dest"], "dest": dest, "signal": "low" if all_high else "high"})
         # Untyped pulse
         else:
             pulse_module["state"] = pulse["signal"]
 
-inp = puzzle.examples[0].input_data
-inp = """broadcaster -> a
-%a -> inv, con
-&inv -> b
-%b -> con
-&con -> output"""
+    return num_low, num_high
 
-modules = parse_modules(inp)
 
-press_button(modules, [{"origin": "button", "dest": "broadcaster", "signal": "low"}])
-press_button(modules, [{"origin": "button", "dest": "broadcaster", "signal": "low"}])
-press_button(modules, [{"origin": "button", "dest": "broadcaster", "signal": "low"}])
-press_button(modules, [{"origin": "button", "dest": "broadcaster", "signal": "low"}])
-print(modules["output"]["state"])
+modules = parse_modules(puzzle.input_data)
+
+total_low = 0
+total_high = 0
+
+for i in range(1000):
+    l, h = press_button(modules, [{"origin": "button", "dest": "broadcaster", "signal": "low"}])
+    total_low += l
+    total_high += h
+
+print(total_low * total_high)
