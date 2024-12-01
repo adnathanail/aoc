@@ -52,6 +52,10 @@ def parse_modules(module_str):
     return out
 
 
+class RXGotTheMessage(Exception):
+    pass
+
+
 def press_button(ms, ps):
     num_low = 0
     num_high = 0
@@ -59,6 +63,8 @@ def press_button(ms, ps):
     while ps:
         # Get next pulse
         pulse = ps.pop(0)
+        if pulse["dest"] == "rx" and pulse["signal"] == "low":
+            raise RXGotTheMessage()
         if pulse["signal"] == "low":
             num_low += 1
         else:
@@ -95,12 +101,22 @@ def press_button(ms, ps):
 
 modules = parse_modules(puzzle.input_data)
 
-total_low = 0
-total_high = 0
+i = 0
+while True:
+    i += 1
+    try:
+        press_button(modules, [{"origin": "button", "dest": "broadcaster", "signal": "low"}])
+    except RXGotTheMessage:
+        break
 
-for i in range(1000):
-    l, h = press_button(modules, [{"origin": "button", "dest": "broadcaster", "signal": "low"}])
-    total_low += l
-    total_high += h
+print(i)
 
-print(total_low * total_high)
+# total_low = 0
+# total_high = 0
+
+# for i in range(1000):
+#     l, h = press_button(modules, [{"origin": "button", "dest": "broadcaster", "signal": "low"}])
+#     total_low += l
+#     total_high += h
+
+# print(total_low * total_high)

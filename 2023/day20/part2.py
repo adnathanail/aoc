@@ -1,11 +1,18 @@
-from aocd.models import Puzzle
+from typing import TypedDict, Optional
+from aocd.models import Puzzle  # type: ignore[import-untyped]
 import time
 
 
 puzzle = Puzzle(year=2023, day=20)
 
 
-def parse_modules(module_str):
+class Module(TypedDict):
+    type: str
+    dests: list[str]
+    state: Optional[str | dict[str, str]]
+
+
+def parse_modules(module_str: str) -> dict[str, Module]:
     out = {}
 
     for row in module_str.split("\n"):
@@ -25,7 +32,7 @@ def parse_modules(module_str):
         destinations = destinations_str.split(", ")
         if module_type == "none":
             assert len(destinations) == 1
-        out[module_name] = {"type": module_type, "dests": destinations}
+        out[module_name] = {"type": module_type, "dests": destinations, "state": None}
 
     # Deal with modules that are only mentioned as a destination
     modules_to_add = []
@@ -42,11 +49,11 @@ def parse_modules(module_str):
         if out[m]["type"] == "flipflop":
             out[m]["state"] = "low"
         elif out[m]["type"] == "conjunction":
-            states = {}
+            states: dict[str, str] = {}
             for m2 in out:
                 if m in out[m2]["dests"]:
                     states[m2] = "low"
-            out[m]["states"] = states
+            out[m]["state"] = states
         elif out[m]["type"] == "none":
             out[m]["state"] = ""
 
@@ -79,10 +86,10 @@ def press_button(ms, ps):
                     ps.append({"origin": pulse["dest"], "dest": dest, "signal": pulse_module["state"]})
         # Conjunction pulse
         elif pulse_module["type"] == "conjunction":
-            pulse_module["states"][pulse["origin"]] = pulse["signal"]
+            pulse_module["state"][pulse["origin"]] = pulse["signal"]
             all_high = True
-            for state in pulse_module["states"]:
-                if pulse_module["states"][state] == "low":
+            for state in pulse_module["state"]:
+                if pulse_module["state"][state] == "low":
                     all_high = False
                     break
             for dest in pulse_module["dests"]:
@@ -98,15 +105,7 @@ t0 = time.time()
 
 modules = parse_modules(puzzle.input_data)
 
-total_low = 0
-total_high = 0
+press_button(modules, [{"origin": "button", "dest": "broadcaster", "signal": "low"}])
 
-for i in range(100000):
-    l, h = press_button(modules, [{"origin": "button", "dest": "broadcaster", "signal": "low"}])
-    total_low += l
-    total_high += h
-
-print(total_low * total_high)
-
-t1 = time.time()
-print(t1 - t0)
+for m in modules:
+    print(m, modules[m]["state"])
