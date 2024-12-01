@@ -1,13 +1,20 @@
 # [Advent of code](https://adventofcode.com/) solutions
 
-Everything is in Python
+My solutions are written using Python 3.12.
 
-I'm using a library called `advent-of-code-data` to load my input data, so you'll need to install that to run my code
+I'm using [uv](https://docs.astral.sh/uv/) to manage my environment and run my code.
 
+I'm using a library called `advent-of-code-data` to load my inputs automatically.
+
+_Code from before 2024 has not been tested with uv or Python 3.12 so it might not work perfectly_
+
+## Setup
 ```shell
-# (Optional)
-python3 -m venv venv  # Create a virtual environment
-source venv/bin/activate  # Activate the virtual environment
-# (Required)
-pip install -r requirements.pip  # Install dependencies
+brew install uv
+uv sync
+```
+
+## Running a solution
+```shell
+uv run 2024/day01/part1.py
 ```
