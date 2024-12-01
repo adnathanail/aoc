@@ -1,2 +1,13 @@
+[project]
+name = "aoc"
+version = "2024.0.0"
+description = "My solutions to the Advent of Code challenges"
+authors = ["Alex Nathanail <adnathanail@hotmail.co.uk>"]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "advent-of-code-data>=2.0.4",
+]
+
 [tool.black]
 line-length = 160
