@@ -1,0 +1,39 @@
+digraph G {
+  rankdir=LR
+
+  num1[label="0-9"]
+  num2[label="0-9"]
+  opbr1[label="("]
+  opbr2[label="("]
+  opbr3[label="("]
+  clbr1[label=")"]
+  clbr2[label=")"]
+  clbr3[label=")"]
+  success[color="green"]
+
+  start -> "m"
+  start -> "d"
+
+  "m" -> "u"
+  "u" -> "l"
+  "l" -> opbr1
+  opbr1 -> num1
+  num1 -> num1
+  num1 -> ","
+  "," -> num2
+  num2 -> num2
+  num2 -> clbr1
+  clbr1 -> success
+
+  "d" -> "o"
+  "o" -> opbr2
+  opbr2 -> clbr2
+  clbr2 -> success
+
+  "o" -> "n"
+  "n" -> "'"
+  "'" -> "t"
+  "t" -> opbr3
+  opbr3 -> clbr3
+  clbr3 -> success
+}
