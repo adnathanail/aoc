@@ -1,3 +1,4 @@
+import os
 import math
 from aocd.models import Puzzle
 from PIL import Image
@@ -36,7 +37,11 @@ def poss_to_image(poss, output_path):
     print(f"Image saved to {output_path}")
 
 
-for n in range(1000):
+if not os.path.exists("2024/day14/steps"):
+    os.makedirs("2024/day14/steps")
+
+
+for n in range(10000):
     poss_to_image(positions, f"2024/day14/steps/step_{n}.png")
     for k in range(len(positions)):
         positions[k] = step(positions[k][0], positions[k][1], velocities[k][0], velocities[k][1])
