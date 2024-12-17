@@ -1,7 +1,7 @@
 const BIT_MASK: u64 = 0b111;
 
-// const known_output: [u64; 20] = [4,1,7,6,4,1,0,2,7,0,0,0,0,0,0,0,0,0,0,0];
-const known_output: [u64; 20] = [2,4,1,1,7,5,1,5,4,0,5,5,0,3,3,0,0,0,0,0];
+// const KNOWN_OUTPUT: [u64; 20] = [4,1,7,6,4,1,0,2,7,0,0,0,0,0,0,0,0,0,0,0];
+const KNOWN_OUTPUT: [u64; 20] = [2,4,1,1,7,5,1,5,4,0,5,5,0,3,3,0,0,0,0,0];
 
 fn main() {
     let start = std::time::Instant::now();
@@ -10,8 +10,8 @@ fn main() {
 
     // assert!(run_program(64854237, &mut program_output));
 
-    //          55980000000
-    for i in 1..10000000000 {
+    //          100000000000
+    for i in 100000000000..1000000000000 {
         if i % 10000000 == 0 {
             println!("{}", i);
         }
@@ -34,10 +34,10 @@ fn run_program(reg_a_initial: u64, out: &mut [u64; 20]) -> bool {
         reg_a >>= 3;
         let reg_b = ((reg_a & BIT_MASK) ^ 1) ^ 5 ^ (reg_a >> ((reg_a & BIT_MASK) ^ 1));
         out[out_pointer] = reg_b & BIT_MASK;
-        if out_pointer == 0 && out[out_pointer] != 2 {
+        if out_pointer == 0 && out[out_pointer] != 2 {  // Manual optimisation for the real KNOWN_OUTPUT
             return false;
         }
         out_pointer += 1
     }
-    return *out == known_output
+    return *out == KNOWN_OUTPUT
 }
