@@ -23,7 +23,7 @@ while ip < len(ins) - 1:
         elif operand == 6:
             operand = regs["C"]
     if opcode == 0:
-        regs["A"] = regs["A"] // (2 ** operand)
+        regs["A"] = regs["A"] // (2**operand)
     elif opcode == 1:
         regs["B"] = operand ^ regs["B"]
     elif opcode == 2:
@@ -37,9 +37,9 @@ while ip < len(ins) - 1:
     elif opcode == 5:
         outs.append(str(operand % 8))
     elif opcode == 6:
-        regs["B"] = regs["A"] // (2 ** operand)
+        regs["B"] = regs["A"] // (2**operand)
     elif opcode == 7:
-        regs["C"] = regs["A"] // (2 ** operand)
+        regs["C"] = regs["A"] // (2**operand)
     else:
         raise Exception(f"Unimplemented opcode '{opcode}'")
     if not dont_inc:

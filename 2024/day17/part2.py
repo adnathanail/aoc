@@ -57,8 +57,9 @@ def run_prog(A):
 
     return out
 
+
 # Test original program is still outputting correctly
-print(run_prog(64854237) == [4,1,7,6,4,1,0,2,7])
+print(run_prog(64854237) == [4, 1, 7, 6, 4, 1, 0, 2, 7])
 
 
 # Implement in rust
@@ -86,6 +87,7 @@ def octal_digits_to_dec(digs):
         # print(i, digs[i], (8**i) * digs[i])
         tot += (8**i) * digs[i]
     return tot
+
 
 for j in range(8):
     print(j, run_prog(octal_digits_to_dec([j, 5, 7, 2, 7, 6, 2, 3, 7, 0, 6, 4, 4, 6, 2, 5, 4])))
