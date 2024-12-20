@@ -28,7 +28,6 @@ def match_pattern(pat, tows):
 
 num = 0
 for pattern in patterns:
-    print(pattern)
     num += match_pattern(pattern, towels)
 
 print(num)
