@@ -68,7 +68,7 @@ def list_cheats(in_grid):
         for j in range(len(in_grid[i])):
             if in_grid[i][j] != ".":
                 continue
-            potential_jump_dirs = [(- 1, 0), (0, - 1), (1, 0), (0, 1)]
+            potential_jump_dirs = [(1, 0), (0, 1)]
             for pjd in potential_jump_dirs:
                 no_jump = (j, i)
                 one_jump = (j + pjd[0], i + pjd[1])
