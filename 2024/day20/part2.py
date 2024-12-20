@@ -21,7 +21,7 @@ input_data = puzzle.input_data
 # ###############"""
 
 
-def generate_grid(inp):
+def generate_grid():
     input_lines = input_data.splitlines()
 
     grid_arr = []
@@ -45,28 +45,28 @@ def generate_grid(inp):
     return grid_arr, start_loc, end_loc
 
 
-def generate_graph(in_grid):
+def generate_graph():
     out = nx.Graph()
-    for i in range(len(in_grid)):
-        for j in range(len(in_grid[i])):
+    for i in range(len(grid)):
+        for j in range(len(grid[i])):
             if grid[i][j] != ".":
                 continue
             out.add_node((j, i))
             dirs = [(i - 1, j), (i, j - 1), (i + 1, j), (i, j + 1)]
             for newi, newj in dirs:
-                if 0 <= newi < len(in_grid) and 0 <= newj < len(in_grid[j]):
-                    if in_grid[newi][newj] == ".":
+                if 0 <= newi < len(grid) and 0 <= newj < len(grid[j]):
+                    if grid[newi][newj] == ".":
                         out.add_node((newj, newi))
                         out.add_edge((j, i), (newj, newi))
 
     return out
 
 
-def list_cheats(in_grid):
+def list_cheats():
     cheats = []
-    for i in range(len(in_grid)):
-        for j in range(len(in_grid[i])):
-            if in_grid[i][j] != ".":
+    for i in range(len(grid)):
+        for j in range(len(grid[i])):
+            if grid[i][j] != ".":
                 continue
             potential_jump_dirs = [(1, 0), (0, 1)]
             for pjd in potential_jump_dirs:
@@ -74,13 +74,13 @@ def list_cheats(in_grid):
                 one_jump = (j + pjd[0], i + pjd[1])
                 two_jump = (j + pjd[0] * 2, i + pjd[1] * 2)
                 three_jump = (j + pjd[0] * 3, i + pjd[1] * 3)
-                if 0 <= one_jump[0] < len(in_grid[i]) and 0 <= one_jump[1] < len(in_grid) and 0 <= two_jump[0] < len(in_grid[i]) and 0 <= two_jump[1] < len(in_grid):
-                    if in_grid[one_jump[1]][one_jump[0]] == "#":
-                        if in_grid[two_jump[1]][two_jump[0]] == ".":
+                if 0 <= two_jump[0] < width and 0 <= two_jump[1] < height:
+                    if grid[one_jump[1]][one_jump[0]] == "#":
+                        if grid[two_jump[1]][two_jump[0]] == ".":
                             if (no_jump, two_jump) not in cheats and (two_jump, no_jump) not in cheats:
                                 cheats.append((no_jump, two_jump))
-                        if 0 <= three_jump[0] < len(in_grid[i]) and 0 <= three_jump[1] < len(in_grid):
-                            if in_grid[two_jump[1]][two_jump[0]] == "#" and in_grid[three_jump[1]][three_jump[0]] == ".":
+                        if 0 <= three_jump[0] < width and 0 <= three_jump[1] < height:
+                            if grid[two_jump[1]][two_jump[0]] == "#" and grid[three_jump[1]][three_jump[0]] == ".":
                                 if (no_jump, three_jump) not in cheats and (three_jump, no_jump) not in cheats:
                                     cheats.append((no_jump, three_jump))
     return cheats
@@ -88,13 +88,15 @@ def list_cheats(in_grid):
 start_time = time.time()
 
 print("Generating grid")
-grid, start, end = generate_grid(input_data)
+grid, start, end = generate_grid()
+height = len(grid)
+width = len(grid[0])
 
 print("Generating graph")
-graph = generate_graph(grid)
+graph = generate_graph()
 
 print("Finding cheats")
-cheats = list_cheats(grid)
+cheats = list_cheats()
 print(len(cheats), "found")
 
 print("Testing cheats")
