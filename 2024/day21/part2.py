@@ -36,7 +36,7 @@ def part_options_to_full_strs(options):
     if not options:
         return []
 
-    results = options[0]
+    results = [[x] for x in options[0]]
 
     # Iterate through remaining sets of options
     for option_set in options[1:]:
@@ -45,7 +45,7 @@ def part_options_to_full_strs(options):
         for partial in results:
             # Combine it with each new option
             for option in option_set:
-                new_results.append(partial + option)
+                new_results.append(partial + [option])
         results = new_results
 
     return results
@@ -80,17 +80,18 @@ def check_instructions_dont_cross_bad_key(coord_lookup, code):
     x, y = coord_lookup["A"]
     bad_key_poss = coord_lookup[None]
 
-    for char in code:
-        if char == ">":
-            x += 1
-        elif char == "v":
-            y += 1
-        elif char == "<":
-            x -= 1
-        elif char == "^":
-            y -= 1
-        if (x, y) == bad_key_poss:
-            return False
+    for chunk in code:
+        for char in chunk:
+            if char == ">":
+                x += 1
+            elif char == "v":
+                y += 1
+            elif char == "<":
+                x -= 1
+            elif char == "^":
+                y -= 1
+            if (x, y) == bad_key_poss:
+                return False
     return True
 
 
@@ -102,15 +103,14 @@ def get_valid_instructions(coord_lookup, code):
 
 
 rc_cache = {}
-def enter_robot_code(code):
+def enter_robot_code(code_chunks):
     """
     Enter a code specifically to the robot key pads
         caches code chunks
     """
-    code_chunks = code.split("A")
-    out = ""
-    for i in range(len(code_chunks) - 1):
-        chunk = code_chunks[i] + "A"
+    out = []
+    for i in range(len(code_chunks)):
+        chunk = code_chunks[i]
         # print(chunk)
         if chunk in rc_cache:
             out += rc_cache[chunk]
@@ -138,19 +138,20 @@ robot_key_pad_coord_lookup = generate_coord_lookup(robot_key_pad)
 
 start_time = time.time()
 
-intermediate_robots = 2
+intermediate_robots = 15
 
 tot = 0
 for code in codes:
     robot_instruction_options = get_valid_instructions(number_key_pad_coord_lookup, code)
 
     for i in range(intermediate_robots):
+        print(i)
         new_options = []
         for opt in robot_instruction_options:
             new_options.append(enter_robot_code(opt))
         robot_instruction_options = new_options
 
-    tot += min([len(r3) for r3 in robot_instruction_options]) * int(code[:-1])
+    tot += min(len("".join(x)) for x in robot_instruction_options) * int(code[:-1])
 
 print(tot)
 
