@@ -74,6 +74,9 @@ def enter_code(key_poss, code):
 
 
 def check_instructions_dont_cross_bad_key(coord_lookup, code):
+    """
+    Given a series of instructions, and the relevant keypad, check the path given doesn't cross the empty key
+    """
     x, y = coord_lookup["A"]
     bad_key_poss = coord_lookup[None]
 
@@ -91,16 +94,31 @@ def check_instructions_dont_cross_bad_key(coord_lookup, code):
     return True
 
 
-def get_valid_shortest_robot_instructions(coord_lookup, codes):
+def get_valid_instructions(coord_lookup, code):
     """
     Given a list of codes to attempt to input and a coord lookup, return all possible instructions to input this code
     """
-    all_possible_insts = []
-    for code in codes:
-        all_possible_insts += [inst for inst in enter_code(coord_lookup, code) if check_instructions_dont_cross_bad_key(coord_lookup, inst)]
-    return all_possible_insts
-    # shortest_inst_length = min([len(inst) for inst in all_possible_insts])
-    # return [inst for inst in all_possible_insts if len(inst) == shortest_inst_length]
+    return [inst for inst in enter_code(coord_lookup, code) if check_instructions_dont_cross_bad_key(coord_lookup, inst)]
+
+
+rc_cache = {}
+def enter_robot_code(code):
+    """
+    Enter a code specifically to the robot key pads
+        caches code chunks
+    """
+    code_chunks = code.split("A")
+    out = ""
+    for i in range(len(code_chunks) - 1):
+        chunk = code_chunks[i] + "A"
+        # print(chunk)
+        if chunk in rc_cache:
+            out += rc_cache[chunk]
+        else:
+            ch = get_valid_instructions(robot_key_pad_coord_lookup, chunk)[0]
+            rc_cache[chunk] = ch
+            out += ch
+    return out
 
 
 number_key_pad = (
@@ -124,10 +142,13 @@ intermediate_robots = 2
 
 tot = 0
 for code in codes:
-    robot_instruction_options = get_valid_shortest_robot_instructions(number_key_pad_coord_lookup, [code])
+    robot_instruction_options = get_valid_instructions(number_key_pad_coord_lookup, code)
 
     for i in range(intermediate_robots):
-        robot_instruction_options = get_valid_shortest_robot_instructions(robot_key_pad_coord_lookup, robot_instruction_options)
+        new_options = []
+        for opt in robot_instruction_options:
+            new_options.append(enter_robot_code(opt))
+        robot_instruction_options = new_options
 
     tot += min([len(r3) for r3 in robot_instruction_options]) * int(code[:-1])
 
