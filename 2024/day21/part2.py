@@ -95,27 +95,24 @@ robot_key_pad = (
 robot_key_pad_coord_lookup = generate_coord_lookup(robot_key_pad)
 
 
+intermediate_robots = 2
+
 tot = 0
 for code in codes:
     # Get all possible robot 1 (depressurized) instructions for the current code
-    robot_1_instruction_options = [
+    robot_instruction_options = [
         r1 for r1 in enter_code(number_key_pad_coord_lookup, code) if check_instructions_dont_cross_bad_key(number_key_pad_coord_lookup, r1)
     ]
 
-    # Get all possible robot 2 (radiation) instructions for all the possible robot 1 instructions
-    robot_2_instruction_options = []
-    for r1 in robot_1_instruction_options:
-        robot_2_instruction_options += [
-            r2 for r2 in enter_code(robot_key_pad_coord_lookup, r1) if check_instructions_dont_cross_bad_key(robot_key_pad_coord_lookup, r2)
-        ]
+    for _ in range(intermediate_robots):
+        # Get all possible robot 2 (radiation) instructions for all the possible robot 1 instructions
+        next_robot_instruction_options = []
+        for ri in robot_instruction_options:
+            next_robot_instruction_options += [
+                rn for rn in enter_code(robot_key_pad_coord_lookup, ri) if check_instructions_dont_cross_bad_key(robot_key_pad_coord_lookup, rn)
+            ]
+        robot_instruction_options = next_robot_instruction_options
 
-    # Get all possible robot 3 (cold) instructions for all the possible robot 2 instructions
-    robot_3_instruction_options = []
-    for r2 in robot_2_instruction_options:
-        robot_3_instruction_options += [
-            r3 for r3 in enter_code(robot_key_pad_coord_lookup, r2) if check_instructions_dont_cross_bad_key(robot_key_pad_coord_lookup, r3)
-        ]
-
-    tot += min([len(r3) for r3 in robot_3_instruction_options]) * int(code[:-1])
+    tot += min([len(r3) for r3 in robot_instruction_options]) * int(code[:-1])
 
 print(tot)
