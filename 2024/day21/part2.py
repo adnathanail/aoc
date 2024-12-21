@@ -72,18 +72,20 @@ def enter_code(key_poss, code):
     return part_options_to_full_strs(out_part_options)
 
 
-def check_instructions_dont_cross_bad_key(key_poss, code):
-    loc = key_poss["A"]
+def check_instructions_dont_cross_bad_key(coord_lookup, code):
+    x, y = coord_lookup["A"]
+    bad_key_poss = coord_lookup[None]
+
     for char in code:
         if char == ">":
-            loc = (loc[0] + 1, loc[1])
+            x += 1
         elif char == "v":
-            loc = (loc[0], loc[1] + 1)
+            y += 1
         elif char == "<":
-            loc = (loc[0] - 1, loc[1])
+            x -= 1
         elif char == "^":
-            loc = (loc[0], loc[1] - 1)
-        if loc == key_poss[None]:
+            y -= 1
+        if (x, y) == bad_key_poss:
             return False
     return True
 
