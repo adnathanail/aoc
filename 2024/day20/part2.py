@@ -3,21 +3,21 @@ from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2024, day=20)
 input_data = puzzle.input_data
-# input_data = """###############
-# #...#...#.....#
-# #.#.#.#.#.###.#
-# #S#...#.#.#...#
-# #######.#.#.###
-# #######.#.#...#
-# #######.#.###.#
-# ###..E#...#...#
-# ###.#######.###
-# #...###...#...#
-# #.#####.#.###.#
-# #.#...#.#.#...#
-# #.#.#.#.#.#.###
-# #...#...#...###
-# ###############"""
+input_data = """###############
+#...#...#.....#
+#.#.#.#.#.###.#
+#S#...#.#.#...#
+#######.#.#.###
+#######.#.#...#
+#######.#.###.#
+###..E#...#...#
+###.#######.###
+#...###...#...#
+#.#####.#.###.#
+#.#...#.#.#...#
+#.#.#.#.#.#.###
+#...#...#...###
+###############"""
 
 
 def generate_grid():
@@ -76,21 +76,31 @@ def generate_path(start):
     return out
 
 
+def find_points_with_manhattan_distance(point, dist):
+    if dist == 0:
+        return []
+    out = []
+    for i in range(dist + 1):
+        a, b = i, dist - i
+        out.append((point[0] + a, point[1] + b))
+        out.append((point[0] + a, point[1] - b))
+        out.append((point[0] - a, point[1] + b))
+        out.append((point[0] - a, point[1] - b))
+    out += find_points_with_manhattan_distance(point, dist - 1)
+    return out
+
+
 def list_cheats():
-    cheats = []
+    cheats = set()
     for i in range(height):
         for j in range(width):
             if grid[i][j] != ".":
                 continue
             no_jump = (j, i)
-            potential_jump_dirs = [(1, 0), (0, 1)]
-            for pjd in potential_jump_dirs:
-                one_jump = (j + pjd[0], i + pjd[1])
-                two_jump = (j + pjd[0] * 2, i + pjd[1] * 2)
-                if 0 <= two_jump[0] < width and 0 <= two_jump[1] < height:
-                    if grid[one_jump[1]][one_jump[0]] == "#" and grid[two_jump[1]][two_jump[0]] == ".":
-                        if (no_jump, two_jump) not in cheats and (two_jump, no_jump) not in cheats:
-                            cheats.append((no_jump, two_jump))
+            for jump in find_points_with_manhattan_distance(no_jump, 20):
+                if 0 <= jump[0] < width and 0 <= jump[1] < height:
+                    if grid[jump[1]][jump[0]] == ".":
+                        cheats.add(tuple(sorted([no_jump, no_jump])))
     return cheats
 
 
@@ -119,9 +129,19 @@ print(len(cheats), "found")
 print("Testing cheats")
 num_good_cheats = 0
 for cheat in cheats:
-    if cheat_time_saved(cheat) >= 100:
+    if cheat_time_saved(cheat) >= 50:
         num_good_cheats += 1
 
 print(num_good_cheats)
 
 print("Time taken", time.time() - start_time)
+
+
+# points = find_points_with_manhattan_distance((25, 25), 20)
+# for i in range(len(grid)):
+#     for j in range(len(grid[i])):
+#         if (j, i) in points:
+#             print("X", end="")
+#         else:
+#             print(grid[i][j], end="")
+#     print()
