@@ -99,6 +99,15 @@ def list_cheats():
                                     cheats.append((no_jump, three_jump))
     return cheats
 
+
+def manhattan(p1, p2):
+    return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
+
+
+def cheat_time_saved(ch):
+    return abs(the_path.index(ch[0]) - the_path.index(ch[1])) - manhattan(ch[0], ch[1])
+
+
 start_time = time.time()
 
 print("Generating grid")
@@ -115,21 +124,9 @@ print(len(cheats), "found")
 print("Testing cheats")
 num_good_cheats = 0
 for cheat in cheats:
-    time_saved = abs(the_path.index(cheat[0]) - the_path.index(cheat[1])) - 2
-    if time_saved >= 100:
+    if cheat_time_saved(cheat) >= 100:
         num_good_cheats += 1
 
 print(num_good_cheats)
 
 print("Time taken", time.time() - start_time)
-
-
-# for c in cheats:
-#     for i in range(len(grid)):
-#         for j in range(len(grid)):
-#             if (j, i) in c:
-#                 print("C", end="")
-#             else:
-#                 print(grid[i][j], end="")
-#         print()
-#     input()

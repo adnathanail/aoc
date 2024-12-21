@@ -52,13 +52,18 @@ def list_cheats(in_grid):
         for j in range(len(in_grid[i])):
             if in_grid[i][j] != ".":
                 continue
-            potential_jump_dirs = [(- 1, 0), (0, - 1), (1, 0), (0, 1)]
+            potential_jump_dirs = [(-1, 0), (0, -1), (1, 0), (0, 1)]
             for pjd in potential_jump_dirs:
                 no_jump = (j, i)
                 one_jump = (j + pjd[0], i + pjd[1])
                 two_jump = (j + pjd[0] * 2, i + pjd[1] * 2)
                 three_jump = (j + pjd[0] * 3, i + pjd[1] * 3)
-                if 0 <= one_jump[0] < len(in_grid[i]) and 0 <= one_jump[1] < len(in_grid) and 0 <= two_jump[0] < len(in_grid[i]) and 0 <= two_jump[1] < len(in_grid):
+                if (
+                    0 <= one_jump[0] < len(in_grid[i])
+                    and 0 <= one_jump[1] < len(in_grid)
+                    and 0 <= two_jump[0] < len(in_grid[i])
+                    and 0 <= two_jump[1] < len(in_grid)
+                ):
                     if in_grid[one_jump[1]][one_jump[0]] == "#":
                         if in_grid[two_jump[1]][two_jump[0]] == ".":
                             if (no_jump, two_jump) not in cheats and (two_jump, no_jump) not in cheats:
@@ -68,7 +73,6 @@ def list_cheats(in_grid):
                                 if (no_jump, three_jump) not in cheats and (three_jump, no_jump) not in cheats:
                                     cheats.append((no_jump, three_jump))
     return cheats
-
 
 
 print("Generating grid")
@@ -83,6 +87,7 @@ def get_shortest_path_with_cheat(G, s, e, cheat):
     out = nx.shortest_path_length(G, s, e, weight="weight")
     G.remove_edge(cheat[0], cheat[1])
     return out
+
 
 shortest_path_no_cheats = nx.shortest_path_length(graph, start, end)
 print("Shortest path no cheats", shortest_path_no_cheats)
