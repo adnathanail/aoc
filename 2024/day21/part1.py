@@ -27,7 +27,6 @@ def delta_to_chars(delta, negative_char, positive_char):
         return positive_char * delta
 
 
-
 def part_options_to_full_strs(options):
     """
     Given a list of lists, where each member list is a series of options of strings that could appear there, return a list of all possible strings resulting from all combinations

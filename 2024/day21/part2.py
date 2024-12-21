@@ -27,6 +27,7 @@ def delta_to_chars(delta, negative_char, positive_char):
     else:
         return positive_char * delta
 
+
 def part_options_to_full_strs(options):
     """
     Given a list of lists, where each member list is a series of options of strings that could appear there, return a list of all possible strings resulting from all combinations
@@ -34,9 +35,9 @@ def part_options_to_full_strs(options):
     """
     if not options:
         return []
-    
+
     results = options[0]
-    
+
     # Iterate through remaining sets of options
     for option_set in options[1:]:
         new_results = []
@@ -90,6 +91,18 @@ def check_instructions_dont_cross_bad_key(coord_lookup, code):
     return True
 
 
+def get_valid_shortest_robot_instructions(coord_lookup, codes):
+    """
+    Given a list of codes to attempt to input and a coord lookup, return all possible instructions to input this code
+    """
+    all_possible_insts = []
+    for code in codes:
+        all_possible_insts += [inst for inst in enter_code(coord_lookup, code) if check_instructions_dont_cross_bad_key(coord_lookup, inst)]
+    return all_possible_insts
+    # shortest_inst_length = min([len(inst) for inst in all_possible_insts])
+    # return [inst for inst in all_possible_insts if len(inst) == shortest_inst_length]
+
+
 number_key_pad = (
     ("7", "8", "9"),
     ("4", "5", "6"),
@@ -111,19 +124,10 @@ intermediate_robots = 2
 
 tot = 0
 for code in codes:
-    # Get all possible robot 1 (depressurized) instructions for the current code
-    robot_instruction_options = [
-        r1 for r1 in enter_code(number_key_pad_coord_lookup, code) if check_instructions_dont_cross_bad_key(number_key_pad_coord_lookup, r1)
-    ]
+    robot_instruction_options = get_valid_shortest_robot_instructions(number_key_pad_coord_lookup, [code])
 
     for i in range(intermediate_robots):
-        # Get all possible robot 2 (radiation) instructions for all the possible robot 1 instructions
-        next_robot_instruction_options = []
-        for ri in robot_instruction_options:
-            next_robot_instruction_options += [
-                rn for rn in enter_code(robot_key_pad_coord_lookup, ri) if check_instructions_dont_cross_bad_key(robot_key_pad_coord_lookup, rn)
-            ]
-        robot_instruction_options = next_robot_instruction_options
+        robot_instruction_options = get_valid_shortest_robot_instructions(robot_key_pad_coord_lookup, robot_instruction_options)
 
     tot += min([len(r3) for r3 in robot_instruction_options]) * int(code[:-1])
 
