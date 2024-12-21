@@ -85,9 +85,10 @@ def list_cheats():
             no_jump = (j, i)
             potential_jump_dirs = [(1, 0), (0, 1)]
             for pjd in potential_jump_dirs:
+                one_jump = (j + pjd[0], i + pjd[1])
                 two_jump = (j + pjd[0] * 2, i + pjd[1] * 2)
                 if 0 <= two_jump[0] < width and 0 <= two_jump[1] < height:
-                    if grid[two_jump[1]][two_jump[0]] == ".":
+                    if grid[one_jump[1]][one_jump[0]] == "." and grid[two_jump[1]][two_jump[0]] == ".":
                         if (no_jump, two_jump) not in cheats and (two_jump, no_jump) not in cheats:
                             cheats.append((no_jump, two_jump))
     return cheats
