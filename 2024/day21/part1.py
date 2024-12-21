@@ -12,6 +12,19 @@ def generate_coord_lookup(key_pad):
     return coord_lookup
 
 
+def x_delta_to_chars(xd):
+    if xd < 0:
+        return "<" * -xd
+    else:
+        return ">" * xd
+
+
+def y_delta_to_chars(yd):
+    if yd < 0:
+        return "^" * - yd
+    else:
+        return "v" * yd
+
 
 def enter_code(key_poss, code):
     out = ""
@@ -19,14 +32,8 @@ def enter_code(key_poss, code):
     for char in code:
         char_loc = key_poss[char]
         x_delta, y_delta = char_loc[0] - prev_loc[0], char_loc[1] - prev_loc[1]
-        if x_delta < 0:
-            out += "<" * -x_delta
-        else:
-            out += ">" * x_delta
-        if y_delta < 0:
-            out += "^" * - y_delta
-        else:
-            out += "v" * y_delta
+        out += x_delta_to_chars(x_delta)
+        out += y_delta_to_chars(y_delta)
         out += "A"
         prev_loc = char_loc
     return out
@@ -46,7 +53,7 @@ robot_key_pad = (
 robot_key_pad_coord_lookup = generate_coord_lookup(robot_key_pad)
 
 codes = ["029A", "980A", "179A", "456A", "379A"]
-codes = ["179A"]
+# codes = ["179A"]
 for code in codes:
     robot_1_instructions = enter_code(number_key_pad_coord_lookup, code)
     print(robot_1_instructions)
