@@ -3,21 +3,21 @@ from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2024, day=20)
 input_data = puzzle.input_data
-input_data = """###############
-#...#...#.....#
-#.#.#.#.#.###.#
-#S#...#.#.#...#
-#######.#.#.###
-#######.#.#...#
-#######.#.###.#
-###..E#...#...#
-###.#######.###
-#...###...#...#
-#.#####.#.###.#
-#.#...#.#.#...#
-#.#.#.#.#.#.###
-#...#...#...###
-###############"""
+# input_data = """###############
+# #...#...#.....#
+# #.#.#.#.#.###.#
+# #S#...#.#.#...#
+# #######.#.#.###
+# #######.#.#...#
+# #######.#.###.#
+# ###..E#...#...#
+# ###.#######.###
+# #...###...#...#
+# #.#####.#.###.#
+# #.#...#.#.#...#
+# #.#.#.#.#.#.###
+# #...#...#...###
+# ###############"""
 
 
 def generate_grid():
@@ -100,7 +100,7 @@ def list_cheats():
             for jump in find_points_with_manhattan_distance(no_jump, 20):
                 if 0 <= jump[0] < width and 0 <= jump[1] < height:
                     if grid[jump[1]][jump[0]] == ".":
-                        cheats.add(tuple(sorted([no_jump, no_jump])))
+                        cheats.add(tuple(sorted([no_jump, jump])))
     return cheats
 
 
@@ -129,7 +129,7 @@ print(len(cheats), "found")
 print("Testing cheats")
 num_good_cheats = 0
 for cheat in cheats:
-    if cheat_time_saved(cheat) >= 50:
+    if cheat_time_saved(cheat) >= 100:
         num_good_cheats += 1
 
 print(num_good_cheats)
