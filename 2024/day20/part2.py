@@ -135,13 +135,3 @@ for cheat in cheats:
 print(num_good_cheats)
 
 print("Time taken", time.time() - start_time)
-
-
-# points = find_points_with_manhattan_distance((25, 25), 20)
-# for i in range(len(grid)):
-#     for j in range(len(grid[i])):
-#         if (j, i) in points:
-#             print("X", end="")
-#         else:
-#             print(grid[i][j], end="")
-#     print()
