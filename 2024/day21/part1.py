@@ -32,6 +32,17 @@ def enter_code(key_poss, code):
     for char in code:
         char_loc = key_poss[char]
         x_delta, y_delta = char_loc[0] - prev_loc[0], char_loc[1] - prev_loc[1]
+        simulating_path_loc = prev_loc
+        for _ in range(abs(x_delta)):
+            simulating_path_loc = (simulating_path_loc[0] + (-1 if x_delta < 0 else 1), simulating_path_loc[1])
+            if simulating_path_loc == key_poss[None]:
+                print(code, char)
+                raise Exception("Can't cross the blank key!")
+        for _ in range(abs(y_delta)):
+            simulating_path_loc = (simulating_path_loc[0], simulating_path_loc[1] + (-1 if y_delta < 0 else 1))
+            if simulating_path_loc == key_poss[None]:
+                print(code, char)
+                raise Exception("Can't cross the blank key!")
         out += x_delta_to_chars(x_delta)
         out += y_delta_to_chars(y_delta)
         out += "A"
@@ -52,13 +63,13 @@ robot_key_pad = (
 )
 robot_key_pad_coord_lookup = generate_coord_lookup(robot_key_pad)
 
-codes = ["029A", "980A", "179A", "456A", "379A"]
-# codes = ["179A"]
+# codes = ["029A", "980A", "179A", "456A", "379A"]
+codes = ["179A"]
 for code in codes:
     robot_1_instructions = enter_code(number_key_pad_coord_lookup, code)
-    print(robot_1_instructions)
+    print("R1", robot_1_instructions)
     robot_2_instructions = enter_code(robot_key_pad_coord_lookup, robot_1_instructions)
-    print(robot_2_instructions)
+    print("R2", robot_2_instructions)
     robot_3_instructions = enter_code(robot_key_pad_coord_lookup, robot_2_instructions)
     print(robot_3_instructions)
     print(len(robot_3_instructions))
