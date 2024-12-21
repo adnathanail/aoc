@@ -1,3 +1,4 @@
+import time
 from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2024, day=21)
@@ -26,20 +27,27 @@ def delta_to_chars(delta, negative_char, positive_char):
     else:
         return positive_char * delta
 
-
-
 def part_options_to_full_strs(options):
     """
     Given a list of lists, where each member list is a series of options of strings that could appear there, return a list of all possible strings resulting from all combinations
     E.g. [["a", "b"], ["c", "d"]] gives ["ac", "ad", "bc", "bd"]
     """
-    if len(options) == 1:
-        return options[0]
-    out = []
-    for item in options[0]:
-        for end_str in part_options_to_full_strs(options[1:]):
-            out.append(item + end_str)
-    return out
+    if not options:
+        return []
+    
+    results = options[0]
+    
+    # Iterate through remaining sets of options
+    for option_set in options[1:]:
+        new_results = []
+        # For each existing partial result
+        for partial in results:
+            # Combine it with each new option
+            for option in option_set:
+                new_results.append(partial + option)
+        results = new_results
+
+    return results
 
 
 def enter_code(key_poss, code):
@@ -95,6 +103,8 @@ robot_key_pad = (
 robot_key_pad_coord_lookup = generate_coord_lookup(robot_key_pad)
 
 
+start_time = time.time()
+
 intermediate_robots = 2
 
 tot = 0
@@ -104,7 +114,7 @@ for code in codes:
         r1 for r1 in enter_code(number_key_pad_coord_lookup, code) if check_instructions_dont_cross_bad_key(number_key_pad_coord_lookup, r1)
     ]
 
-    for _ in range(intermediate_robots):
+    for i in range(intermediate_robots):
         # Get all possible robot 2 (radiation) instructions for all the possible robot 1 instructions
         next_robot_instruction_options = []
         for ri in robot_instruction_options:
@@ -116,3 +126,5 @@ for code in codes:
     tot += min([len(r3) for r3 in robot_instruction_options]) * int(code[:-1])
 
 print(tot)
+
+print("Time", time.time() - start_time)
