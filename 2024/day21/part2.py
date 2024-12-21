@@ -109,9 +109,7 @@ def enter_robot_code(code_chunks):
         caches code chunks
     """
     out = []
-    for i in range(len(code_chunks)):
-        chunk = code_chunks[i]
-        # print(chunk)
+    for chunk in code_chunks:
         if chunk in rc_cache:
             out += rc_cache[chunk]
         else:
@@ -138,7 +136,7 @@ robot_key_pad_coord_lookup = generate_coord_lookup(robot_key_pad)
 
 start_time = time.time()
 
-intermediate_robots = 15
+intermediate_robots = 20
 
 tot = 0
 for code in codes:
@@ -152,6 +150,7 @@ for code in codes:
         robot_instruction_options = new_options
 
     tot += min(len("".join(x)) for x in robot_instruction_options) * int(code[:-1])
+    break
 
 print(tot)
 
