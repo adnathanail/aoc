@@ -88,7 +88,7 @@ def list_cheats():
                 one_jump = (j + pjd[0], i + pjd[1])
                 two_jump = (j + pjd[0] * 2, i + pjd[1] * 2)
                 if 0 <= two_jump[0] < width and 0 <= two_jump[1] < height:
-                    if grid[one_jump[1]][one_jump[0]] == "." and grid[two_jump[1]][two_jump[0]] == ".":
+                    if grid[one_jump[1]][one_jump[0]] == "#" and grid[two_jump[1]][two_jump[0]] == ".":
                         if (no_jump, two_jump) not in cheats and (two_jump, no_jump) not in cheats:
                             cheats.append((no_jump, two_jump))
     return cheats
