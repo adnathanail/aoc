@@ -78,25 +78,18 @@ def generate_path(start):
 
 def list_cheats():
     cheats = []
-    for i in range(len(grid)):
-        for j in range(len(grid[i])):
+    for i in range(height):
+        for j in range(width):
             if grid[i][j] != ".":
                 continue
+            no_jump = (j, i)
             potential_jump_dirs = [(1, 0), (0, 1)]
             for pjd in potential_jump_dirs:
-                no_jump = (j, i)
-                one_jump = (j + pjd[0], i + pjd[1])
                 two_jump = (j + pjd[0] * 2, i + pjd[1] * 2)
-                three_jump = (j + pjd[0] * 3, i + pjd[1] * 3)
                 if 0 <= two_jump[0] < width and 0 <= two_jump[1] < height:
-                    if grid[one_jump[1]][one_jump[0]] == "#":
-                        if grid[two_jump[1]][two_jump[0]] == ".":
-                            if (no_jump, two_jump) not in cheats and (two_jump, no_jump) not in cheats:
-                                cheats.append((no_jump, two_jump))
-                        if 0 <= three_jump[0] < width and 0 <= three_jump[1] < height:
-                            if grid[two_jump[1]][two_jump[0]] == "#" and grid[three_jump[1]][three_jump[0]] == ".":
-                                if (no_jump, three_jump) not in cheats and (three_jump, no_jump) not in cheats:
-                                    cheats.append((no_jump, three_jump))
+                    if grid[two_jump[1]][two_jump[0]] == ".":
+                        if (no_jump, two_jump) not in cheats and (two_jump, no_jump) not in cheats:
+                            cheats.append((no_jump, two_jump))
     return cheats
 
 
@@ -115,6 +108,7 @@ grid, start, end = generate_grid()
 height = len(grid)
 width = len(grid[0])
 
+print("Generating path")
 the_path = generate_path(start)
 
 print("Finding cheats")
