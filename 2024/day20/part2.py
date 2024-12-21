@@ -1,6 +1,5 @@
 import time
 from aocd.models import Puzzle
-import networkx as nx
 
 puzzle = Puzzle(year=2024, day=20)
 input_data = puzzle.input_data
@@ -45,20 +44,35 @@ def generate_grid():
     return grid_arr, start_loc, end_loc
 
 
-def generate_graph():
-    out = nx.Graph()
-    for i in range(len(grid)):
-        for j in range(len(grid[i])):
-            if grid[i][j] != ".":
-                continue
-            out.add_node((j, i))
-            dirs = [(i - 1, j), (i, j - 1), (i + 1, j), (i, j + 1)]
-            for newi, newj in dirs:
-                if 0 <= newi < len(grid) and 0 <= newj < len(grid[j]):
-                    if grid[newi][newj] == ".":
-                        out.add_node((newj, newi))
-                        out.add_edge((j, i), (newj, newi))
-
+def generate_path(start):
+    out = [start]
+    deltas = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+    current_delta = None
+    for delta in deltas:
+        nnext = (start[0] + delta[0], start[1] + delta[1])
+        if grid[nnext[1]][nnext[0]] == ".":
+            current_delta = delta
+            break
+    if current_delta is None:
+        raise Exception("No path from start")
+    current = start
+    over = False
+    while not over:
+        nnext = (current[0] + delta[0], current[1] + delta[1])
+        if grid[nnext[1]][nnext[0]] == ".":
+            current = nnext
+            out.append(nnext)
+        else:
+            rotated_delta = (abs(current_delta[1]), abs(current_delta[0]))
+            deltas_to_try = [rotated_delta, (-rotated_delta[0], -rotated_delta[1])]
+            current_delta = None
+            for delta in deltas_to_try:
+                nnext = (current[0] + delta[0], current[1] + delta[1])
+                if grid[nnext[1]][nnext[0]] == ".":
+                    current_delta = delta
+                    break
+            if current_delta is None:
+                over = True
     return out
 
 
@@ -92,21 +106,30 @@ grid, start, end = generate_grid()
 height = len(grid)
 width = len(grid[0])
 
-print("Generating graph")
-graph = generate_graph()
+the_path = generate_path(start)
 
 print("Finding cheats")
 cheats = list_cheats()
 print(len(cheats), "found")
 
 print("Testing cheats")
-shortest_path_no_cheats = nx.shortest_path_length(graph, start, end)
 num_good_cheats = 0
 for cheat in cheats:
-    time_saved = nx.shortest_path_length(graph, cheat[0], cheat[1]) - 2
+    time_saved = abs(the_path.index(cheat[0]) - the_path.index(cheat[1])) - 2
     if time_saved >= 100:
         num_good_cheats += 1
 
 print(num_good_cheats)
 
 print("Time taken", time.time() - start_time)
+
+
+# for c in cheats:
+#     for i in range(len(grid)):
+#         for j in range(len(grid)):
+#             if (j, i) in c:
+#                 print("C", end="")
+#             else:
+#                 print(grid[i][j], end="")
+#         print()
+#     input()
