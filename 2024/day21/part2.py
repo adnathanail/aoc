@@ -103,6 +103,8 @@ def get_valid_instructions(coord_lookup, code):
 
 
 rc_cache = {}
+
+
 def enter_robot_code(code_chunks):
     """
     Enter a code specifically to the robot key pads
@@ -136,21 +138,19 @@ robot_key_pad_coord_lookup = generate_coord_lookup(robot_key_pad)
 
 start_time = time.time()
 
-intermediate_robots = 20
+intermediate_robots = 2
 
 tot = 0
 for code in codes:
     robot_instruction_options = get_valid_instructions(number_key_pad_coord_lookup, code)
 
     for i in range(intermediate_robots):
-        print(i)
         new_options = []
         for opt in robot_instruction_options:
             new_options.append(enter_robot_code(opt))
         robot_instruction_options = new_options
 
     tot += min(len("".join(x)) for x in robot_instruction_options) * int(code[:-1])
-    break
 
 print(tot)
 
