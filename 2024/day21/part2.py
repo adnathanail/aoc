@@ -1,3 +1,5 @@
+import math
+import networkx as nx
 import time
 from aocd.models import Puzzle
 
@@ -6,151 +8,108 @@ input_data = puzzle.input_data
 codes = input_data.splitlines()
 
 
-def generate_coord_lookup(key_pad):
-    """
-    Given a keypad grid, return a dictionary mapping a key's text to its coord on the keypad
-    """
-    coord_lookup = {}
-    for i in range(len(key_pad)):
-        for j in range(len(key_pad[i])):
-            coord_lookup[key_pad[i][j]] = (j, i)
-    return coord_lookup
+def generate_keypad_map(keypad):
+    keypad_graph = nx.Graph()
+    keypad_coord_lookup = {}
+
+    for i in range(len(keypad)):
+        for j in range(len(keypad[i])):
+            if keypad[i][j] is not None:
+                keypad_graph.add_node(keypad[i][j])
+                keypad_coord_lookup[keypad[i][j]] = (j, i)
+
+    for i in range(len(keypad)):
+        for j in range(len(keypad[i])):
+            if keypad[i][j] is None:
+                continue
+            if i + 1 < len(keypad) and keypad[i + 1][j] is not None:
+                keypad_graph.add_edge(keypad[i][j], keypad[i + 1][j])
+            if j + 1 < len(keypad[i]) and keypad[i][j + 1] is not None:
+                keypad_graph.add_edge(keypad[i][j], keypad[i][j + 1])
+
+    def node_path_to_instructions(path):
+        out = ""
+        for i in range(len(path) - 1):
+            node_a_coord = keypad_coord_lookup[path[i]]
+            node_b_coord = keypad_coord_lookup[path[i + 1]]
+            delta = (node_b_coord[0] - node_a_coord[0], node_b_coord[1] - node_a_coord[1])
+            if delta == (1, 0):
+                out += ">"
+            elif delta == (0, 1):
+                out += "v"
+            if delta == (-1, 0):
+                out += "<"
+            elif delta == (0, -1):
+                out += "^"
+        return out
+
+    def instructions_between_nodes(a, b):
+        return [node_path_to_instructions(path) for path in nx.all_shortest_paths(keypad_graph, a, b)]
+
+    keypad_map = {}
+
+    for a in keypad_graph.nodes:
+        keypad_map[a] = {}
+        for b in keypad_graph.nodes:
+            keypad_map[a][b] = instructions_between_nodes(a, b)
+
+    return keypad_map
 
 
-def delta_to_chars(delta, negative_char, positive_char):
-    """
-    Given a delta and the corresponding characters for its positive and negative values, return a string telling a robot how to enter that delta
-    E.g. moving left 3 spaces: (-3, "<", ">") gives "<<<"
-    """
-    if delta < 0:
-        return negative_char * -delta
-    else:
-        return positive_char * delta
-
-
-def part_options_to_full_strs(options):
-    """
-    Given a list of lists, where each member list is a series of options of strings that could appear there, return a list of all possible strings resulting from all combinations
-    E.g. [["a", "b"], ["c", "d"]] gives ["ac", "ad", "bc", "bd"]
-    """
-    if not options:
-        return []
-
-    results = [[x] for x in options[0]]
-
-    # Iterate through remaining sets of options
-    for option_set in options[1:]:
-        new_results = []
-        # For each existing partial result
-        for partial in results:
-            # Combine it with each new option
-            for option in option_set:
-                new_results.append(partial + [option])
-        results = new_results
-
-    return results
-
-
-def enter_code(key_poss, code):
-    """
-    Given a key label to coord lookup map, and a desired sequence of key presses, return all possible direct robot instructions that achieve this
-        this function can return instructions that cross the empty key (i.e. invalid instructions)
-        a "direct" robot instruction is one that doesn't backtrack, e.g. to go 1 space right it wouldn't return "^>v", it would just return "v"
-    """
-    out_part_options = []
-    prev_loc = key_poss["A"]
-    for char in code:
-        char_loc = key_poss[char]
-        x_delta, y_delta = char_loc[0] - prev_loc[0], char_loc[1] - prev_loc[1]
-        x_chars, y_chars = delta_to_chars(x_delta, "<", ">"), delta_to_chars(y_delta, "^", "v")
-        if y_delta == 0:
-            out_part_options.append([x_chars + "A"])
-        elif x_delta == 0:
-            out_part_options.append([y_chars + "A"])
-        else:
-            out_part_options.append([x_chars + y_chars + "A", y_chars + x_chars + "A"])
-        prev_loc = char_loc
-    return part_options_to_full_strs(out_part_options)
-
-
-def check_instructions_dont_cross_bad_key(coord_lookup, code):
-    """
-    Given a series of instructions, and the relevant keypad, check the path given doesn't cross the empty key
-    """
-    x, y = coord_lookup["A"]
-    bad_key_poss = coord_lookup[None]
-
-    for chunk in code:
-        for char in chunk:
-            if char == ">":
-                x += 1
-            elif char == "v":
-                y += 1
-            elif char == "<":
-                x -= 1
-            elif char == "^":
-                y -= 1
-            if (x, y) == bad_key_poss:
-                return False
-    return True
-
-
-def get_valid_instructions(coord_lookup, code):
-    """
-    Given a list of codes to attempt to input and a coord lookup, return all possible instructions to input this code
-    """
-    return [inst for inst in enter_code(coord_lookup, code) if check_instructions_dont_cross_bad_key(coord_lookup, inst)]
-
-
-rc_cache = {}
-
-
-def enter_robot_code(code_chunks):
-    """
-    Enter a code specifically to the robot key pads
-        caches code chunks
-    """
-    out = []
-    for chunk in code_chunks:
-        if chunk in rc_cache:
-            out += rc_cache[chunk]
-        else:
-            ch = get_valid_instructions(robot_key_pad_coord_lookup, chunk)[0]
-            rc_cache[chunk] = ch
-            out += ch
-    return out
-
-
-number_key_pad = (
+number_keypad = (
     ("7", "8", "9"),
     ("4", "5", "6"),
     ("1", "2", "3"),
     (None, "0", "A"),
 )
-number_key_pad_coord_lookup = generate_coord_lookup(number_key_pad)
-
-robot_key_pad = (
+number_keypad_map = generate_keypad_map(number_keypad)
+robot_keypad = (
     (None, "^", "A"),
     ("<", "v", ">"),
 )
-robot_key_pad_coord_lookup = generate_coord_lookup(robot_key_pad)
+robot_keypad_map = generate_keypad_map(robot_keypad)
+
+
+def get_valid_instructions(code, previous="A", *, keypad_map):
+    if len(code) == 1:
+        return [chunk + "A" for chunk in keypad_map[previous][code[0]]]
+    out = []
+    for path in get_valid_instructions(code[1:], code[0], keypad_map=keypad_map):
+        for chunk in keypad_map[previous][code[0]]:
+            out.append(chunk + "A" + path)
+    return out
+
+
+shortest_instruction_length_cache = {}
+
+
+def shortest_instruction_length(keys, depth):
+    if depth == 0:
+        return len(keys)
+    if (keys, depth) in shortest_instruction_length_cache:
+        return shortest_instruction_length_cache[(keys, depth)]
+
+    total = 0
+    for subKey in keys.split("A")[:-1]:
+        subKey += "A"
+        shortest_thing = math.inf
+        for sequence in get_valid_instructions(subKey, keypad_map=robot_keypad_map):
+            shortest_thing = min(shortest_instruction_length(sequence, depth - 1), shortest_thing)
+        total += shortest_thing
+    shortest_instruction_length_cache[(keys, depth)] = total
+    return total
 
 
 start_time = time.time()
 
-intermediate_robots = 2
+intermediate_robots = 25
 
 tot = 0
-for code in codes:
-    robot_instruction_options = get_valid_instructions(number_key_pad_coord_lookup, code)
-
-    for i in range(intermediate_robots):
-        new_options = []
-        for opt in robot_instruction_options:
-            new_options.append(enter_robot_code(opt))
-        robot_instruction_options = new_options
-
-    tot += min(len("".join(x)) for x in robot_instruction_options) * int(code[:-1])
+for keys in codes:
+    shortest_thing = math.inf
+    for sequence in get_valid_instructions(keys, keypad_map=number_keypad_map):
+        shortest_thing = min(shortest_instruction_length(sequence, intermediate_robots), shortest_thing)
+    tot += shortest_thing * int(keys[:-1])
 
 print(tot)
 
