@@ -39,7 +39,6 @@ while gates:
         gates.pop(j)
 
 
-
 z_wire_names = sorted([wire for wire in wires if wire[0] == "z"])[::-1]
 z_wire_values = ["1" if wires[w] else "0" for w in z_wire_names]
 print(int("".join(z_wire_values), 2))

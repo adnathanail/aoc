@@ -1,4 +1,5 @@
 from aocd.models import Puzzle
+import networkx as nx
 
 puzzle = Puzzle(year=2024, day=24)
 input_data = puzzle.input_data
@@ -14,6 +15,23 @@ for w1, w2 in wires_to_swap:
     input_data = input_data.replace("-> 🦀", f"-> {w2}")
 
 starts_str, gates_str = input_data.split("\n\n")
+
+# # Output graph to viewier
+# G = nx.DiGraph()
+# gates = []
+# for gate_str in gates_str.split("\n"):
+#     in1, op, in2, _, outt = gate_str.split(" ")
+#     G.add_node(in1)
+#     G.add_node(in2)
+#     G.add_node(f"{in1} {op} {in2}")
+#     G.add_node(outt)
+#     G.add_edge(in1, f"{in1} {op} {in2}")
+#     G.add_edge(in2, f"{in1} {op} {in2}")
+#     G.add_edge(f"{in1} {op} {in2}", outt)
+#     gates.append((in1, in2, op, outt))
+
+# with open("./2024/day24/part2.dot", "w") as f:
+#     f.write(str(nx.nx_pydot.to_pydot(G)))
 
 initial_wires = {}
 for start_str in starts_str.split("\n"):
@@ -34,11 +52,9 @@ for gate_str in gates_str.split("\n"):
 
 def wires_to_dec(wires, prefix):
     wire_names = sorted([wire for wire in wires if wire[0] == prefix])[::-1]
-    # for w1, w2 in wires_to_swap:
-    #     wind1, wind2 = wire_names.index(w1), wire_names.index(w2)
-    #     wire_names[wind1], wire_names[wind2] = wire_names[wind2], wire_names[wind1]
     wire_values = ["1" if wires[w] else "0" for w in wire_names]
     return int("".join(wire_values), 2)
+
 
 def run_circuit(wires):
     gates_to_proc = gates.copy()
@@ -62,6 +78,7 @@ def run_circuit(wires):
 
     return wires_to_dec(wires, "z")
 
+
 def dec_to_wires(x, y):
     out = {w: False for w in initial_wires}
     x_bits = bin(x)[2:][::-1]
@@ -76,7 +93,7 @@ def dec_to_wires(x, y):
 br = False
 for l in range(1, 44):
     for m in range(1, 44):
-        f, g = (2 ** l) - 1, (2**m) - 1
+        f, g = (2**l) - 1, (2**m) - 1
         wi = dec_to_wires(f, g)
         out = run_circuit(wi)
         if f + g != out:
