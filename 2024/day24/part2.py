@@ -97,10 +97,8 @@ for l in range(1, 44):
         wi = dec_to_wires(f, g)
         out = run_circuit(wi)
         if f + g != out:
-            print("BAD")
             print(bin(f), len(bin(f)) - 2)
             print(bin(g), len(bin(g)) - 2)
-            print(out)
             br = True
             break
     if br:
