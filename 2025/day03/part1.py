@@ -3,9 +3,9 @@ from aocd.models import Puzzle
 puzzle = Puzzle(year=2025, day=3)
 inp = puzzle.input_data
 
-# To find the largest 2 digit number, we just need the largest number overall
-#   and then the largest number to the right of that
-#   (ensuring that the first number has at least one number to the right of it)
+# To find the largest 2 digit number, we just need to find the largest digit
+#   (ensuring there is at least one number to the right of it)
+#   and then the largest number to the right of that will be the second digit
 
 def find_largest_number_in_string(string_to_search):
     for i in range(9, -1, -1):
