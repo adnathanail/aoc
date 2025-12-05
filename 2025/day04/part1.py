@@ -1,7 +1,6 @@
 from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2025, day=4)
-inp = puzzle.examples[0].input_data
 inp = puzzle.input_data
 
 
@@ -10,6 +9,11 @@ HEIGHT = len(grid)
 WIDTH = len(grid[0])
 
 def get_valid_surrounding_square_indexes(x, y):
+    """
+    Given a coordinate, return all the surrounding coordinates that exist
+    i.e. ones that don't cause IndexErrors
+    """
+    # Numbers below match comments on the lines which deal with each potential valid location
     # 123
     # 4X5
     # 678
@@ -33,6 +37,9 @@ def get_valid_surrounding_square_indexes(x, y):
     return valid_locs
 
 def get_surrounding_squares(x, y):
+    """
+    Get the values in every square surrounding the given coordinate
+    """
     out = []
     for loc in get_valid_surrounding_square_indexes(x, y):
         out.append(grid[loc[1]][loc[0]])

@@ -1,8 +1,7 @@
 from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2025, day=4)
-inp = puzzle.examples[0].input_data
-# inp = puzzle.input_data
+inp = puzzle.input_data
 
 
 grid = [list(row) for row in inp.splitlines()]
@@ -10,6 +9,11 @@ HEIGHT = len(grid)
 WIDTH = len(grid[0])
 
 def get_valid_surrounding_square_indexes(x, y):
+    """
+    Given a coordinate, return all the surrounding coordinates that exist
+    i.e. ones that don't cause IndexErrors
+    """
+    # Numbers below match comments on the lines which deal with each potential valid location
     # 123
     # 4X5
     # 678
@@ -33,6 +37,9 @@ def get_valid_surrounding_square_indexes(x, y):
     return valid_locs
 
 def get_is_acccessible(x, y):
+    """
+    Given a coordinate, determine whether it is accessilbe
+    """
     num_adjacent_rolls = 0
     for loc in get_valid_surrounding_square_indexes(x, y):
         if grid[loc[1]][loc[0]] == "@":
@@ -41,6 +48,7 @@ def get_is_acccessible(x, y):
             return False
     return True
 
+# Get a list of the locations of every rolls
 roll_locs = []
 for yy in range(HEIGHT):
     for xx in range(WIDTH):
@@ -49,39 +57,19 @@ for yy in range(HEIGHT):
 
 num_accessible_rolls = 0
 any_removed = True  # set true so first loop runs
+# Keep looping whilst the previous loop found any accessible rolls
 while any_removed:
     any_removed = False
-    to_remove = []
     for rl in roll_locs:
+        # If a roll is accessible
         if get_is_acccessible(rl[0], rl[1]):
+            # Add it to the tally
             num_accessible_rolls += 1
-            to_remove.append(rl)
+            # Remove it from the grid
+            grid[rl[1]][rl[0]] = "."
+            # Remove it from the list of rolls to check
+            roll_locs.remove(rl)
+            # Make the next loop run
             any_removed = True
-    print(len(to_remove))
-    for tr in to_remove:
-        grid[tr[1]][tr[0]] = "."
-        roll_locs.remove(tr)
 
 print(num_accessible_rolls)
-
-
-# num_accessible_rolls = 0
-# to_remove = []
-# for rl in roll_locs:
-#     if get_is_acccessible(rl[0], rl[1]):
-#         num_accessible_rolls += 1
-#         to_remove.append(rl)
-# print(num_accessible_rolls)
-
-# for tr in to_remove:
-#     grid[tr[1]][tr[0]] = "."
-#     roll_locs.remove(tr)
-
-
-# num_accessible_rolls = 0
-# to_remove = []
-# for rl in roll_locs:
-#     if get_is_acccessible(rl[0], rl[1]):
-#         num_accessible_rolls += 1
-#         to_remove.append(rl)
-# print(num_accessible_rolls)
