@@ -2,27 +2,35 @@ from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2025, day=5)
 inp = puzzle.input_data
-# inp = puzzle.examples[0].input_data
 
 ranges_str, numbers_str = inp.split("\n\n")
 
 ranges = [tuple(int(v) for v in r.split("-")) for r in ranges_str.splitlines()]
 
-def merge_ranges(a1, a2, b1, b2):
-    if a1 < b2 < a2:
+def can_merge_ranges(a1, a2, b1, b2):
+    """
+    Check if two ranges overlap
+    """
+    if a1 <= b2 <= a2:
         return True
-    if b1 < a2 < b2:
+    if b1 <= a2 <= b2:
         return True
     return False
 
 def find_ranges_indexes_to_merge():
+    """
+    Find the next set of mergeable ranges
+    """
     for i in range(len(ranges) - 1):
         for j in range(i + 1, len(ranges)):
-            if merge_ranges(*ranges[i], *ranges[j]):
+            if can_merge_ranges(*ranges[i], *ranges[j]):
                 return (i, j)
     return None
 
-print(ranges)
+# Go through every pair of ranges
+#   if they are overlap, merge them
+#   then reset and keep looking for another merge,
+#   until none of the ranges overlap
 while True:
     itm = find_ranges_indexes_to_merge()
     if itm is None:
@@ -36,8 +44,10 @@ while True:
         if i not in itm:
             new_ranges.append(ranges[i])
     ranges = new_ranges
-    print(ranges)
 
+# Once none of the ranges overlap, the number of 
+#   fresh ingredients is just the sum of the size
+#   of every range
 fresh_ingredients = 0
 for rr in ranges:
     fresh_ingredients += rr[1] - rr[0] + 1

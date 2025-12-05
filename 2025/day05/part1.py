@@ -8,6 +8,9 @@ ranges_str, numbers_str = inp.split("\n\n")
 ranges = [tuple(int(v) for v in r.split("-")) for r in ranges_str.splitlines()]
 
 def is_in_ranges(n):
+    """
+    Check if a given number is within the ranges specified
+    """
     for range in ranges:
         if n >= range[0] and n <= range[1]:
             return True
