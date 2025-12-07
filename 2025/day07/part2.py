@@ -18,18 +18,27 @@ splitter_indexes = [
     if (splitters := find(row, "^"))
 ]
 
-# List of all current beam indexes
-beams = [rows[0].index("S")]  # Get location of first beam
+# Map of all beam locations to number of beams in that location
+beams = {
+    rows[0].index("S"): 1  # Get location of first beam
+}
+
+def add_beam_to_dict(beams_dict, new_beam_index, new_beam_value):
+    """
+    If an index is already in the dictionary, we want to add it's value to the current value instead of overwriting
+    """
+    if new_beam_index not in beams_dict:
+        beams_dict[new_beam_index] = 0
+    beams_dict[new_beam_index] += new_beam_value
 
 for splitter_row in splitter_indexes:
-    print(splitter_row)
-    new_beams = []
+    new_beams = {}
     for beam_index in beams:
         if beam_index in splitter_row:
-            new_beams.append(beam_index - 1)
-            new_beams.append(beam_index + 1)
+            add_beam_to_dict(new_beams, beam_index -1, beams[beam_index])
+            add_beam_to_dict(new_beams, beam_index +1, beams[beam_index])
         else:
-            new_beams.append(beam_index)
+            add_beam_to_dict(new_beams, beam_index, beams[beam_index])
     beams = new_beams
 
-print(len(beams))
+print(sum(beams.values()))
