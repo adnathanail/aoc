@@ -2,7 +2,7 @@
 name = "aoc"
 version = "2024.0.0"
 description = "My solutions to the Advent of Code challenges"
-authors = ["Alex Nathanail <adnathanail@hotmail.co.uk>"]
+authors = [{name = "Alex Nathanail", email = "adnathanail@hotmail.co.uk"}]
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -10,6 +10,8 @@ dependencies = [
     "networkx>=3.4.2",
     "pillow>=11.0.0",
     "pydot>=3.0.3",
+    "scipy>=1.16.3",
+    "snakeviz>=2.2.2",
 ]
 
 [tool.black]

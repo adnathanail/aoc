@@ -27,7 +27,6 @@ for fdh in range(num_rounds):
     shortest_distance = inf
     for i in distance_lookup:
         for j in distance_lookup[i]:
-            # print(i, j, distance_lookup[i][j])
             if distance_lookup[i][j] < shortest_distance and (i, j) not in connections:
                 shortest_distance = distance_lookup[i][j]
                 closest_points = (i, j)
