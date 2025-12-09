@@ -5,33 +5,37 @@ from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2025, day=8)
 inp = puzzle.input_data
-num_rounds = 1000
 
+# Extract list of coordinates for each junction box
 junction_boxes = [[int(n) for n in row.split(",")] for row in inp.splitlines()]
 
+# -- Cache distance between each pair of boxes --
 def euc_dist(a, b):
     return sqrt((a[0] - b[0])**2 + (a[1] - b[1])**2 + (a[2] - b[2])**2)
 
 distance_lookup = {}
 
 for i in range(len(junction_boxes) - 1):
-    distance_lookup[i] = {}
     for j in range(i + 1, len(junction_boxes)):
-        distance_lookup[i][j] = euc_dist(junction_boxes[i], junction_boxes[j])
+        distance_lookup[(i, j)] = euc_dist(junction_boxes[i], junction_boxes[j])
 
-connections = []
+# -- Form connected components --
+# Sort the distance cache, so we can just run through it once,
+#   instead of searching for the next closest pair every time
+distances_in_increasing_order = sorted(distance_lookup.items(), key=lambda x: x[1])
+
+# Create disjoint set, with every junction box in its own subset
 connected_components = DisjointSet(list(range(len(junction_boxes))))
 
-for fdh in range(num_rounds):
-    closest_points = None
-    shortest_distance = inf
-    for i in distance_lookup:
-        for j in distance_lookup[i]:
-            if distance_lookup[i][j] < shortest_distance and (i, j) not in connections:
-                shortest_distance = distance_lookup[i][j]
-                closest_points = (i, j)
+# Go through each pair of junction boxes, in order of increasing distance,
+#   until there is just one connected component in the graph
+i = -1
+while len(connected_components.subsets()) > 1:
+    i += 1
+    connected_components.merge(*distances_in_increasing_order[i][0])
 
-    connections.append(closest_points)
-    connected_components.merge(closest_points[0], closest_points[1])
+# Get the last connection made
+last_connection = distances_in_increasing_order[i][0]
 
-print(prod(sorted([len(cc) for cc in connected_components.subsets()])[-3:]))
+# Print the product of the x coordinates of the junction boxes of the last connection made
+print(junction_boxes[last_connection[0]][0] * junction_boxes[last_connection[1]][0])
