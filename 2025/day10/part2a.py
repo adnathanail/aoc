@@ -3,7 +3,7 @@ from itertools import chain, combinations
 from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2025, day=10)
-inp = puzzle.input_data
+inp = puzzle.examples[0].input_data
 
 # Parse machine data
 machines = []
@@ -31,14 +31,35 @@ def run_buttons(num_lights, buttons_to_push):
             out[i] = not out[i]
     return out
 
-num_button_presses = 0
-for machine in machines:
-    number_of_lights = len(machine["desired_state"])
+def get_button_presses_for_desired_state(button_wirings, desired_state):
+    number_of_lights = len(desired_state)
     # The powerset function returns subsets of increasing size,
     #   so the first one we find is automatically the shortest
-    for buttons in powerset(machine["button_wirings"]):
-        if run_buttons(number_of_lights, buttons) == machine["desired_state"]:
-            break
-    num_button_presses += len(buttons)
+    for buttons in powerset(button_wirings):
+        if run_buttons(number_of_lights, buttons) == desired_state:
+            return buttons
+
+def get_num_button_presses_for_joltages(button_wirings, joltages):
+    if set(joltages) == {0}:
+        return 0
+    # print(joltages)
+    odd_joltages = [bool(jolt % 2) for jolt in joltages]
+    button_pushes_to_get_even_joltages = get_button_presses_for_desired_state(button_wirings, odd_joltages)
+    print(button_pushes_to_get_even_joltages)
+    for button in button_pushes_to_get_even_joltages:
+        for wire in button:
+            joltages[wire] -= 1
+    # print(joltages)
+    for i in range(len(joltages)):
+        joltages[i] = joltages[i] // 2
+    # print(joltages)
+    print()
+    return len(button_pushes_to_get_even_joltages) + (2 * get_num_button_presses_for_joltages(button_wirings, joltages))
+
+num_button_presses = 0
+for machine in machines[-1:]:
+    print(get_num_button_presses_for_joltages(machine["button_wirings"], machine["joltages"]))
+    num_button_presses += get_num_button_presses_for_joltages(machine["button_wirings"], machine["joltages"])
+    # break
 
 print(num_button_presses)
