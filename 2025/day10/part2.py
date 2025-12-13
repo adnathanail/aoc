@@ -5,6 +5,7 @@ from aocd.models import Puzzle
 puzzle = Puzzle(year=2025, day=10)
 inp = puzzle.examples[0].input_data
 # inp = puzzle.input_data
+inp = "[#....#...#] (1,2,3,4,6,7,8) (4,9) (2,3,6,7,9) (0,3,7,8) (0,3,5,8) (0,4,5,6) (4,5,6,8) (1,2,4,6,7,9) {29,3,15,31,45,32,44,31,38,28}"
 
 # Parse machine data
 machines = []
@@ -43,20 +44,13 @@ def find_smallest_presses(button_wirings, desired_joltages):
                     if potential_state not in states:
                         states[potential_state] = states[state] + 1
                         new_states_to_visit.add(potential_state)
-                    # else:
-                    #     print("SEEN")
-                    # new_states.append(potential_state)
+
         states_to_visit = new_states_to_visit
-        # print(states)
-        # print(states_to_visit)
-        # print()
     return states[desired_joltages]
 
 
 num_button_presses = 0
 for machine in machines:
-    # print(find_smallest_presses(machine["button_wirings"], machine["joltages"]))
     num_button_presses += find_smallest_presses(machine["button_wirings"], machine["joltages"])
-    # break
 
 print(num_button_presses)
