@@ -9,6 +9,13 @@ inp = puzzle.input_data
 red_tile_coords = [tuple(int(v) for v in row.split(",")) for row in inp.splitlines()]
 
 def get_horizontal_and_vertical_lines(rtcs):
+    """
+    Given a list of red tile coordinates
+    Joins each pair of adjacent points into a line, and organises them
+      into two dictionaries, of horizontal and vertical lines, where
+      the key of the dictionary is the shared coordinate (x for verticals, and
+      y for horizontals) and the value of the dict is the range of the other coordinate
+    """
     verts = {}
     horis = {}
     for i in range(len(rtcs)):
@@ -22,25 +29,31 @@ def get_horizontal_and_vertical_lines(rtcs):
     return verts, horis
 
 def is_valid_square(a, b, verts, horis):
+    """
+    Given two coordinates, and dictionaries of horizontal and vertical
+      lines, determines whether any of the lines fall within the ranges
+      of the square defined by the two coordinates
+    """
     xs = sorted((a[0], b[0]))
     ys = sorted((a[1], b[1]))
     for vert in verts:
+        # Vertical line falls within horizontal range of the square
         if xs[0] < vert < xs[1]:
-            # print(vert, verts[vert])
+            # Vertical line crossing top edge of square
             if verts[vert][0] <= ys[0] and verts[vert][1] > ys[0]:
-                # print("1")
                 return False
+            # Vertical line crossing bottom edge of square
             elif verts[vert][0] < ys[1] and verts[vert][1] >= ys[1]:
-                # print("2")
                 return False
     
     for hori in horis:
+        # Horizontal line falls between vertical range of the square
         if ys[0] < hori < ys[1]:
+            # Horizontal line crossing left edge of square
             if horis[hori][0] <= xs[0] and horis[hori][1] > xs[0]:
-                # print("1")
                 return False
+            # Horizontal line crossing right edge of square
             elif horis[hori][0] < xs[1] and horis[hori][1] >= xs[1]:
-                # print("2")
                 return False
     return True
 
@@ -59,5 +72,7 @@ for i in range(len(red_tile_coords) - 1):
 
 print(largest_square_size)
 
+# Squares from example, incorrectly marked as valid,
+#   due to not correctly dealing with being "inside" vs "outside" the shape
 # 7,1 2,3
 # 9,7 2,5
