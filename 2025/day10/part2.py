@@ -76,3 +76,5 @@ for machine in machines:
     num_button_presses += find_smallest_presses(machine["button_wirings"], machine["joltages"])
 
 print(num_button_presses)
+
+# Not certain if there is potentail for shorter paths to be ignored, due to the priority queue meaning we no longer explore states in order
