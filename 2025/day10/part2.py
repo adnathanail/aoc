@@ -23,14 +23,24 @@ def button_wiring_to_tuple(buttons, num_lights):
 def add_tuples(t1, t2):
     return tuple(sum(t) for t in zip(t1, t2))
 
+def compare_tuples(t1, t2):
+    for i in range(len(t1)):
+        if t1[i] > t2[i]:
+            return False
+    return True
+
 def find_smallest_presses(button_wirings, desired_joltages):
     states = [tuple(0 for _ in desired_joltages)]
     button_tuples = [button_wiring_to_tuple(button, len(desired_joltages)) for button in button_wirings]
-    print(button_tuples)
-    # print(button_wiring_to_tuple(button_wirings, len(desired_joltages)))
-    for state in states:
-        for bt in button_tuples:
-
+    for _ in range(10):
+        new_states = []
+        for state in states:
+            for bt in button_tuples:
+                potential_state = add_tuples(state, bt)
+                if compare_tuples(potential_state, desired_joltages):
+                    new_states.append(potential_state)
+        states = new_states
+        print(new_states)
     return 0
 
 
