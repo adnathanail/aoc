@@ -1,9 +1,11 @@
 from itertools import chain, combinations
+import math
 
 from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2025, day=10)
-inp = puzzle.examples[0].input_data
+# inp = puzzle.examples[0].input_data
+inp = puzzle.input_data
 
 # Parse machine data
 machines = []
@@ -31,35 +33,35 @@ def run_buttons(num_lights, buttons_to_push):
             out[i] = not out[i]
     return out
 
-def get_button_presses_for_desired_state(button_wirings, desired_state):
+def get_possible_buttons_for_desired_state(button_wirings, desired_state):
     number_of_lights = len(desired_state)
     # The powerset function returns subsets of increasing size,
     #   so the first one we find is automatically the shortest
     for buttons in powerset(button_wirings):
         if run_buttons(number_of_lights, buttons) == desired_state:
-            return buttons
+            yield buttons
 
 def get_num_button_presses_for_joltages(button_wirings, joltages):
+    if any([jolt < 0 for jolt in joltages]):
+        return math.inf
     if set(joltages) == {0}:
         return 0
-    # print(joltages)
     odd_joltages = [bool(jolt % 2) for jolt in joltages]
-    button_pushes_to_get_even_joltages = get_button_presses_for_desired_state(button_wirings, odd_joltages)
-    print(button_pushes_to_get_even_joltages)
-    for button in button_pushes_to_get_even_joltages:
-        for wire in button:
-            joltages[wire] -= 1
-    # print(joltages)
-    for i in range(len(joltages)):
-        joltages[i] = joltages[i] // 2
-    # print(joltages)
-    print()
-    return len(button_pushes_to_get_even_joltages) + (2 * get_num_button_presses_for_joltages(button_wirings, joltages))
+    possible_buttons_for_even_joltages = get_possible_buttons_for_desired_state(button_wirings, odd_joltages)
+    least_buttons = math.inf
+    for buttons in possible_buttons_for_even_joltages:
+        new_joltages = joltages.copy()
+        for button in buttons:
+            for wire in button:
+                new_joltages[wire] -= 1
+        for i in range(len(new_joltages)):
+            new_joltages[i] = new_joltages[i] // 2
+        least_buttons = min(least_buttons, len(buttons) + (2 * get_num_button_presses_for_joltages(button_wirings, new_joltages)))
+    return least_buttons
 
 num_button_presses = 0
-for machine in machines[-1:]:
-    print(get_num_button_presses_for_joltages(machine["button_wirings"], machine["joltages"]))
+for machine in machines:
+    print(machine)
     num_button_presses += get_num_button_presses_for_joltages(machine["button_wirings"], machine["joltages"])
-    # break
 
 print(num_button_presses)
