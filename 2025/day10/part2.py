@@ -30,23 +30,33 @@ def compare_tuples(t1, t2):
     return True
 
 def find_smallest_presses(button_wirings, desired_joltages):
-    states = [tuple(0 for _ in desired_joltages)]
+    start_state = tuple(0 for _ in desired_joltages)
+    states_to_visit = set([start_state])
+    states = {start_state: 0}
     button_tuples = [button_wiring_to_tuple(button, len(desired_joltages)) for button in button_wirings]
-    for _ in range(10):
-        new_states = []
-        for state in states:
+    while desired_joltages not in states:
+        new_states_to_visit = set()
+        for state in states_to_visit:
             for bt in button_tuples:
                 potential_state = add_tuples(state, bt)
                 if compare_tuples(potential_state, desired_joltages):
-                    new_states.append(potential_state)
-        states = new_states
-        print(new_states)
-    return 0
+                    if potential_state not in states:
+                        states[potential_state] = states[state] + 1
+                        new_states_to_visit.add(potential_state)
+                    # else:
+                    #     print("SEEN")
+                    # new_states.append(potential_state)
+        states_to_visit = new_states_to_visit
+        # print(states)
+        # print(states_to_visit)
+        # print()
+    return states[desired_joltages]
 
 
 num_button_presses = 0
 for machine in machines:
+    # print(find_smallest_presses(machine["button_wirings"], machine["joltages"]))
     num_button_presses += find_smallest_presses(machine["button_wirings"], machine["joltages"])
-    break
+    # break
 
 print(num_button_presses)
