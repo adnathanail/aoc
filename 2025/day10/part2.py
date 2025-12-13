@@ -2,6 +2,7 @@
 # https://www.reddit.com/r/adventofcode/comments/1pk87hl/2025_day_10_part_2_bifurcate_your_way_to_victory/
 
 from itertools import chain, combinations
+from functools import cache
 import math
 
 from aocd.models import Puzzle
@@ -25,10 +26,12 @@ def powerset(iterable):
     s = list(iterable)
     return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
 
+@cache
 def add_tuples(t1, t2, m):
     """ Sum of 2 equal-length tuples modulo m, elementwise """
     return tuple(sum(t) % m for t in zip(t1, t2))
 
+@cache
 def run_buttons(num_lights, button_tuples_to_use):
     """
     Simulate a list of button presses
@@ -38,18 +41,20 @@ def run_buttons(num_lights, button_tuples_to_use):
         out = add_tuples(out, but, 2)
     return out
 
+@cache
 def get_possible_buttons_for_desired_state(button_tuples, binary_desired_state):
     """
     Given a list of button tuples, and a desired state (consisting of only 0's and 1's)
-      yield (as a generator) all possible button presses that reach that desired state
+      returns all possible button presses that reach that desired state
     """
     number_of_lights = len(binary_desired_state)
-    # The powerset function returns subsets of increasing size,
-    #   so the first one we find is automatically the shortest
-    for buttons in powerset(button_tuples):
-        if run_buttons(number_of_lights, buttons) == binary_desired_state:
-            yield buttons
+    return [
+        # The powerset function returns subsets of increasing size, so the first one we find is automatically the shortest
+        buttons for buttons in powerset(button_tuples)
+        if run_buttons(number_of_lights, buttons) == binary_desired_state
+    ]
 
+@cache
 def subtract_tuples(t1, t2):
     """
     Subtract one tuple from another, equal-length, tuple, elementwise
@@ -60,7 +65,7 @@ def int_divide_tuple(t, s):
     """
     Integer-divide a tuple by a scalar, elementwise
     """
-    return [item // s for item in t]
+    return tuple(item // s for item in t)
 
 def get_num_button_presses_for_joltages(button_tuples, joltages):
     """
@@ -102,6 +107,6 @@ def button_wiring_to_tuple(buttons, num_lights):
 num_button_presses = 0
 for machine in machines:
     print(machine)
-    num_button_presses += get_num_button_presses_for_joltages([button_wiring_to_tuple(wiring, len(machine["joltages"])) for wiring in machine["button_wirings"]], machine["joltages"])
+    num_button_presses += get_num_button_presses_for_joltages(tuple(button_wiring_to_tuple(wiring, len(machine["joltages"])) for wiring in machine["button_wirings"]), machine["joltages"])
 
 print(num_button_presses)

@@ -18,3 +18,9 @@ uv sync
 ```shell
 uv run 2024/day01/part1.py
 ```
+
+## Profiling a solution
+```shell
+python3 -m cProfile -o program.prof ./2025/day10/part2.py
+
+```
