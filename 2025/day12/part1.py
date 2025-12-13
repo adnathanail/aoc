@@ -69,6 +69,9 @@ def offset_present(present_coords, x_offset, y_offset):
 def attempt_placement(current_placement, region_width, region_height, present_ids_to_place):
     if not present_ids_to_place:
         return current_placement
+    # Short circuit when there aren't enough spaces left on the grid to place
+    if (len(current_placement) + 5 * len(present_ids_to_place)) > region_height * region_width:
+        return False
     for present_coords in get_all_versions_of_present(PRESS[present_ids_to_place[0]]):
         for x_offset in range(0, region_width - PRESENT_WIDTH_HEIGHT + 1):
             for y_offset in range(0, region_height - PRESENT_WIDTH_HEIGHT + 1):
