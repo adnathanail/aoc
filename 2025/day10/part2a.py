@@ -4,7 +4,6 @@ import math
 from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2025, day=10)
-# inp = puzzle.examples[0].input_data
 inp = puzzle.input_data
 
 # Parse machine data
@@ -14,7 +13,7 @@ for row in inp.splitlines():
     machines.append({
         "desired_state": [char == "#" for char in row_split[0][1:-1]],
         "button_wirings": [[int(v) for v in button[1:-1].split(",")] for button in row_split[1:-1]],
-        "joltages": [int(j) for j in row_split[-1][1:-1].split(",")]
+        "joltages": tuple(int(j) for j in row_split[-1][1:-1].split(","))
     })
 
 # Helper function https://docs.python.org/3/library/itertools.html#itertools-recipes
@@ -23,45 +22,59 @@ def powerset(iterable):
     s = list(iterable)
     return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
 
-def run_buttons(num_lights, buttons_to_push):
+def add_tuples(t1, t2, m):
+    """ Sum of 2 equal-length tuples modulo m, elementwise """
+    return tuple(sum(t) % m for t in zip(t1, t2))
+
+def run_buttons(num_lights, button_tuples_to_use):
     """
     Simulate a list of button presses
     """
-    out = [False for _ in range(num_lights)]
-    for but in buttons_to_push:
-        for i in but:
-            out[i] = not out[i]
+    out = tuple(0 for _ in range(num_lights))
+    for but in button_tuples_to_use:
+        out = add_tuples(out, but, 2)
     return out
 
-def get_possible_buttons_for_desired_state(button_wirings, desired_state):
+# print(run_buttons(4, [(0, 1, 0, 0), (1, 0, 1, 0)]))
+
+def get_possible_buttons_for_desired_state(button_tuples, desired_state):
     number_of_lights = len(desired_state)
     # The powerset function returns subsets of increasing size,
     #   so the first one we find is automatically the shortest
-    for buttons in powerset(button_wirings):
+    for buttons in powerset(button_tuples):
         if run_buttons(number_of_lights, buttons) == desired_state:
             yield buttons
 
-def get_num_button_presses_for_joltages(button_wirings, joltages):
+# print(list(get_possible_buttons_for_desired_state([(0, 0, 1, 0), (1, 0, 1, 0), (0, 1, 0, 0)], (0, 1, 1, 0))))
+
+def subtract_tuples(t1, t2):
+    # """ Sum of 2 equal-length tuples, elementwise """
+    return tuple(t[0] - t[1] for t in zip(t1, t2))
+
+def divide_tuple(t, s):
+    return [item // s for item in t]
+
+def get_num_button_presses_for_joltages(button_tuples, joltages):
     if any([jolt < 0 for jolt in joltages]):
         return math.inf
     if set(joltages) == {0}:
         return 0
-    odd_joltages = [bool(jolt % 2) for jolt in joltages]
-    possible_buttons_for_even_joltages = get_possible_buttons_for_desired_state(button_wirings, odd_joltages)
+    joltage_parities = tuple(jolt % 2 for jolt in joltages)
     least_buttons = math.inf
-    for buttons in possible_buttons_for_even_joltages:
-        new_joltages = joltages.copy()
+    for buttons in get_possible_buttons_for_desired_state(button_tuples, joltage_parities):
+        new_joltages = joltages
         for button in buttons:
-            for wire in button:
-                new_joltages[wire] -= 1
-        for i in range(len(new_joltages)):
-            new_joltages[i] = new_joltages[i] // 2
-        least_buttons = min(least_buttons, len(buttons) + (2 * get_num_button_presses_for_joltages(button_wirings, new_joltages)))
+            new_joltages = subtract_tuples(new_joltages, button)
+        new_joltages = divide_tuple(new_joltages, 2)
+        least_buttons = min(least_buttons, len(buttons) + (2 * get_num_button_presses_for_joltages(button_tuples, new_joltages)))
     return least_buttons
+
+def button_wiring_to_tuple(buttons, num_lights):
+    return tuple(1 if i in buttons else 0 for i in range(num_lights))
 
 num_button_presses = 0
 for machine in machines:
     print(machine)
-    num_button_presses += get_num_button_presses_for_joltages(machine["button_wirings"], machine["joltages"])
+    num_button_presses += get_num_button_presses_for_joltages([button_wiring_to_tuple(wiring, len(machine["joltages"])) for wiring in machine["button_wirings"]], machine["joltages"])
 
 print(num_button_presses)
