@@ -1,3 +1,4 @@
+from functools import cache
 from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2025, day=12)
@@ -57,79 +58,30 @@ def get_all_versions_of_present(present_coords):
 
 press, regs = process_input(inp)
 
-# for pres in get_all_versions_of_present(press[3]):
-#     print_grid(pres)
-#     print()
-
+@cache
 def offset_present(present_coords, x_offset, y_offset):
     return frozenset((coord[0] + x_offset, coord[1] + y_offset) for coord in present_coords)
 
-# def attempt_placement(current_placement, presents, region_width, region_height, placement_tally):
-#     if placement_tally == 0:
-#         return #current_placement
-#     # print_grid(current_placement.union(presents[0]), width=region_width, height=region_height)
-#     for x_offset in range(0, region_width - PRESENT_WIDTH_HEIGHT + 1):
-#         for y_offset in range(0, region_width - PRESENT_WIDTH_HEIGHT + 1):
-#             new_placement = current_placement.union(offset_present(presents[0], x_offset, y_offset))
-#             print_grid(new_placement, width=region_width, height=region_height)
-#             print()
-#             print(new_placement.intersection(offset_present(rotate_present_right(rotate_present_right(presents[0])), 1, 1)))
-#             break
-#             attempt_placement(new_placement, presents, region_width, region_height, placement_tally - 1)
-#             # new_placement = current_placement.union(offset_present(presents[0], x_offset, y_offset))
-#             # print_grid(current_placement.union(offset_present(presents[0], x_offset, y_offset)), width=region_width, height=region_height)
-#         break
 
-# def attempt_placement(current_placement, presents, region_width, region_height, placement_tally):
-#     if placement_tally == 0:
-#         return current_placement
-#     # print_grid(current_placement.union(presents[0]), width=region_width, height=region_height)
-#     print_grid(current_placement, width=region_width, height=region_height)
-#     for present_coords in get_all_versions_of_present(presents[0]):
-#         for x_offset in range(0, region_width - PRESENT_WIDTH_HEIGHT + 1):
-#             for y_offset in range(0, region_width - PRESENT_WIDTH_HEIGHT + 1):
-#                 present_to_place = offset_present(present_coords, x_offset, y_offset)
-#                 if current_placement.intersection(present_to_place) == set():
-#                     maybe_working_arrangement = attempt_placement(current_placement.union(present_to_place), presents, region_width, region_height, placement_tally - 1)
-#                     print(maybe_working_arrangement)
-#                     if maybe_working_arrangement:
-#                         return maybe_working_arrangement
-#                     # if working_arrangement := attempt_placement(current_placement.union(present_to_place), presents, region_width, region_height, placement_tally - 1):
-#                     #     return working_arrangement
-#                 # new_placement = current_placement.union(offset_present(present_coords, x_offset, y_offset))
-#                 # print_grid(new_placement, width=region_width, height=region_height)
-#                 # print()
-#                 # print(new_placement.intersection(offset_present(rotate_present_right(rotate_present_right(presents[0])), 1, 1)))
-#                 # break
-#                 # attempt_placement(new_placement, presents, region_width, region_height, placement_tally - 1)
-#                 # # new_placement = current_placement.union(offset_present(presents[0], x_offset, y_offset))
-#                 # # print_grid(current_placement.union(offset_present(presents[0], x_offset, y_offset)), width=region_width, height=region_height)
-#     return False
-
-def attempt_placement(current_placement, presents, region_width, region_height, placement_tally):
-    if placement_tally == 0:
+def attempt_placement(current_placement, presents, region_width, region_height, present_ids_to_place):
+    if not present_ids_to_place:
         return current_placement
-    print_grid(current_placement, width=region_width, height=region_height)
-    for present_coords in get_all_versions_of_present(presents[4]):
+    for present_coords in get_all_versions_of_present(presents[present_ids_to_place[0]]):
         for x_offset in range(0, region_width - PRESENT_WIDTH_HEIGHT + 1):
-            for y_offset in range(0, region_width - PRESENT_WIDTH_HEIGHT + 1):
+            for y_offset in range(0, region_height - PRESENT_WIDTH_HEIGHT + 1):
                 present_to_place = offset_present(present_coords, x_offset, y_offset)
                 if current_placement.intersection(present_to_place) == set():
-                    maybe_working_arrangement = attempt_placement(current_placement.union(present_to_place), presents, region_width, region_height, placement_tally - 1)
+                    maybe_working_arrangement = attempt_placement(current_placement.union(present_to_place), presents, region_width, region_height, present_ids_to_place[1:])
                     if maybe_working_arrangement:
-                        print(11, placement_tally, present_coords)
                         return maybe_working_arrangement
     return False
 
 
-for region in regs:
+for region in regs[:-1]:
     wh, pts = region
-    # region_width, region_height = wh
-    print_grid(attempt_placement(set(), press, wh[0], wh[1], 2), width=wh[0], height=wh[1])
-    # region_placements = set()
-    # region_placements = region_placements.union(press[0])
-    # print_grid(region_placements, width=region_width, height=region_height)
-    break
-# region = set()
-# print(press[0])
-# print(region.union(press[0]))
+    pids_to_place_this_region = []
+    for i in range(len(pts)):
+        for _ in range(pts[i]):
+            pids_to_place_this_region.append(i)
+    if placement := attempt_placement(set(), press, wh[0], wh[1], pids_to_place_this_region):
+        print_grid(placement, width=wh[0], height=wh[1])
