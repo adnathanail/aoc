@@ -3,7 +3,7 @@ from functools import cache
 from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2025, day=12)
-inp = puzzle.examples[0].input_data
+inp = puzzle.input_data
 
 PRESENT_WIDTH_HEIGHT = 3
 
@@ -70,7 +70,7 @@ def attempt_placement(current_placement, region_width, region_height, present_id
     if not present_ids_to_place:
         return current_placement
     # Short circuit when there aren't enough spaces left on the grid to place
-    if (len(current_placement) + 5 * len(present_ids_to_place)) > region_height * region_width:
+    if (len(current_placement) + sum(len(PRESS[pres_id]) for pres_id in present_ids_to_place)) > region_height * region_width:
         return False
     for present_coords in get_all_versions_of_present(PRESS[present_ids_to_place[0]]):
         for x_offset in range(0, region_width - PRESENT_WIDTH_HEIGHT + 1):
@@ -82,12 +82,14 @@ def attempt_placement(current_placement, region_width, region_height, present_id
                         return maybe_working_arrangement
     return False
 
-
+tot = 0
 for region in REGS:
     wh, pts = region
     pids_to_place_this_region = []
     for i in range(len(pts)):
         for _ in range(pts[i]):
             pids_to_place_this_region.append(i)
-    if placement := attempt_placement(frozenset(), wh[0], wh[1], tuple(pids_to_place_this_region)):
-        print_grid(placement, width=wh[0], height=wh[1])
+    if attempt_placement(frozenset(), wh[0], wh[1], tuple(pids_to_place_this_region)):
+        tot += 1
+
+print(tot)
