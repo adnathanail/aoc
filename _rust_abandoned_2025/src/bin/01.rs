@@ -36,7 +36,6 @@ pub fn part_two(input: &str) -> Option<u64> {
                 num_zeroes += 1;
             }
         }
-
     }
     Some(num_zeroes)
 }
