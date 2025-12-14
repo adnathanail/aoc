@@ -1,4 +1,4 @@
-use std::cmp::{max, min};
+use std::cmp::max;
 use std::collections::HashMap;
 
 advent_of_code::solution!(9);
@@ -30,18 +30,22 @@ pub fn part_one(input: &str) -> Option<i32> {
     Some(largest_square_size)
 }
 
-fn get_horizontal_and_vertical_lines(
-    rtcs: &[[i32; 2]],
-) -> (HashMap<i32, (i32, i32)>, HashMap<i32, (i32, i32)>) {
+fn sort_ints_to_array(a: i32, b: i32) -> [i32; 2] {
+    if a <= b { [a, b] } else { [b, a] }
+}
+
+type TilingLineMap = HashMap<i32, [i32; 2]>;
+
+fn get_horizontal_and_vertical_lines(rtcs: &[[i32; 2]]) -> (TilingLineMap, TilingLineMap) {
     let mut verts = HashMap::new();
     let mut horis = HashMap::new();
     for i in 0..rtcs.len() {
         let a = rtcs[i];
         let b = rtcs[(i + 1) % rtcs.len()];
         if a[0] == b[0] {
-            verts.insert(a[0], (min(a[1], b[1]), max(a[1], b[1])));
+            verts.insert(a[0], sort_ints_to_array(a[1], b[1]).into());
         } else if a[1] == b[1] {
-            horis.insert(a[1], (min(a[0], b[0]), max(a[0], b[0])));
+            horis.insert(a[1], sort_ints_to_array(a[0], b[0]).into());
         } else {
             panic!("Invalid line: {:?} {:?}", a, b);
         }
@@ -49,12 +53,52 @@ fn get_horizontal_and_vertical_lines(
     (verts, horis)
 }
 
-pub fn part_two(input: &str) -> Option<u64> {
+fn is_valid_square(a: [i32; 2], b: [i32; 2], verts: &TilingLineMap, horis: &TilingLineMap) -> bool {
+    let xs: [i32; 2] = sort_ints_to_array(a[0], b[0]);
+    let ys: [i32; 2] = sort_ints_to_array(a[1], b[1]);
+    for (vert_x, vert_ys) in verts {
+        if xs[0] < *vert_x && *vert_x < xs[1] {
+            if vert_ys[0] <= ys[0] && vert_ys[1] > ys[0] {
+                return false;
+            }
+            if vert_ys[0] < ys[1] && vert_ys[1] >= ys[1] {
+                return false;
+            }
+        }
+    }
+    for (hori_y, hori_xs) in horis {
+        if ys[0] < *hori_y && *hori_y < ys[1] {
+            if hori_xs[0] <= xs[0] && hori_xs[1] > xs[1] {
+                return false;
+            }
+            if hori_xs[0] < xs[1] && hori_xs[1] >= xs[1] {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+pub fn part_two(input: &str) -> Option<i32> {
     let red_tile_coords = get_red_tile_coords(input);
     let (vertical_lines, horizontal_lines) = get_horizontal_and_vertical_lines(&red_tile_coords);
-    println!("{:?}", vertical_lines);
-    println!("{:?}", horizontal_lines);
-    None
+    let mut largest_square_size = 0;
+    for i in 0..(red_tile_coords.len() - 1) {
+        for j in (i + 1)..red_tile_coords.len() {
+            if is_valid_square(
+                red_tile_coords[i],
+                red_tile_coords[j],
+                &vertical_lines,
+                &horizontal_lines,
+            ) {
+                largest_square_size = max(
+                    largest_square_size,
+                    get_square_size(red_tile_coords[i], red_tile_coords[j]),
+                )
+            }
+        }
+    }
+    Some(largest_square_size)
 }
 
 #[cfg(test)]
