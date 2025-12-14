@@ -12,11 +12,13 @@ fn get_red_tile_coords(input: &str) -> Vec<[u32; 2]> {
     out
 }
 
-fn get_square_size(c1: [u32; 2], c2: [u32; 2]) -> i64 {
-    (((c1[0] as i64) - (c2[0] as i64)).abs() + 1) * (((c1[1] as i64) - (c2[1] as i64)).abs() + 1)
+fn get_square_size(c1: [u32; 2], c2: [u32; 2]) -> u64 {
+    let width = ((c1[0] as i64) - (c2[0] as i64)).abs() + 1;
+    let height = ((c1[1] as i64) - (c2[1] as i64)).abs() + 1;
+    (width * height) as u64
 }
 
-pub fn part_one(input: &str) -> Option<i64> {
+pub fn part_one(input: &str) -> Option<u64> {
     let red_tile_coords = get_red_tile_coords(input);
     let mut largest_square_size = 0;
     for i in 0..(red_tile_coords.len() - 1) {
@@ -79,7 +81,7 @@ fn is_valid_square(a: [u32; 2], b: [u32; 2], verts: &TilingLineMap, horis: &Tili
     true
 }
 
-pub fn part_two(input: &str) -> Option<i64> {
+pub fn part_two(input: &str) -> Option<u64> {
     let red_tile_coords = get_red_tile_coords(input);
     let (vertical_lines, horizontal_lines) = get_horizontal_and_vertical_lines(&red_tile_coords);
     let mut largest_square_size = 0;
