@@ -1,6 +1,3 @@
-from math import sqrt, inf, prod
-from scipy.cluster.hierarchy import DisjointSet
-
 from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2025, day=9)
