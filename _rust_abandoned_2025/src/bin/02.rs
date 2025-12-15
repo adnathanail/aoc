@@ -63,18 +63,18 @@ fn is_invalid_part_two(num: u64) -> bool {
         let mut chunks_different = false;
         for i in 0..(num_length / rep_length) {
             let subs = get_substring_from_number(num, i * rep_length, (i + 1) * rep_length);
-            if first_chunk == None {
+            if first_chunk.is_none() {
                 first_chunk = Some(subs);
             } else if first_chunk != Some(subs) {
                 chunks_different = true;
                 break;
             }
         }
-        if chunks_different == false {
+        if !chunks_different {
             return true;
         }
     }
-    return false;
+    false
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
