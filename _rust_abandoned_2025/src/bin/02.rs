@@ -19,19 +19,23 @@ fn is_invalid_part_one(num: u64) -> bool {
         == get_substring_from_number(num, num_length / 2, num_length)
 }
 
-pub fn part_one(input: &str) -> Option<u64> {
+fn get_total_invalid_strings(input: &str, invalidity_function: fn(u64) -> bool) -> Option<u64> {
     let mut tot_invalids = 0;
     for num_range in input.strip_suffix("\n").unwrap().split(",") {
         let num_range_split = num_range.split("-").collect::<Vec<&str>>();
         let from_num: u64 = num_range_split[0].parse().unwrap();
         let to_num: u64 = num_range_split[1].parse().unwrap();
         for num in from_num..(to_num + 1) {
-            if is_invalid_part_one(num) {
+            if invalidity_function(num) {
                 tot_invalids += num;
             }
         }
     }
     Some(tot_invalids)
+}
+
+pub fn part_one(input: &str) -> Option<u64> {
+    get_total_invalid_strings(input, is_invalid_part_one)
 }
 
 type FactorLookup = Vec<Vec<u32>>;
@@ -74,18 +78,7 @@ fn is_invalid_part_two(num: u64) -> bool {
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
-    let mut tot_invalids = 0;
-    for num_range in input.strip_suffix("\n").unwrap().split(",") {
-        let num_range_split = num_range.split("-").collect::<Vec<&str>>();
-        let from_num: u64 = num_range_split[0].parse().unwrap();
-        let to_num: u64 = num_range_split[1].parse().unwrap();
-        for num in from_num..(to_num + 1) {
-            if is_invalid_part_two(num) {
-                tot_invalids += num;
-            }
-        }
-    }
-    Some(tot_invalids)
+    get_total_invalid_strings(input, is_invalid_part_two)
 }
 
 #[cfg(test)]
