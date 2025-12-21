@@ -4,6 +4,9 @@ use advent_of_code::{get_number_length, get_substring_from_number};
 use std::cmp::max;
 
 fn get_largest_digit_in_number(num: u64) -> (u64, u32) {
+    // Slightly inefficient, as it starts from the right hand-side of the number
+    //   meaning we cannot short-circuit when we find a 9, because we could
+    //   find a 9 further to the left, giving more options for the second run
     let mut largest = 0;
     let mut largest_index = 0;
 
@@ -15,38 +18,28 @@ fn get_largest_digit_in_number(num: u64) -> (u64, u32) {
             largest = digit;
             largest_index = i;
         }
-        // println!("{} {}", curr, curr % 10);
         largest = max(largest, curr % 10);
         curr /= 10;
         i += 1;
     }
-    // println!("{} {}", largest, largest_index);
     (largest, largest_index)
 }
 
 pub fn part_one(input: &str) -> Option<u64> {
     let mut total_joltage = 0;
     for row in input.strip_suffix("\n").unwrap().split("\n") {
+        // Parse string to int
         let num: u64 = row.parse().unwrap();
-        let num_length: u32 = get_number_length(num);
-        // println!("{} {}", num, get_number_length(num));
-        // println!("{}", get_substring_from_number(num, 1, num_length));
+        // Get largest digit in number (excluding the last digit)
         let (first_largest_digit, first_largest_digit_index) =
-            get_largest_digit_in_number(get_substring_from_number(num, 1, num_length));
-        // println!("{} {}", first_largest_digit, first_largest_digit_index);
-        // println!(
-        //     "{}",
-        //     get_substring_from_number(num, 0, first_largest_digit_index + 1)
-        // );
+            get_largest_digit_in_number(get_substring_from_number(num, 1, get_number_length(num)));
+        // Get largest digit to the right of first largest digit
         let (second_largest_digit, _) = get_largest_digit_in_number(get_substring_from_number(
             num,
             0,
             first_largest_digit_index + 1,
         ));
-        println!("{} {}", first_largest_digit, second_largest_digit);
         total_joltage += first_largest_digit * 10 + second_largest_digit;
-        // println!("{:?}", get_largest_digit_in_number(get_substring_from_number(num, 1, num_length)));
-        // break;
     }
     Some(total_joltage)
 }
