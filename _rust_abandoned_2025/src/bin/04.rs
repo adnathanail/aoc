@@ -76,7 +76,6 @@ fn parse_grid(input: &str) -> Grid {
         .strip_suffix("\n")
         .unwrap()
         .split("\n")
-        .into_iter()
         .map(|x| x.chars().map(|ch| ch == '@').collect())
         .collect()
 }
@@ -84,8 +83,8 @@ fn parse_grid(input: &str) -> Grid {
 pub fn part_one(input: &str) -> Option<u64> {
     let grid: Grid = parse_grid(input);
     // Get width and height
-    let height = (&grid).len();
-    let width = (&grid[0]).len();
+    let height = grid.len();
+    let width = grid[0].len();
     // Accumulator
     let mut num_accessible_rolls = 0;
     // Go through grid
@@ -103,13 +102,13 @@ pub fn part_one(input: &str) -> Option<u64> {
 pub fn part_two(input: &str) -> Option<u64> {
     let mut grid: Grid = parse_grid(input);
     // Get width and height
-    let height = (&grid).len();
-    let width = (&grid[0]).len();
+    let height = grid.len();
+    let width = grid[0].len();
     // Get a list of the locations of every rolls
     let mut roll_locs: Vec<(usize, usize)> = vec![];
-    for y in 0..height {
-        for x in 0..width {
-            if grid[y][x] {
+    for (y, row) in grid.iter().enumerate() {
+        for (x, val) in row.iter().enumerate() {
+            if *val {
                 roll_locs.push((x, y));
             }
         }
@@ -117,7 +116,7 @@ pub fn part_two(input: &str) -> Option<u64> {
     let mut num_accessible_rolls = 0;
     let mut indexes_to_remove: Vec<usize> = vec![];
     // Force loop to run first time (if no rolls are accessible then this will infinite loop 😱)
-    while num_accessible_rolls == 0 || indexes_to_remove.len() > 0 {
+    while num_accessible_rolls == 0 || !indexes_to_remove.is_empty() {
         // Indexes of rolls in roll_locs to remove (have to do this outside of the loop)
         indexes_to_remove = vec![];
         for (index, rl) in roll_locs.iter().enumerate() {
@@ -127,7 +126,7 @@ pub fn part_two(input: &str) -> Option<u64> {
                 indexes_to_remove.push(index);
             }
         }
-        for index in (&indexes_to_remove).iter().rev() {
+        for index in indexes_to_remove.iter().rev() {
             roll_locs.remove(*index);
         }
     }

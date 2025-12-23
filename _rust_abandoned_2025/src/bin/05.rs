@@ -49,7 +49,7 @@ fn can_merge_ranges(a1: usize, a2: usize, b1: usize, b2: usize) -> bool {
     if b1 <= a2 && a2 <= b2 {
         return true;
     }
-    return false;
+    false
 }
 
 fn find_ranges_indexes_to_merge(ranges: &Ranges) -> Option<(usize, usize)> {
@@ -72,9 +72,9 @@ pub fn part_two(input: &str) -> Option<u64> {
             let rtm1 = ranges[rtm1_index];
             let rtm2 = ranges[rtm2_index];
             let mut new_ranges: Ranges = vec![(min(rtm1.0, rtm2.0), max(rtm1.1, rtm2.1))];
-            for i in 0..ranges.len() {
+            for (i, range) in ranges.iter().enumerate() {
                 if i != rtm1_index && i != rtm2_index {
-                    new_ranges.push(ranges[i])
+                    new_ranges.push(*range)
                 }
             }
             ranges = new_ranges;
