@@ -55,15 +55,18 @@ fn get_valid_surrounding_square_indexes(
     out
 }
 
-fn get_num_adjacent_rolls(grid: &Grid, height: usize, width: usize, x: usize, y: usize) -> u64 {
-    // Get the values in every square surrounding the given coordinate
-    let mut out = 0;
+fn get_is_acccessible(grid: &Grid, height: usize, width: usize, x: usize, y: usize) -> bool {
+    // Given a coordinate, determine whether it is accessilbe
+    let mut num_adjacent_rolls = 0;
     for loc in get_valid_surrounding_square_indexes(height, width, x, y) {
         if grid[loc.1][loc.0] {
-            out += 1;
+            num_adjacent_rolls += 1;
+        }
+        if num_adjacent_rolls > 3 {
+            return false;
         }
     }
-    out
+    true
 }
 
 fn parse_grid(input: &str) -> Grid {
@@ -89,7 +92,7 @@ pub fn part_one(input: &str) -> Option<u64> {
     for y in 0..height {
         for x in 0..width {
             // If there is a roll there, and it is accessible (less than 4 neighbours)
-            if grid[y][x] && (get_num_adjacent_rolls(&grid, height, width, x, y) < 4) {
+            if grid[y][x] && get_is_acccessible(&grid, height, width, x, y) {
                 num_accessible_rolls += 1
             }
         }
@@ -113,10 +116,12 @@ pub fn part_two(input: &str) -> Option<u64> {
     }
     let mut num_accessible_rolls = 0;
     let mut indexes_to_remove: Vec<usize> = vec![];
+    // Force loop to run first time (if no rolls are accessible then this will infinite loop 😱)
     while num_accessible_rolls == 0 || indexes_to_remove.len() > 0 {
+        // Indexes of rolls in roll_locs to remove (have to do this outside of the loop)
         indexes_to_remove = vec![];
         for (index, rl) in roll_locs.iter().enumerate() {
-            if get_num_adjacent_rolls(&grid, height, width, rl.0, rl.1) < 4 {
+            if get_is_acccessible(&grid, height, width, rl.0, rl.1) {
                 num_accessible_rolls += 1;
                 grid[rl.1][rl.0] = false;
                 indexes_to_remove.push(index);
