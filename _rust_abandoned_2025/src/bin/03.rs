@@ -14,7 +14,11 @@ const DIGITS: [(u64, char); 10] = [
 ];
 
 fn get_largest_digit_in_number(num: &str) -> Option<(u64, usize)> {
+    // Given a string of digits, find the left-most occurrence of the largest
+    //   digit in the string
+    // Go through each digit (and its char representation) in descending order
     for (digit, digit_char) in DIGITS {
+        // If the digit is in the string, return the index
         if let Some(index) = num.find(digit_char) {
             return Some((digit, index));
         }
@@ -22,23 +26,17 @@ fn get_largest_digit_in_number(num: &str) -> Option<(u64, usize)> {
     None
 }
 
-pub fn part_one(input: &str) -> Option<u64> {
-    let mut total_joltage = 0;
-    for row in input.strip_suffix("\n").unwrap().split("\n") {
-        // Get largest digit in number (excluding the last digit)
-        let (first_largest_digit, first_largest_digit_index) =
-            get_largest_digit_in_number(&row[0..row.len() - 1]).unwrap();
-        // Get largest digit to the right of first largest digit
-        let (second_largest_digit, _) =
-            get_largest_digit_in_number(&row[first_largest_digit_index + 1..]).unwrap();
-        total_joltage += first_largest_digit * 10 + second_largest_digit;
-    }
-    Some(total_joltage)
-}
-
 fn get_largest_n_digit_substring(num: &str, n: u64) -> u64 {
+    // Given a string of digits, and the desired length of the result
+    //   find the "substring" (as an integer) with the largest value
+    //   formed just by removing digits from the string
+    // Keep track of the substring we are searching in with 2 pointers
+    // The left is limited by the index of the previously found largest number
     let mut left_offset = 0;
+    // The right is limited by the number of digits we still have to find
+    //   (so we are guaranteed to find an n-digit string)
     let mut right_offset = n as usize;
+    // Accumulator
     let mut out = 0;
 
     // i is used to get powers of 10, to construct the number, so we go from 12 - 0
@@ -46,18 +44,31 @@ fn get_largest_n_digit_substring(num: &str, n: u64) -> u64 {
         right_offset -= 1;
         let (digit, index) =
             get_largest_digit_in_number(&num[left_offset..num.len() - right_offset]).unwrap();
+        // Build output by multiplying digits by powers of 10, so that the output is
+        //   a number as opposed to a string, for ease of addition later
         out += digit * 10_u64.pow(i as u32);
         left_offset += index + 1;
     }
     out
 }
 
-pub fn part_two(input: &str) -> Option<u64> {
+fn solve_problem_for_n(input: &str, n: u64) -> Option<u64> {
+    // Given a full input string, split it by rows
+    //   and find the largest "substring" for each row
+    //   returning the sum of these "substrings" as numbers
     let mut total_joltage = 0;
     for row in input.strip_suffix("\n").unwrap().split("\n") {
-        total_joltage += get_largest_n_digit_substring(row, 12);
+        total_joltage += get_largest_n_digit_substring(row, n);
     }
     Some(total_joltage)
+}
+
+pub fn part_one(input: &str) -> Option<u64> {
+    solve_problem_for_n(input, 2)
+}
+
+pub fn part_two(input: &str) -> Option<u64> {
+    solve_problem_for_n(input, 12)
 }
 
 #[cfg(test)]
