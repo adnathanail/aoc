@@ -2,18 +2,18 @@ advent_of_code::solution!(4);
 
 type Grid = Vec<Vec<bool>>;
 
-fn print_grid(grid: &Grid) {
-    for yy in 0..grid.len() {
-        for xx in 0..grid[yy].len() {
-            if grid[yy][xx] {
-                print!("@");
-            } else {
-                print!(".");
-            }
-        }
-        println!();
-    }
-}
+// fn print_grid(grid: &Grid) {
+//     for yy in 0..grid.len() {
+//         for xx in 0..grid[yy].len() {
+//             if grid[yy][xx] {
+//                 print!("@");
+//             } else {
+//                 print!(".");
+//             }
+//         }
+//         println!();
+//     }
+// }
 
 fn get_valid_surrounding_square_indexes(
     height: usize,
@@ -66,16 +66,20 @@ fn get_num_adjacent_rolls(grid: &Grid, height: usize, width: usize, x: usize, y:
     out
 }
 
-pub fn part_one(input: &str) -> Option<u64> {
+fn parse_grid(input: &str) -> Grid {
     // Convert input string into a 2D vec of booleans,
     //   where true means a roll, and false otherwise
-    let grid: Grid = input
+    input
         .strip_suffix("\n")
         .unwrap()
         .split("\n")
         .into_iter()
         .map(|x| x.chars().map(|ch| ch == '@').collect())
-        .collect();
+        .collect()
+}
+
+pub fn part_one(input: &str) -> Option<u64> {
+    let grid: Grid = parse_grid(input);
     // Get width and height
     let height = (&grid).len();
     let width = (&grid[0]).len();
@@ -94,7 +98,35 @@ pub fn part_one(input: &str) -> Option<u64> {
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
-    None
+    let mut grid: Grid = parse_grid(input);
+    // Get width and height
+    let height = (&grid).len();
+    let width = (&grid[0]).len();
+    // Get a list of the locations of every rolls
+    let mut roll_locs: Vec<(usize, usize)> = vec![];
+    for y in 0..height {
+        for x in 0..width {
+            if grid[y][x] {
+                roll_locs.push((x, y));
+            }
+        }
+    }
+    let mut num_accessible_rolls = 0;
+    let mut indexes_to_remove: Vec<usize> = vec![];
+    while num_accessible_rolls == 0 || indexes_to_remove.len() > 0 {
+        indexes_to_remove = vec![];
+        for (index, rl) in roll_locs.iter().enumerate() {
+            if get_num_adjacent_rolls(&grid, height, width, rl.0, rl.1) < 4 {
+                num_accessible_rolls += 1;
+                grid[rl.1][rl.0] = false;
+                indexes_to_remove.push(index);
+            }
+        }
+        for index in (&indexes_to_remove).iter().rev() {
+            roll_locs.remove(*index);
+        }
+    }
+    Some(num_accessible_rolls)
 }
 
 #[cfg(test)]
