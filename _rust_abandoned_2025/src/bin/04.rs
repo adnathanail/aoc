@@ -16,18 +16,18 @@ fn print_grid(grid: &Grid) {
 }
 
 fn get_valid_surrounding_square_indexes(
-    height: u64,
-    width: u64,
-    x: u64,
-    y: u64,
-) -> Vec<(u64, u64)> {
+    height: usize,
+    width: usize,
+    x: usize,
+    y: usize,
+) -> Vec<(usize, usize)> {
     // Given a coordinate, return all the surrounding coordinates that exist
     //   i.e. ones that don't cause IndexErrors
     // Numbers below match comments on the lines which deal with each potential valid location
     // 123
     // 4X5
     // 678
-    let mut out: Vec<(u64, u64)> = vec![];
+    let mut out: Vec<(usize, usize)> = vec![];
     if y > 0 {
         if x > 0 {
             out.push((x - 1, y - 1)); // 1
@@ -55,19 +55,11 @@ fn get_valid_surrounding_square_indexes(
     out
 }
 
-fn get_num_adjacent_rolls(grid: &Grid, height: u64, width: u64, x: u64, y: u64) -> u64 {
-    println!(
-        "bbb {} {} aa {} {} {:?}",
-        height,
-        width,
-        x,
-        y,
-        get_valid_surrounding_square_indexes(height, width, x, y)
-    );
+fn get_num_adjacent_rolls(grid: &Grid, height: usize, width: usize, x: usize, y: usize) -> u64 {
     // Get the values in every square surrounding the given coordinate
     let mut out = 0;
     for loc in get_valid_surrounding_square_indexes(height, width, x, y) {
-        if grid[loc.1 as usize][loc.0 as usize] {
+        if grid[loc.1][loc.0] {
             out += 1;
         }
     }
@@ -75,6 +67,8 @@ fn get_num_adjacent_rolls(grid: &Grid, height: u64, width: u64, x: u64, y: u64) 
 }
 
 pub fn part_one(input: &str) -> Option<u64> {
+    // Convert input string into a 2D vec of booleans,
+    //   where true means a roll, and false otherwise
     let grid: Grid = input
         .strip_suffix("\n")
         .unwrap()
@@ -82,20 +76,16 @@ pub fn part_one(input: &str) -> Option<u64> {
         .into_iter()
         .map(|x| x.chars().map(|ch| ch == '@').collect())
         .collect();
+    // Get width and height
     let height = (&grid).len();
     let width = (&grid[0]).len();
+    // Accumulator
     let mut num_accessible_rolls = 0;
-    for yy in 0..height {
-        for xx in 0..width {
-            if grid[yy][xx]
-                && (get_num_adjacent_rolls(
-                    &grid,
-                    height as u64,
-                    width as u64,
-                    xx as u64,
-                    yy as u64,
-                ) < 4)
-            {
+    // Go through grid
+    for y in 0..height {
+        for x in 0..width {
+            // If there is a roll there, and it is accessible (less than 4 neighbours)
+            if grid[y][x] && (get_num_adjacent_rolls(&grid, height, width, x, y) < 4) {
                 num_accessible_rolls += 1
             }
         }
