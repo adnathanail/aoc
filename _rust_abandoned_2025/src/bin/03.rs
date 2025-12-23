@@ -1,44 +1,36 @@
 advent_of_code::solution!(3);
 
-use advent_of_code::{get_number_length, get_substring_from_number};
-use std::cmp::max;
+const DIGITS: [(u64, char); 10] = [
+    (9, '9'),
+    (8, '8'),
+    (7, '7'),
+    (6, '6'),
+    (5, '5'),
+    (4, '4'),
+    (3, '3'),
+    (2, '2'),
+    (1, '1'),
+    (0, '0'),
+];
 
-fn get_largest_digit_in_number(num: u64) -> (u64, u32) {
-    // Slightly inefficient, as it starts from the right hand-side of the number
-    //   meaning we cannot short-circuit when we find a 9, because we could
-    //   find a 9 further to the left, giving more options for the second run
-    let mut largest = 0;
-    let mut largest_index = 0;
-
-    let mut curr = num;
-    let mut i = 0;
-    while curr > 0 {
-        let digit = curr % 10;
-        if digit >= largest {
-            largest = digit;
-            largest_index = i;
+fn get_largest_digit_in_number(num: &str) -> Option<(u64, usize)> {
+    for (digit, digit_char) in DIGITS {
+        if let Some(index) = num.find(digit_char) {
+            return Some((digit, index));
         }
-        largest = max(largest, curr % 10);
-        curr /= 10;
-        i += 1;
     }
-    (largest, largest_index)
+    None
 }
 
 pub fn part_one(input: &str) -> Option<u64> {
     let mut total_joltage = 0;
     for row in input.strip_suffix("\n").unwrap().split("\n") {
-        // Parse string to int
-        let num: u64 = row.parse().unwrap();
         // Get largest digit in number (excluding the last digit)
         let (first_largest_digit, first_largest_digit_index) =
-            get_largest_digit_in_number(get_substring_from_number(num, 1, get_number_length(num)));
+            get_largest_digit_in_number(&row[0..row.len() - 1]).unwrap();
         // Get largest digit to the right of first largest digit
-        let (second_largest_digit, _) = get_largest_digit_in_number(get_substring_from_number(
-            num,
-            0,
-            first_largest_digit_index + 1,
-        ));
+        let (second_largest_digit, _) =
+            get_largest_digit_in_number(&row[first_largest_digit_index + 1..]).unwrap();
         total_joltage += first_largest_digit * 10 + second_largest_digit;
     }
     Some(total_joltage)
