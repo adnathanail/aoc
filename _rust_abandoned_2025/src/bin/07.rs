@@ -60,27 +60,20 @@ pub fn part_two(input: &str) -> Option<u64> {
         let mut new_beams: HashMap<usize, u64> = HashMap::new();
         for beam_index in beams.keys() {
             if splitter_row.contains(beam_index) {
-                if !new_beams.contains_key(&((*beam_index) - 1)) {
-                    new_beams.insert(beam_index - 1, 0);
-                }
-                if !new_beams.contains_key(&((*beam_index) + 1)) {
-                    new_beams.insert(beam_index + 1, 0);
-                }
                 new_beams.insert(
                     beam_index - 1,
-                    new_beams.get(&(beam_index - 1)).unwrap() + beams.get(beam_index).unwrap(),
+                    new_beams.get(&(beam_index - 1)).unwrap_or(&0)
+                        + beams.get(beam_index).unwrap_or(&0),
                 );
                 new_beams.insert(
                     beam_index + 1,
-                    new_beams.get(&(beam_index + 1)).unwrap() + beams.get(beam_index).unwrap(),
+                    new_beams.get(&(beam_index + 1)).unwrap_or(&0)
+                        + beams.get(beam_index).unwrap_or(&0),
                 );
             } else {
-                if !new_beams.contains_key(beam_index) {
-                    new_beams.insert(*beam_index, 0);
-                }
                 new_beams.insert(
                     *beam_index,
-                    new_beams.get(beam_index).unwrap() + beams.get(beam_index).unwrap(),
+                    new_beams.get(beam_index).unwrap_or(&0) + beams.get(beam_index).unwrap_or(&0),
                 );
             }
         }
