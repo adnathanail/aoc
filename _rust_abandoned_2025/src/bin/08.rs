@@ -1,6 +1,7 @@
 use disjoint_sets::UnionFind;
 use ordered_float::OrderedFloat;
 use priority_queue::PriorityQueue;
+use std::cmp::Reverse;
 use std::collections::HashMap;
 use std::hash::Hash;
 advent_of_code::solution!(8);
@@ -37,10 +38,13 @@ fn do_part_one(input: &str, num_iterations: u64) -> Option<u64> {
     //   by the distance between each paid
     // OrderedFloat is a wrapper around floats provided by a library, giving floats
     //   the Ord trait, required by the priority queue from another library..!
-    let mut pq: PriorityQueue<(usize, usize), OrderedFloat<f32>> = PriorityQueue::new();
+    let mut pq: PriorityQueue<(usize, usize), Reverse<OrderedFloat<f32>>> = PriorityQueue::new();
     for i in 0..(junction_boxes.len() - 1) {
         for j in (i + 1)..junction_boxes.len() {
-            pq.push((i, j), euc_dist(&junction_boxes[i], &junction_boxes[j]));
+            pq.push(
+                (i, j),
+                Reverse(euc_dist(&junction_boxes[i], &junction_boxes[j])),
+            );
         }
     }
     // Go through the queue in increasing order of distance,
