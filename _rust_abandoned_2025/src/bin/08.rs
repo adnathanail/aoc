@@ -1,5 +1,6 @@
 use disjoint_sets::UnionFind;
-use priq::PriorityQueue;
+use ordered_float::OrderedFloat;
+use priority_queue::PriorityQueue;
 use std::collections::HashMap;
 use std::hash::Hash;
 advent_of_code::solution!(8);
@@ -14,9 +15,11 @@ fn process_input(input: &str) -> Vec<Vec<i64>> {
         .collect()
 }
 
-fn euc_dist(a: &[i64], b: &[i64]) -> f32 {
+fn euc_dist(a: &[i64], b: &[i64]) -> OrderedFloat<f32> {
     // Get the 3D euclidean distance between two points as a float
-    (((a[0] - b[0]).pow(2) + (a[1] - b[1]).pow(2) + (a[2] - b[2]).pow(2)) as f32).sqrt()
+    OrderedFloat(
+        (((a[0] - b[0]).pow(2) + (a[1] - b[1]).pow(2) + (a[2] - b[2]).pow(2)) as f32).sqrt(),
+    )
 }
 
 fn tally_vec<T: Hash + Eq + Copy>(inp: &Vec<T>) -> HashMap<T, u64> {
@@ -30,18 +33,24 @@ fn tally_vec<T: Hash + Eq + Copy>(inp: &Vec<T>) -> HashMap<T, u64> {
 
 fn do_part_one(input: &str, num_iterations: u64) -> Option<u64> {
     let junction_boxes = process_input(input);
-    let mut pq: PriorityQueue<f32, (usize, usize)> = PriorityQueue::new();
-    // Cache distances between all pairs of junction boxes
-    let mut distance_lookup: HashMap<(usize, usize), f32> = HashMap::new();
+    // Cache all pairs of junction boxes into a priority queue, sorted
+    //   by the distance between each paid
+    // OrderedFloat is a wrapper around floats provided by a library, giving floats
+    //   the Ord trait, required by the priority queue from another library..!
+    let mut pq: PriorityQueue<(usize, usize), OrderedFloat<f32>> = PriorityQueue::new();
     for i in 0..(junction_boxes.len() - 1) {
         for j in (i + 1)..junction_boxes.len() {
-            pq.put(euc_dist(&junction_boxes[i], &junction_boxes[j]), (i, j));
+            pq.push((i, j), euc_dist(&junction_boxes[i], &junction_boxes[j]));
         }
     }
-    // Join up the connections in increasing order of distance up to num_iterations
+    // Go through the queue in increasing order of distance,
+    //   joining up the connections up to num_iterations
+    // "UnionFind" is a way of keeping track of connected components
+    //   you tell it how many elements you have, then you can join any
+    //   elements together, and it keeps track of all the elements that
+    //   are connected to each other
     let mut connected_components: UnionFind<usize> = UnionFind::new(junction_boxes.len());
-    for _ in 0..num_iterations {
-        let pair = pq.pop().unwrap().1;
+    for (pair, _) in pq.into_sorted_iter().take(num_iterations as usize) {
         connected_components.union(pair.0, pair.1);
     }
     // Count how many junction boxes are in each connected component

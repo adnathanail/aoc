@@ -33,4 +33,5 @@ imageproc = "0.25.0"
 
 # Solution dependencies
 disjoint-sets = "0.4.2"
-priq = "0.2.0"
+priority-queue = "2.7.0"
+ordered-float = "5.1.0"
