@@ -38,7 +38,7 @@ pub fn part_one(input: &str) -> Option<u64> {
     for splitter_row in &splitter_indexes_by_row {
         let mut new_beams: HashSet<usize> = HashSet::new();
         for beam_index in &beams {
-            if splitter_row.contains(&beam_index) {
+            if splitter_row.contains(beam_index) {
                 new_beams.insert(beam_index - 1);
                 new_beams.insert(beam_index + 1);
                 num_splits += 1;
