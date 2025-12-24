@@ -32,6 +32,6 @@ png = "0.17"
 imageproc = "0.25.0"
 
 # Solution dependencies
-disjoint-sets = "0.4.2"
+disjoint = "0.8.0"
 priority-queue = "2.7.0"
 ordered-float = "5.1.0"

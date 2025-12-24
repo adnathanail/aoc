@@ -1,4 +1,4 @@
-use disjoint_sets::UnionFind;
+use disjoint::DisjointSet;
 use ordered_float::OrderedFloat;
 use priority_queue::PriorityQueue;
 use std::cmp::Reverse;
@@ -49,22 +49,22 @@ fn do_part_one(input: &str, num_iterations: u64) -> Option<u64> {
     }
     // Go through the queue in increasing order of distance,
     //   joining up the connections up to num_iterations
-    // "UnionFind" is a way of keeping track of connected components
+    // "DisjointSet" is a way of keeping track of connected components
     //   you tell it how many elements you have, then you can join any
     //   elements together, and it keeps track of all the elements that
     //   are connected to each other
-    let mut connected_components: UnionFind<usize> = UnionFind::new(junction_boxes.len());
+    let mut connected_components = DisjointSet::with_len(junction_boxes.len());
     for (pair, _) in pq.into_sorted_iter().take(num_iterations as usize) {
-        connected_components.union(pair.0, pair.1);
+        connected_components.join(pair.0, pair.1);
     }
-    // Count how many junction boxes are in each connected component
-    let mut tallies: Vec<u64> = tally_vec(&connected_components.to_vec())
-        .values()
-        .copied()
+    let mut set_lengths: Vec<u64> = connected_components
+        .sets()
+        .into_iter()
+        .map(|set| set.len() as u64)
         .collect();
     // Get the product of the sizes of the 3 largest connected components
-    tallies.sort();
-    Some(tallies.iter().rev().take(3).product())
+    set_lengths.sort();
+    Some(set_lengths.iter().rev().take(3).product())
 }
 
 pub fn part_one(input: &str) -> Option<u64> {
