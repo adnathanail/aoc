@@ -34,9 +34,10 @@ cargo all
 | [Day 5](./src/bin/05.rs) | `144.5µs` | `211.2µs` |
 | [Day 6](./src/bin/06.rs) | `123.3µs` | `249.4µs` |
 | [Day 7](./src/bin/07.rs) | `210.3µs` | `274.0µs` |
+| [Day 8](./src/bin/08.rs) | `42.3ms` | `166.3ms` |
 | [Day 9](./src/bin/09.rs) | `118.8µs` | `24.8ms` |
 
-**Total: 485.14ms**
+**Total: 693.74ms**
 <!--- benchmarking table --->
 
 ## Usage
