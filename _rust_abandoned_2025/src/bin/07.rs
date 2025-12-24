@@ -1,8 +1,8 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 advent_of_code::solution!(7);
 
-pub fn part_one(input: &str) -> Option<u64> {
+fn process_input(input: &str) -> (Vec<Vec<usize>>, usize) {
     // List of splitter index locations on each row
     let mut splitter_indexes_by_row: Vec<Vec<usize>> = vec![];
     let mut start_index: Option<usize> = None;
@@ -24,10 +24,15 @@ pub fn part_one(input: &str) -> Option<u64> {
             splitter_indexes_by_row.push(row_splitter_indexes)
         }
     }
+    (splitter_indexes_by_row, start_index.unwrap())
+}
+
+pub fn part_one(input: &str) -> Option<u64> {
+    let (splitter_indexes_by_row, start_index) = process_input(input);
     // Set to keep track of beams
     let mut beams: HashSet<usize> = HashSet::new();
     // Add start index as initial beam
-    beams.insert(start_index.unwrap());
+    beams.insert(start_index);
 
     let mut num_splits: u64 = 0;
     for splitter_row in &splitter_indexes_by_row {
@@ -47,7 +52,41 @@ pub fn part_one(input: &str) -> Option<u64> {
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
-    None
+    let (splitter_indexes_by_row, start_index) = process_input(input);
+    // Dictionary to keep track of the number of beams at each index
+    let mut beams: HashMap<usize, u64> = HashMap::new();
+    beams.insert(start_index, 1);
+    for splitter_row in splitter_indexes_by_row {
+        let mut new_beams: HashMap<usize, u64> = HashMap::new();
+        for beam_index in beams.keys() {
+            if splitter_row.contains(beam_index) {
+                if !new_beams.contains_key(&((*beam_index) - 1)) {
+                    new_beams.insert(beam_index - 1, 0);
+                }
+                if !new_beams.contains_key(&((*beam_index) + 1)) {
+                    new_beams.insert(beam_index + 1, 0);
+                }
+                new_beams.insert(
+                    beam_index - 1,
+                    new_beams.get(&(beam_index - 1)).unwrap() + beams.get(beam_index).unwrap(),
+                );
+                new_beams.insert(
+                    beam_index + 1,
+                    new_beams.get(&(beam_index + 1)).unwrap() + beams.get(beam_index).unwrap(),
+                );
+            } else {
+                if !new_beams.contains_key(beam_index) {
+                    new_beams.insert(*beam_index, 0);
+                }
+                new_beams.insert(
+                    *beam_index,
+                    new_beams.get(beam_index).unwrap() + beams.get(beam_index).unwrap(),
+                );
+            }
+        }
+        beams = new_beams;
+    }
+    Some(beams.values().sum::<u64>())
 }
 
 #[cfg(test)]
