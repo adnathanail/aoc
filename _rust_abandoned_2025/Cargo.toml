@@ -32,3 +32,4 @@ png = "0.17"
 imageproc = "0.25.0"
 
 # Solution dependencies
+disjoint-sets = "0.4.2"
