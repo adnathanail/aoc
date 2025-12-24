@@ -15,7 +15,7 @@ fn process_input(input: &str) -> Vec<Vec<i64>> {
 }
 
 fn get_boxes_to_join_in_order(
-    junction_boxes: &Vec<Vec<i64>>,
+    junction_boxes: &[Vec<i64>],
 ) -> PriorityQueue<(usize, usize), Reverse<OrderedFloat<f32>>> {
     // Cache all pairs of junction boxes into a priority queue, sorted
     //   by the distance between each paid
