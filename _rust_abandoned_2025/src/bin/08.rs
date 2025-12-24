@@ -2,8 +2,6 @@ use disjoint::DisjointSet;
 use ordered_float::OrderedFloat;
 use priority_queue::PriorityQueue;
 use std::cmp::Reverse;
-use std::collections::HashMap;
-use std::hash::Hash;
 advent_of_code::solution!(8);
 
 fn process_input(input: &str) -> Vec<Vec<i64>> {
@@ -16,29 +14,14 @@ fn process_input(input: &str) -> Vec<Vec<i64>> {
         .collect()
 }
 
-fn euc_dist(a: &[i64], b: &[i64]) -> OrderedFloat<f32> {
-    // Get the 3D euclidean distance between two points as a float
-    OrderedFloat(
-        (((a[0] - b[0]).pow(2) + (a[1] - b[1]).pow(2) + (a[2] - b[2]).pow(2)) as f32).sqrt(),
-    )
-}
-
-fn tally_vec<T: Hash + Eq + Copy>(inp: &Vec<T>) -> HashMap<T, u64> {
-    // Given a vector of values, count how many occurrences of each value there are
-    let mut out: HashMap<T, u64> = HashMap::new();
-    for val in inp {
-        out.insert(*val, out.get(val).unwrap_or(&0) + 1);
-    }
-    out
-}
-
-fn do_part_one(input: &str, num_iterations: u64) -> Option<u64> {
-    let junction_boxes = process_input(input);
+fn get_boxes_to_join_in_order(
+    junction_boxes: &Vec<Vec<i64>>,
+) -> PriorityQueue<(usize, usize), Reverse<OrderedFloat<f32>>> {
     // Cache all pairs of junction boxes into a priority queue, sorted
     //   by the distance between each paid
     // OrderedFloat is a wrapper around floats provided by a library, giving floats
     //   the Ord trait, required by the priority queue from another library..!
-    let mut pq: PriorityQueue<(usize, usize), Reverse<OrderedFloat<f32>>> = PriorityQueue::new();
+    let mut pq = PriorityQueue::new();
     for i in 0..(junction_boxes.len() - 1) {
         for j in (i + 1)..junction_boxes.len() {
             pq.push(
@@ -47,6 +30,19 @@ fn do_part_one(input: &str, num_iterations: u64) -> Option<u64> {
             );
         }
     }
+    pq
+}
+
+fn euc_dist(a: &[i64], b: &[i64]) -> OrderedFloat<f32> {
+    // Get the 3D euclidean distance between two points as a float
+    OrderedFloat(
+        (((a[0] - b[0]).pow(2) + (a[1] - b[1]).pow(2) + (a[2] - b[2]).pow(2)) as f32).sqrt(),
+    )
+}
+
+fn do_part_one(input: &str, num_iterations: u64) -> Option<u64> {
+    let junction_boxes = process_input(input);
+    let pq = get_boxes_to_join_in_order(&junction_boxes);
     // Go through the queue in increasing order of distance,
     //   joining up the connections up to num_iterations
     // "DisjointSet" is a way of keeping track of connected components
@@ -72,7 +68,15 @@ pub fn part_one(input: &str) -> Option<u64> {
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
-    None
+    let junction_boxes = process_input(input);
+    let mut pq = get_boxes_to_join_in_order(&junction_boxes);
+    let mut connected_components = DisjointSet::with_len(junction_boxes.len());
+    let mut pair: (usize, usize) = (0, 0);
+    while connected_components.sets().len() > 1 {
+        (pair, _) = pq.pop().unwrap();
+        connected_components.join(pair.0, pair.1);
+    }
+    Some((junction_boxes[pair.0][0] * junction_boxes[pair.1][0]) as u64)
 }
 
 #[cfg(test)]
