@@ -33,3 +33,4 @@ imageproc = "0.25.0"
 
 # Solution dependencies
 disjoint-sets = "0.4.2"
+priq = "0.2.0"

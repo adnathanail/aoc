@@ -1,4 +1,5 @@
 use disjoint_sets::UnionFind;
+use priq::PriorityQueue;
 use std::collections::HashMap;
 use std::hash::Hash;
 advent_of_code::solution!(8);
@@ -29,21 +30,18 @@ fn tally_vec<T: Hash + Eq + Copy>(inp: &Vec<T>) -> HashMap<T, u64> {
 
 fn do_part_one(input: &str, num_iterations: u64) -> Option<u64> {
     let junction_boxes = process_input(input);
+    let mut pq: PriorityQueue<f32, (usize, usize)> = PriorityQueue::new();
     // Cache distances between all pairs of junction boxes
     let mut distance_lookup: HashMap<(usize, usize), f32> = HashMap::new();
     for i in 0..(junction_boxes.len() - 1) {
         for j in (i + 1)..junction_boxes.len() {
-            distance_lookup.insert((i, j), euc_dist(&junction_boxes[i], &junction_boxes[j]));
+            pq.put(euc_dist(&junction_boxes[i], &junction_boxes[j]), (i, j));
         }
     }
-    // Get list of connections sorted by distance from smallest to largest
-    let mut sorted_connection_pairs: Vec<(usize, usize)> =
-        distance_lookup.keys().copied().collect();
-    sorted_connection_pairs
-        .sort_by(|con1, con2| distance_lookup[con1].total_cmp(&distance_lookup[con2]));
     // Join up the connections in increasing order of distance up to num_iterations
     let mut connected_components: UnionFind<usize> = UnionFind::new(junction_boxes.len());
-    for pair in sorted_connection_pairs.iter().take(num_iterations as usize) {
+    for _ in 0..num_iterations {
+        let pair = pq.pop().unwrap().1;
         connected_components.union(pair.0, pair.1);
     }
     // Count how many junction boxes are in each connected component
