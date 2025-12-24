@@ -12,7 +12,7 @@ fn process_input(input: &str) -> Vec<Vec<i64>> {
         .collect()
 }
 
-fn euc_dist(a: &Vec<i64>, b: &Vec<i64>) -> f32 {
+fn euc_dist(a: &[i64], b: &[i64]) -> f32 {
     (((a[0] - b[0]).pow(2) + (a[1] - b[1]).pow(2) + (a[2] - b[2]).pow(2)) as f32).sqrt()
 }
 
@@ -52,10 +52,10 @@ fn do_part_one(input: &str, num_iterations: u64) -> Option<u64> {
     }
     let mut tallies: Vec<u64> = tally_vec(&connected_components.to_vec())
         .values()
-        .map(|x| *x)
+        .copied()
         .collect();
     tallies.sort();
-    let blah: Vec<u64> = tallies.iter().rev().take(3).map(|x| *x).collect();
+    let blah: Vec<u64> = tallies.iter().rev().take(3).copied().collect();
     Some(blah.iter().product::<u64>())
 }
 
