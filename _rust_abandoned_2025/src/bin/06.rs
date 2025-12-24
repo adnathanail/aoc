@@ -4,18 +4,19 @@ pub fn part_one(input: &str) -> Option<u64> {
     let mut vals: Vec<Vec<u64>> = vec![];
     let mut grand_total = 0;
     for (i, row) in input.split("\n").enumerate() {
-        for (j, val_str) in row.split(" ").filter(|x| *x != "").enumerate() {
+        for (j, val_str) in row.split(" ").filter(|x| !x.is_empty()).enumerate() {
+            // Create empty vectors on first row
             if i == 0 {
                 vals.push(vec![]);
             }
+            // Try to parse the value as a number
             if let Ok(val) = val_str.parse::<u64>() {
                 vals[j].push(val);
+            } else if val_str == "+" {
+                // If parsing failed, it must be an operator
+                grand_total += vals[j].iter().sum::<u64>();
             } else {
-                if val_str == "+" {
-                    grand_total += vals[j].iter().sum::<u64>();
-                } else {
-                    grand_total += vals[j].iter().product::<u64>();
-                }
+                grand_total += vals[j].iter().product::<u64>();
             }
         }
     }
@@ -36,7 +37,7 @@ fn get_column_widths(operands_row: &str) -> Vec<u64> {
     }
     n += 1;
     out.push(n);
-    return out;
+    out
 }
 
 fn split_out_puzzles<'a>(
@@ -66,7 +67,7 @@ fn split_out_puzzles<'a>(
             ind += *cw as usize;
         }
     }
-    return out;
+    out
 }
 
 fn transpose_puzzle(puzz: &Vec<&str>) -> Vec<u64> {
