@@ -1,16 +1,16 @@
 use itertools::Itertools;
 advent_of_code::solution!(10);
 
-type DesiredState = Vec<bool>;
+type LightingState = Vec<bool>;
 type ButtonWirings = Vec<Vec<u64>>;
 type Joltages = Vec<u64>;
-type Machine = (DesiredState, ButtonWirings, Joltages);
+type Machine = (LightingState, ButtonWirings, Joltages);
 
 fn parse_input(input: &str) -> Vec<Machine> {
     let mut out = vec![];
     for row in input.strip_suffix("\n").unwrap().split("\n") {
         let row_split: Vec<&str> = row.split(" ").collect();
-        let desired_state: DesiredState = row_split[0]
+        let desired_state: LightingState = row_split[0]
             .chars()
             .filter(|x| *x != '[' && *x != ']')
             .map(|x| x == '#')
@@ -35,7 +35,7 @@ fn parse_input(input: &str) -> Vec<Machine> {
     out
 }
 
-fn run_buttons(num_lights: usize, buttons_to_push: &Vec<&Vec<u64>>) -> Vec<bool> {
+fn run_buttons(num_lights: usize, buttons_to_push: &Vec<&Vec<u64>>) -> LightingState {
     let mut out = vec![false; num_lights];
     for but in buttons_to_push {
         for i in *but {
