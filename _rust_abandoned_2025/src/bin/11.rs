@@ -1,12 +1,11 @@
 use std::collections::HashMap;
-// use std::sync::{LazyLock, Mutex};
+use std::sync::{LazyLock, Mutex};
 advent_of_code::solution!(11);
 
 type Cables = HashMap<usize, Vec<usize>>;
 type CableNames<'a> = Vec<&'a str>;
 
 fn get_cable_index(cable_names: &Vec<&str>, val: &str) -> usize {
-    println!("{}", val);
     cable_names.iter().position(|x| *x == val).unwrap()
 }
 
@@ -32,17 +31,17 @@ fn get_cables<'a>(input: &'a str) -> (CableNames<'a>, Cables) {
     (cable_names, out)
 }
 
-// static FOLLOW_CABLES_CACHE: LazyLock<Mutex<HashMap<(&str, &str), u64>>> =
-//     LazyLock::new(|| Mutex::new(HashMap::new()));
+static FOLLOW_CABLES_CACHE: LazyLock<Mutex<HashMap<(usize, usize), u64>>> =
+    LazyLock::new(|| Mutex::new(HashMap::new()));
 
 fn follow_cables(cables: &Cables, start_cable: &usize, end_cable: &usize) -> u64 {
-    // if let Some(&result) = FOLLOW_CABLES_CACHE
-    //     .lock()
-    //     .unwrap()
-    //     .get(&(start_cable, end_cable))
-    // {
-    //     return result;
-    // }
+    if let Some(&result) = FOLLOW_CABLES_CACHE
+        .lock()
+        .unwrap()
+        .get(&(*start_cable, *end_cable))
+    {
+        return result;
+    }
 
     let mut out = 0;
     for c in cables[start_cable].iter() {
@@ -52,10 +51,10 @@ fn follow_cables(cables: &Cables, start_cable: &usize, end_cable: &usize) -> u64
             out += follow_cables(cables, c, end_cable)
         }
     }
-    // FOLLOW_CABLES_CACHE
-    //     .lock()
-    //     .unwrap()
-    //     .insert((start_cable, end_cable), out);
+    FOLLOW_CABLES_CACHE
+        .lock()
+        .unwrap()
+        .insert((*start_cable, *end_cable), out);
     out
 }
 
