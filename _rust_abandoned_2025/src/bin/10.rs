@@ -15,18 +15,18 @@ fn parse_input(input: &str) -> Vec<Machine> {
             .filter(|x| *x != '[' && *x != ']')
             .map(|x| x == '#')
             .collect();
-        let button_wirings_str = (&row_split[1..row_split.len() - 1]).to_vec();
+        let button_wirings_str = row_split[1..row_split.len() - 1].to_vec();
         let button_wirings: ButtonWirings = button_wirings_str
             .into_iter()
             .map(|x| {
-                (&x[1..x.len() - 1])
+                x[1..x.len() - 1]
                     .split(",")
                     .map(|x| x.parse().unwrap())
                     .collect()
             })
             .collect();
         let joltages_str = row_split[row_split.len() - 1];
-        let joltages: Joltages = (&joltages_str[1..joltages_str.len() - 1])
+        let joltages: Joltages = joltages_str[1..joltages_str.len() - 1]
             .split(",")
             .map(|x| x.parse::<u64>().unwrap())
             .collect();
