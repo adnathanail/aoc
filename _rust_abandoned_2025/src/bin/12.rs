@@ -104,6 +104,7 @@ type PresentPlacement = HashSet<Coord>;
 #[hotpath::measure]
 fn attempt_placement(
     presents: &Vec<PresentCoords>,
+    all_present_versions: &Vec<HashSet<PresentCoords>>,
     current_placement: PresentPlacement,
     region_width: usize,
     region_height: usize,
@@ -120,7 +121,7 @@ fn attempt_placement(
     if (current_placement.len() + squares_to_place) > region_height * region_width {
         return None;
     }
-    for present_coords in get_all_versions_of_present(&presents[present_ids_to_place[0]]) {
+    for present_coords in &all_present_versions[present_ids_to_place[0]] {
         for x_offset in 0..(region_width - PRESENT_WIDTH_HEIGHT + 1) {
             for y_offset in 0..(region_height - PRESENT_WIDTH_HEIGHT + 1) {
                 let present_to_place = offset_present(&present_coords, x_offset, y_offset);
@@ -130,6 +131,7 @@ fn attempt_placement(
                         current_placement.union(&ptp_set).copied().collect();
                     if let Some(maybe_working_arrangement) = attempt_placement(
                         presents,
+                        all_present_versions,
                         current_placement_plus_ptp,
                         region_width,
                         region_height,
@@ -145,7 +147,11 @@ fn attempt_placement(
 }
 
 pub fn part_one(input: &str) -> Option<u64> {
-    let (present_coords, regions) = process_input(input);
+    let (presents, regions) = process_input(input);
+    let all_present_versions: Vec<HashSet<PresentCoords>> = presents
+        .iter()
+        .map(|present_coords| get_all_versions_of_present(&present_coords))
+        .collect();
     let mut tot = 0;
     for region in regions {
         println!("{:?}", region);
@@ -157,7 +163,8 @@ pub fn part_one(input: &str) -> Option<u64> {
             }
         }
         if attempt_placement(
-            &present_coords,
+            &presents,
+            &all_present_versions,
             HashSet::new(),
             reg_width,
             reg_height,
