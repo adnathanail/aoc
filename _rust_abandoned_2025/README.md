@@ -27,7 +27,7 @@ cargo all
 
 | Day | Part 1 | Part 2 |
 | :---: | :---: | :---:  |
-| [Day 1](./src/bin/01.rs) | `56.6µs` | `355.9µs` |
+| [Day 1](./src/bin/01.rs) | `57.1µs` | `353.8µs` |
 | [Day 2](./src/bin/02.rs) | `18.5ms` | `419.2ms` |
 | [Day 3](./src/bin/03.rs) | `24.3µs` | `96.2µs` |
 | [Day 4](./src/bin/04.rs) | `978.0µs` | `19.8ms` |
@@ -36,8 +36,10 @@ cargo all
 | [Day 7](./src/bin/07.rs) | `210.3µs` | `274.0µs` |
 | [Day 8](./src/bin/08.rs) | `42.3ms` | `166.3ms` |
 | [Day 9](./src/bin/09.rs) | `118.8µs` | `24.8ms` |
+| [Day 10](./src/bin/10.rs) | `1.2ms` | `7.2s` |
+| [Day 11](./src/bin/11.rs) | `2.8ms` | `2.7ms` |
 
-**Total: 693.74ms**
+**Total: 7900.44ms**
 <!--- benchmarking table --->
 
 ## Profiling
