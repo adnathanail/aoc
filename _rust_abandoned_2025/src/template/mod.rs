@@ -59,6 +59,8 @@ macro_rules! solution {
         #[global_allocator]
         static ALLOC: dhat::Alloc = dhat::Alloc;
 
+        // For hotpath profiling
+        #[hotpath::main]
         fn main() {
             use $crate::template::runner::*;
             let input = $crate::template::read_file("inputs", DAY);

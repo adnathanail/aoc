@@ -40,6 +40,33 @@ cargo all
 **Total: 693.74ms**
 <!--- benchmarking table --->
 
+## Profiling
+
+Using the [hotpath](https://hotpath.rs) package
+
+`#[hotpath::main]` is already added to the `main` function invoked by the `advent_of_code::solution!` macro
+
+Add the `#[hotpath::measure]` to any functions you want to profile
+
+Then run profiling for solving a specific day with
+```
+cargo run --bin 1 --features hotpath --profile profiling
+```
+
+For use in tests add the `#[hotpath::main]` to the test function (below `#[test]`)
+```rust
+#[test]
+    #[hotpath::main]
+    fn test_part_one() {
+```
+
+And run
+```
+cargo test --bin 1 --features hotpath --profile profiling
+```
+
+<!--#[hotpath::measure]-->
+
 ## Usage
 
 ### ➡️ Scaffold a day

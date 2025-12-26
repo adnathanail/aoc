@@ -14,10 +14,19 @@ doctest = false
 inherits = "release"
 debug = 1
 
+# Profiling
+[profile.profiling]
+inherits = "release"
+debug = 1
+
 [features]
 dhat-heap = ["dhat"]
 today = ["chrono"]
 test_lib = []
+# Profiling
+hotpath = ["hotpath/hotpath"]
+hotpath-alloc = ["hotpath/hotpath-alloc"]
+
 
 [dependencies]
 
@@ -36,3 +45,6 @@ disjoint = "0.8.0"
 priority-queue = "2.7.0"
 ordered-float = "5.1.0"
 itertools = "0.14.0"
+
+# Profiling
+hotpath = "0.9"
