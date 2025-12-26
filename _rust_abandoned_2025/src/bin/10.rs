@@ -1,9 +1,10 @@
 use itertools::Itertools;
+use std::cmp::min;
 advent_of_code::solution!(10);
 
 type LightingState = Vec<bool>;
 type ButtonWirings = Vec<Vec<u64>>;
-type Joltages = Vec<u64>;
+type Joltages = Vec<i64>;
 type Machine = (LightingState, ButtonWirings, Joltages);
 
 fn parse_input(input: &str) -> Vec<Machine> {
@@ -28,7 +29,7 @@ fn parse_input(input: &str) -> Vec<Machine> {
         let joltages_str = row_split[row_split.len() - 1];
         let joltages: Joltages = joltages_str[1..joltages_str.len() - 1]
             .split(",")
-            .map(|x| x.parse::<u64>().unwrap())
+            .map(|x| x.parse::<i64>().unwrap())
             .collect();
         out.push((desired_state, button_wirings, joltages));
     }
@@ -60,8 +61,137 @@ pub fn part_one(input: &str) -> Option<u64> {
     Some(num_button_presses as u64)
 }
 
+fn button_wiring_to_tuple(buttons: &Vec<u64>, num_lights: usize) -> Vec<i64> {
+    (0..num_lights)
+        .map(|x| if buttons.contains(&(x as u64)) { 1 } else { 0 })
+        .collect()
+}
+
+fn add_tuples(t1: &Vec<i64>, t2: &Vec<i64>, m: i64) -> Vec<i64> {
+    let mut out: Vec<i64> = vec![];
+    for i in 0..t1.len() {
+        out.push((t1[i] + t2[i]) % m)
+    }
+    out
+}
+
+fn subtract_tuples(t1: &Vec<i64>, t2: &Vec<i64>) -> Vec<i64> {
+    // Subtract one tuple from another, equal-length, tuple, elementwise
+    let mut out: Vec<i64> = vec![];
+    for i in 0..t1.len() {
+        out.push((t1[i] - t2[i]))
+    }
+    out
+}
+
+fn int_divide_tuple(t1: &Vec<i64>, s: i64) -> Vec<i64> {
+    // Integer-divide a tuple by a scalar, elementwise
+    let mut out: Vec<i64> = vec![];
+    for i in 0..t1.len() {
+        out.push(t1[i] / s)
+    }
+    out
+}
+
+fn run_buttons_tup(num_lights: u64, button_tuples_to_use: &Vec<&Vec<i64>>) -> Vec<i64> {
+    // Simulate a list of button presses
+    let mut out: Vec<i64> = vec![0; num_lights as usize];
+    for but in button_tuples_to_use {
+        out = add_tuples(&out, &but, 2)
+    }
+    return out;
+}
+
+fn get_possible_buttons_for_desired_state(
+    button_tuples: &Vec<Vec<i64>>,
+    binary_desired_state: &Vec<i64>,
+) -> Vec<Vec<Vec<i64>>> {
+    // Given a list of button tuples, and a desired state (consisting of only 0's and 1's)
+    //   returns all possible button presses that reach that desired state
+    let number_of_lights = binary_desired_state.len();
+    let mut out: Vec<Vec<Vec<i64>>> = vec![];
+    for buttons in button_tuples.iter().powerset() {
+        if run_buttons_tup(number_of_lights as u64, &buttons) == *binary_desired_state {
+            out.push(buttons.into_iter().cloned().collect())
+        }
+    }
+    out
+}
+
+fn get_num_button_presses_for_joltages(button_tuples: &Vec<Vec<i64>>, joltages: &Joltages) -> u64 {
+    // For given lists of button tuples and joltages, return the minimum number of button presses
+    //   required to achieve the desired joltages
+    // Can't have negative joltages
+    for jolt in joltages {
+        if *jolt < 0 {
+            return u64::MAX;
+        }
+    }
+    // If the joltages are all 0, we don't need to press any buttons
+    let mut all_zero = true;
+    for jolt in joltages {
+        if *jolt != 0 {
+            all_zero = false;
+            break;
+        }
+    }
+    if all_zero {
+        return 0;
+    }
+    // To find all button presses required to make all the joltage numbers even,
+    //   get a list of the "parity" (0 for even 1 for odd) of the joltages
+    let joltage_parities: Vec<i64> = joltages.into_iter().map(|x| x % 2).collect();
+    let mut least_buttons = u64::MAX;
+    // Find all the button presses that make our joltages even
+    for buttons in get_possible_buttons_for_desired_state(button_tuples, &joltage_parities) {
+        // Apply the button presses to the joltages
+        let mut new_joltages: Joltages = joltages.clone();
+        for button in &buttons {
+            new_joltages = subtract_tuples(&new_joltages, button)
+        }
+        // Divide the new joltages by 2, to obtain a new set of target joltages, potentially with new odd joltages
+        new_joltages = int_divide_tuple(&new_joltages, 2);
+        // - Find the number of button presses required to make the new joltages
+        // - Multiply it by 2, to account for the fact that we halved the targets
+        // - And add the number of button presses we used, to make the joltages even
+        let nbpfj = get_num_button_presses_for_joltages(&button_tuples, &new_joltages);
+        if nbpfj < u64::MAX {
+            least_buttons = min(least_buttons, (buttons.len() as u64) + (2 * nbpfj))
+        }
+    }
+    least_buttons
+}
+
 pub fn part_two(input: &str) -> Option<u64> {
-    None
+    let machines = parse_input(input);
+    let mut num_button_presses = 0;
+    for machine in machines {
+        let number_of_lights = machine.0.len();
+        let button_wiring_tuples: Vec<Vec<i64>> = (&machine.1)
+            .into_iter()
+            .map(|x| button_wiring_to_tuple(x, number_of_lights))
+            .collect();
+        println!("{:?}", machine.1);
+        println!("{:?}", button_wiring_tuples);
+        // println!(
+        //     "{:?}",
+        //     add_tuples(&button_wiring_tuples[0], &button_wiring_tuples[1], 2)
+        // );
+        println!(
+            "{:?}",
+            get_possible_buttons_for_desired_state(&button_wiring_tuples, &vec![0, 0, 0, 1])
+        );
+        num_button_presses +=
+            get_num_button_presses_for_joltages(&button_wiring_tuples, &machine.2);
+        // for buttons in machine.1.iter().powerset() {
+        //     if run_buttons(number_of_lights, &buttons) == machine.0 {
+        //         num_button_presses += buttons.len();
+        //         break;
+        //     }
+        // }
+        // break;
+    }
+    Some(num_button_presses as u64)
 }
 
 #[cfg(test)]
