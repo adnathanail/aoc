@@ -10,22 +10,22 @@ type Machine = (LightingState, ButtonWirings, Joltages);
 fn process_desired_state_str(desired_state_str: &str) -> LightingState {
     desired_state_str
         .chars()
-        .filter(|x| *x != '[' && *x != ']')
-        .map(|x| if x == '#' { 1 } else { 0 })
+        .filter(|ch| *ch != '[' && *ch != ']')
+        .map(|ch| if ch == '#' { 1 } else { 0 })
         .collect()
 }
 
 fn process_button_wirings_str(button_wirings_strs: Vec<&str>, num_lights: usize) -> ButtonWirings {
     button_wirings_strs
         .into_iter()
-        .map(|x| {
-            let button_indexes: Vec<u64> = x[1..x.len() - 1]
+        .map(|but_str| {
+            let button_indexes: Vec<u64> = but_str[1..but_str.len() - 1]
                 .split(",")
-                .map(|x| x.parse().unwrap())
+                .map(|num_str| num_str.parse().unwrap())
                 .collect();
             (0..num_lights)
-                .map(|x| {
-                    if button_indexes.contains(&(x as u64)) {
+                .map(|i| {
+                    if button_indexes.contains(&(i as u64)) {
                         1
                     } else {
                         0
@@ -39,23 +39,26 @@ fn process_button_wirings_str(button_wirings_strs: Vec<&str>, num_lights: usize)
 fn process_joltages_str(joltages_str: &str) -> Joltages {
     joltages_str[1..joltages_str.len() - 1]
         .split(",")
-        .map(|x| x.parse::<i64>().unwrap())
+        .map(|j_str| j_str.parse::<i64>().unwrap())
         .collect()
 }
 
 fn parse_input(input: &str) -> Vec<Machine> {
-    let mut out = vec![];
-    for row in input.strip_suffix("\n").unwrap().split("\n") {
-        let row_split: Vec<&str> = row.split(" ").collect();
-        let desired_state: LightingState = process_desired_state_str(row_split[0]);
-        let button_wirings: Vec<Vec<i64>> = process_button_wirings_str(
-            row_split[1..row_split.len() - 1].to_vec(),
-            desired_state.len(),
-        );
-        let joltages = process_joltages_str(row_split[row_split.len() - 1]);
-        out.push((desired_state, button_wirings, joltages));
-    }
-    out
+    input
+        .strip_suffix("\n")
+        .unwrap()
+        .split("\n")
+        .map(|row| {
+            let row_split: Vec<&str> = row.split(" ").collect();
+            let desired_state = process_desired_state_str(row_split[0]);
+            let num_lights = desired_state.len();
+            (
+                desired_state,
+                process_button_wirings_str(row_split[1..row_split.len() - 1].to_vec(), num_lights),
+                process_joltages_str(row_split[row_split.len() - 1]),
+            )
+        })
+        .collect()
 }
 
 fn run_buttons(num_lights: usize, button_tuples_to_use: &Vec<&Vec<i64>>) -> Vec<i64> {
