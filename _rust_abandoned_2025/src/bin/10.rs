@@ -2,8 +2,10 @@ use itertools::Itertools;
 use std::cmp::min;
 advent_of_code::solution!(10);
 
-type ButtonWiring = [i64; 10];
-type Joltages = [i64; 10];
+const MAX_NUM_LIGHTS: usize = 10;
+
+type ButtonWiring = [i64; MAX_NUM_LIGHTS];
+type Joltages = [i64; MAX_NUM_LIGHTS];
 type Machine = (Joltages, Vec<ButtonWiring>, Joltages, usize);
 
 #[inline]
@@ -35,7 +37,7 @@ fn process_desired_state_str(desired_state_str: &str) -> Joltages {
     //   to make them basically match the format of joltages
     //   so both part 1 and part 2 can share the same code
     // E.g. "[.##.]" -> [0, 1, 1, 0]
-    let mut out = [0i64; 10];
+    let mut out = [0i64; MAX_NUM_LIGHTS];
     for (i, ch) in desired_state_str
         .chars()
         .filter(|ch| *ch != '[' && *ch != ']')
@@ -77,7 +79,7 @@ fn process_button_wirings_str(
 fn process_joltages_str(joltages_str: &str) -> Joltages {
     // Process joltages string into a vector of numbers
     // E.g. "{3,5,4,7}" -> [3, 5, 4, 7]
-    let mut out = [0i64; 10];
+    let mut out = [0i64; MAX_NUM_LIGHTS];
     for (i, j_str) in joltages_str[1..joltages_str.len() - 1]
         .split(",")
         .enumerate()
@@ -115,7 +117,7 @@ fn parse_input(input: &str) -> Vec<Machine> {
 #[hotpath::measure]
 fn run_buttons(num_lights: usize, button_tuples_to_use: &Vec<&ButtonWiring>) -> Joltages {
     // Simulate a list of button presses
-    let mut out = [0i64; 10];
+    let mut out = [0i64; MAX_NUM_LIGHTS];
     for but in button_tuples_to_use {
         add_mod_2_inplace(&mut out, but, num_lights);
     }
