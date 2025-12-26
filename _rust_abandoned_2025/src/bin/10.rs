@@ -75,10 +75,6 @@ pub fn part_one(input: &str) -> Option<u64> {
     let mut num_button_presses = 0;
     for machine in machines {
         let number_of_lights = machine.0.len();
-        // let button_wiring_tuples: Vec<Vec<i64>> = (&machine.1)
-        //     .into_iter()
-        //     .map(|x| button_wiring_to_tuple(x, number_of_lights))
-        //     .collect();
         for buttons in machine.1.iter().powerset() {
             if run_buttons(number_of_lights, &buttons) == machine.0 {
                 num_button_presses += buttons.len();
