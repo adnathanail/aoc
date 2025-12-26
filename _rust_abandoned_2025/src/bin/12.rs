@@ -1,4 +1,4 @@
-use std::{collections::HashSet, hash::Hash};
+use std::collections::HashSet;
 
 advent_of_code::solution!(12, 1);
 
@@ -44,20 +44,23 @@ fn process_input(input: &str) -> (Vec<PresentCoords>, Vec<Region>) {
     (present_coords, regions)
 }
 
+#[hotpath::measure]
 fn rotate_present_right(present_coords: &PresentCoords) -> PresentCoords {
     present_coords
-        .into_iter()
+        .iter()
         .map(|coord| (2 - coord.1, coord.0))
         .collect()
 }
 
+#[hotpath::measure]
 fn flip_present_horizontally(present_coords: &PresentCoords) -> PresentCoords {
     present_coords
-        .into_iter()
+        .iter()
         .map(|coord| (2 - coord.0, coord.1))
         .collect()
 }
 
+#[hotpath::measure]
 fn get_all_versions_of_present(present_coords: &PresentCoords) -> HashSet<PresentCoords> {
     let mut out = HashSet::new();
     let mut present_coords_clone = present_coords.clone();
@@ -74,17 +77,19 @@ fn get_all_versions_of_present(present_coords: &PresentCoords) -> HashSet<Presen
     out
 }
 
+#[hotpath::measure]
 fn offset_present(
     present_coords: &PresentCoords,
     x_offset: usize,
     y_offset: usize,
 ) -> PresentCoords {
     present_coords
-        .into_iter()
+        .iter()
         .map(|coord| (coord.0 + x_offset, coord.1 + y_offset))
         .collect()
 }
 
+#[hotpath::measure]
 fn no_crossover(present_coords: &PresentCoords, present_placement: &PresentPlacement) -> bool {
     for val in present_coords {
         if present_placement.contains(val) {
@@ -96,6 +101,7 @@ fn no_crossover(present_coords: &PresentCoords, present_placement: &PresentPlace
 
 type PresentPlacement = HashSet<Coord>;
 
+#[hotpath::measure]
 fn attempt_placement(
     presents: &Vec<PresentCoords>,
     current_placement: PresentPlacement,
@@ -120,10 +126,8 @@ fn attempt_placement(
                 let present_to_place = offset_present(&present_coords, x_offset, y_offset);
                 if no_crossover(&present_to_place, &current_placement) {
                     let ptp_set: PresentPlacement = present_to_place.into_iter().collect();
-                    let current_placement_plus_ptp: PresentPlacement = current_placement
-                        .union(&ptp_set)
-                        .map(|zz| zz.clone())
-                        .collect();
+                    let current_placement_plus_ptp: PresentPlacement =
+                        current_placement.union(&ptp_set).copied().collect();
                     if let Some(maybe_working_arrangement) = attempt_placement(
                         presents,
                         current_placement_plus_ptp,
@@ -142,26 +146,24 @@ fn attempt_placement(
 
 pub fn part_one(input: &str) -> Option<u64> {
     let (present_coords, regions) = process_input(input);
-    // println!("{:?}", present_coords);
-    // println!("{:?}", regions);
     let mut tot = 0;
     for region in regions {
         println!("{:?}", region);
-        let (reg_width, reg_height, pts) = region;
+        let (reg_width, reg_height, present_tallies) = region;
         let mut pids_to_place_this_region: Vec<usize> = vec![];
-        for i in 0..pts.len() {
-            for _ in 0..pts[i] {
+        for (i, present_tally) in present_tallies.iter().enumerate() {
+            for _ in 0..*present_tally {
                 pids_to_place_this_region.push(i)
             }
         }
-        if !attempt_placement(
+        if attempt_placement(
             &present_coords,
             HashSet::new(),
             reg_width,
             reg_height,
             &pids_to_place_this_region,
         )
-        .is_none()
+        .is_some()
         {
             tot += 1
         }
