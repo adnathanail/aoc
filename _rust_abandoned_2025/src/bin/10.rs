@@ -5,7 +5,13 @@ advent_of_code::solution!(10);
 type LightingState = Vec<i64>;
 type ButtonWirings = Vec<Vec<u64>>;
 type Joltages = Vec<i64>;
-type Machine = (LightingState, ButtonWirings, Joltages);
+type Machine = (LightingState, Vec<Vec<i64>>, Joltages);
+
+fn button_wiring_to_tuple(buttons: &Vec<u64>, num_lights: usize) -> Vec<i64> {
+    (0..num_lights)
+        .map(|x| if buttons.contains(&(x as u64)) { 1 } else { 0 })
+        .collect()
+}
 
 fn parse_input(input: &str) -> Vec<Machine> {
     let mut out = vec![];
@@ -26,12 +32,16 @@ fn parse_input(input: &str) -> Vec<Machine> {
                     .collect()
             })
             .collect();
+        let button_wiring_tuples: Vec<Vec<i64>> = button_wirings
+            .into_iter()
+            .map(|x| button_wiring_to_tuple(&x, desired_state.len()))
+            .collect();
         let joltages_str = row_split[row_split.len() - 1];
         let joltages: Joltages = joltages_str[1..joltages_str.len() - 1]
             .split(",")
             .map(|x| x.parse::<i64>().unwrap())
             .collect();
-        out.push((desired_state, button_wirings, joltages));
+        out.push((desired_state, button_wiring_tuples, joltages));
     }
     out
 }
@@ -50,11 +60,11 @@ pub fn part_one(input: &str) -> Option<u64> {
     let mut num_button_presses = 0;
     for machine in machines {
         let number_of_lights = machine.0.len();
-        let button_wiring_tuples: Vec<Vec<i64>> = (&machine.1)
-            .into_iter()
-            .map(|x| button_wiring_to_tuple(x, number_of_lights))
-            .collect();
-        for buttons in button_wiring_tuples.iter().powerset() {
+        // let button_wiring_tuples: Vec<Vec<i64>> = (&machine.1)
+        //     .into_iter()
+        //     .map(|x| button_wiring_to_tuple(x, number_of_lights))
+        //     .collect();
+        for buttons in machine.1.iter().powerset() {
             if run_buttons(number_of_lights, &buttons) == machine.0 {
                 num_button_presses += buttons.len();
                 break;
@@ -62,12 +72,6 @@ pub fn part_one(input: &str) -> Option<u64> {
         }
     }
     Some(num_button_presses as u64)
-}
-
-fn button_wiring_to_tuple(buttons: &Vec<u64>, num_lights: usize) -> Vec<i64> {
-    (0..num_lights)
-        .map(|x| if buttons.contains(&(x as u64)) { 1 } else { 0 })
-        .collect()
 }
 
 fn add_tuples(t1: &Vec<i64>, t2: &Vec<i64>, m: i64) -> Vec<i64> {
@@ -160,13 +164,7 @@ pub fn part_two(input: &str) -> Option<u64> {
     let machines = parse_input(input);
     let mut num_button_presses = 0;
     for machine in machines {
-        let number_of_lights = machine.0.len();
-        let button_wiring_tuples: Vec<Vec<i64>> = (&machine.1)
-            .into_iter()
-            .map(|x| button_wiring_to_tuple(x, number_of_lights))
-            .collect();
-        num_button_presses +=
-            get_num_button_presses_for_joltages(&button_wiring_tuples, &machine.2);
+        num_button_presses += get_num_button_presses_for_joltages(&machine.1, &machine.2);
     }
     Some(num_button_presses as u64)
 }
