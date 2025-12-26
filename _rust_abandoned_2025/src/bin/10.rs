@@ -25,8 +25,8 @@ fn subtract_inplace(out: &mut Joltages, other: &ButtonWiring, len: usize) {
 #[inline]
 #[hotpath::measure]
 fn divide_inplace(out: &mut Joltages, divisor: i64, len: usize) {
-    for i in 0..len {
-        out[i] /= divisor;
+    for item in out.iter_mut().take(len) {
+        *item /= divisor
     }
 }
 
