@@ -116,17 +116,6 @@ pub fn part_one(input: &str) -> Option<u64> {
 }
 
 #[hotpath::measure]
-fn subtract_tuples(t1: &[i64], t2: &[i64]) -> Vec<i64> {
-    t1.iter().zip(t2).map(|(x, y)| x - y).collect()
-}
-
-#[hotpath::measure]
-fn int_divide_tuple(t1: &[i64], s: i64) -> Vec<i64> {
-    // Integer-divide a tuple by a scalar, elementwise
-    t1.iter().map(|x| x / s).collect()
-}
-
-#[hotpath::measure]
 fn get_possible_buttons_for_desired_state(
     button_tuples: &[ButtonWiring],
     binary_desired_state: &Joltages,
@@ -143,60 +132,71 @@ fn get_possible_buttons_for_desired_state(
     out
 }
 
-// #[hotpath::measure]
-// fn get_num_button_presses_for_joltages(
-//     button_tuples: &Vec<ButtonWiring>,
-//     joltages: &Joltages,
-// ) -> u64 {
-//     // For given lists of button tuples and joltages, return the minimum number of button presses
-//     //   required to achieve the desired joltages
-//     // Can't have negative joltages
-//     for jolt in joltages {
-//         if *jolt < 0 {
-//             return u64::MAX;
-//         }
-//     }
-//     // If the joltages are all 0, we don't need to press any buttons
-//     let mut all_zero = true;
-//     for jolt in joltages {
-//         if *jolt != 0 {
-//             all_zero = false;
-//             break;
-//         }
-//     }
-//     if all_zero {
-//         return 0;
-//     }
-//     // To find all button presses required to make all the joltage numbers even,
-//     //   get a list of the "parity" (0 for even 1 for odd) of the joltages
-//     let joltage_parities: Joltages = joltages.iter().map(|x| x % 2).collect();
-//     let mut least_buttons = u64::MAX;
-//     // Find all the button presses that make our joltages even
-//     for buttons in get_possible_buttons_for_desired_state(button_tuples, &joltage_parities) {
-//         // Apply the button presses to the joltages
-//         let mut new_joltages: Joltages = joltages.clone();
-//         for button in &buttons {
-//             new_joltages = subtract_tuples(&new_joltages, button)
-//         }
-//         // Divide the new joltages by 2, to obtain a new set of target joltages, potentially with new odd joltages
-//         new_joltages = int_divide_tuple(&new_joltages, 2);
-//         // - Find the number of button presses required to make the new joltages
-//         // - Multiply it by 2, to account for the fact that we halved the targets
-//         // - And add the number of button presses we used, to make the joltages even
-//         let nbpfj = get_num_button_presses_for_joltages(button_tuples, &new_joltages);
-//         if nbpfj < u64::MAX {
-//             least_buttons = min(least_buttons, (buttons.len() as u64) + (2 * nbpfj))
-//         }
-//     }
-//     least_buttons
-// }
+#[hotpath::measure]
+fn get_num_button_presses_for_joltages(
+    num_lights: usize,
+    button_tuples: &Vec<ButtonWiring>,
+    joltages: &Joltages,
+) -> u64 {
+    // For given lists of button tuples and joltages, return the minimum number of button presses
+    //   required to achieve the desired joltages
+    // Can't have negative joltages
+    for jolt in joltages {
+        if *jolt < 0 {
+            return u64::MAX;
+        }
+    }
+    // If the joltages are all 0, we don't need to press any buttons
+    let mut all_zero = true;
+    for jolt in joltages {
+        if *jolt != 0 {
+            all_zero = false;
+            break;
+        }
+    }
+    if all_zero {
+        return 0;
+    }
+    // To find all button presses required to make all the joltage numbers even,
+    //   get a list of the "parity" (0 for even 1 for odd) of the joltages
+    let joltage_parities: Joltages = joltages
+        .iter()
+        .map(|x| x % 2)
+        .collect::<Vec<i64>>()
+        .try_into()
+        .unwrap();
+    let mut least_buttons = u64::MAX;
+    // Find all the button presses that make our joltages even
+    for buttons in get_possible_buttons_for_desired_state(button_tuples, &joltage_parities) {
+        // Apply the button presses to the joltages
+        let mut new_joltages: Joltages = joltages.clone();
+        for button in &buttons {
+            for i in 0..num_lights {
+                new_joltages[i] = new_joltages[i] - button[i]
+            }
+        }
+        // Divide the new joltages by 2, to obtain a new set of target joltages, potentially with new odd joltages
+        for i in 0..num_lights {
+            new_joltages[i] /= 2
+        }
+        // - Find the number of button presses required to make the new joltages
+        // - Multiply it by 2, to account for the fact that we halved the targets
+        // - And add the number of button presses we used, to make the joltages even
+        let nbpfj = get_num_button_presses_for_joltages(num_lights, button_tuples, &new_joltages);
+        if nbpfj < u64::MAX {
+            least_buttons = min(least_buttons, (buttons.len() as u64) + (2 * nbpfj))
+        }
+    }
+    least_buttons
+}
 
 pub fn part_two(input: &str) -> Option<u64> {
-    // let machines = parse_input(input);
+    let machines = parse_input(input);
     let mut num_button_presses = 0;
-    // for machine in machines {
-    //     num_button_presses += get_num_button_presses_for_joltages(&machine.1, &machine.2);
-    // }
+    for machine in machines {
+        num_button_presses +=
+            get_num_button_presses_for_joltages(machine.3, &machine.1, &machine.2);
+    }
     Some(num_button_presses)
 }
 
