@@ -8,9 +8,9 @@ type Machine = (Joltages, Vec<ButtonWiring>, Joltages, usize);
 
 #[inline]
 #[hotpath::measure]
-fn add_inplace(out: &mut Joltages, other: &ButtonWiring, m: i64, len: usize) {
+fn add_mod_2_inplace(out: &mut Joltages, other: &ButtonWiring, len: usize) {
     for i in 0..len {
-        out[i] = (out[i] + other[i]) % m;
+        out[i] ^= other[i];
     }
 }
 
@@ -24,7 +24,7 @@ fn subtract_inplace(out: &mut Joltages, other: &ButtonWiring, len: usize) {
 
 #[inline]
 #[hotpath::measure]
-fn divide_inplace(out: &mut Joltages, divisor: i64, len: usize) {
+fn integer_divide_inplace(out: &mut Joltages, divisor: i64, len: usize) {
     for item in out.iter_mut().take(len) {
         *item /= divisor
     }
@@ -117,7 +117,7 @@ fn run_buttons(num_lights: usize, button_tuples_to_use: &Vec<&ButtonWiring>) -> 
     // Simulate a list of button presses
     let mut out = [0i64; 10];
     for but in button_tuples_to_use {
-        add_inplace(&mut out, but, 2, num_lights);
+        add_mod_2_inplace(&mut out, but, num_lights);
     }
     out
 }
@@ -196,7 +196,7 @@ fn get_num_button_presses_for_joltages(
             subtract_inplace(&mut new_joltages, button, num_lights);
         }
         // Divide the new joltages by 2, to obtain a new set of target joltages, potentially with new odd joltages
-        divide_inplace(&mut new_joltages, 2, num_lights);
+        integer_divide_inplace(&mut new_joltages, 2, num_lights);
         // - Find the number of button presses required to make the new joltages
         // - Multiply it by 2, to account for the fact that we halved the targets
         // - And add the number of button presses we used, to make the joltages even
