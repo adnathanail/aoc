@@ -6,6 +6,30 @@ type ButtonWiring = [i64; 10];
 type Joltages = [i64; 10];
 type Machine = (Joltages, Vec<ButtonWiring>, Joltages, usize);
 
+#[inline]
+#[hotpath::measure]
+fn add_inplace(out: &mut Joltages, other: &ButtonWiring, m: i64, len: usize) {
+    for i in 0..len {
+        out[i] = (out[i] + other[i]) % m;
+    }
+}
+
+#[inline]
+#[hotpath::measure]
+fn subtract_inplace(out: &mut Joltages, other: &ButtonWiring, len: usize) {
+    for i in 0..len {
+        out[i] -= other[i];
+    }
+}
+
+#[inline]
+#[hotpath::measure]
+fn divide_inplace(out: &mut Joltages, divisor: i64, len: usize) {
+    for i in 0..len {
+        out[i] /= divisor;
+    }
+}
+
 fn process_desired_state_str(desired_state_str: &str) -> Joltages {
     // Process lighting state string into a vector of 1s and 0s
     //   to make them basically match the format of joltages
@@ -93,9 +117,7 @@ fn run_buttons(num_lights: usize, button_tuples_to_use: &Vec<&ButtonWiring>) -> 
     // Simulate a list of button presses
     let mut out = [0i64; 10];
     for but in button_tuples_to_use {
-        for i in 0..num_lights {
-            out[i] = (out[i] + but[i]) % 2
-        }
+        add_inplace(&mut out, but, 2, num_lights);
     }
     out
 }
@@ -169,16 +191,12 @@ fn get_num_button_presses_for_joltages(
     // Find all the button presses that make our joltages even
     for buttons in get_possible_buttons_for_desired_state(button_tuples, &joltage_parities) {
         // Apply the button presses to the joltages
-        let mut new_joltages: Joltages = joltages.clone();
+        let mut new_joltages: Joltages = *joltages;
         for button in &buttons {
-            for i in 0..num_lights {
-                new_joltages[i] = new_joltages[i] - button[i]
-            }
+            subtract_inplace(&mut new_joltages, button, num_lights);
         }
         // Divide the new joltages by 2, to obtain a new set of target joltages, potentially with new odd joltages
-        for i in 0..num_lights {
-            new_joltages[i] /= 2
-        }
+        divide_inplace(&mut new_joltages, 2, num_lights);
         // - Find the number of button presses required to make the new joltages
         // - Multiply it by 2, to account for the fact that we halved the targets
         // - And add the number of button presses we used, to make the joltages even
