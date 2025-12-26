@@ -86,29 +86,16 @@ pub fn part_one(input: &str) -> Option<u64> {
 }
 
 fn add_tuples(t1: &Vec<i64>, t2: &Vec<i64>, m: i64) -> Vec<i64> {
-    let mut out: Vec<i64> = vec![];
-    for i in 0..t1.len() {
-        out.push((t1[i] + t2[i]) % m)
-    }
-    out
+    t1.iter().zip(t2).map(|(x, y)| (x + y) % m).collect()
 }
 
 fn subtract_tuples(t1: &Vec<i64>, t2: &Vec<i64>) -> Vec<i64> {
-    // Subtract one tuple from another, equal-length, tuple, elementwise
-    let mut out: Vec<i64> = vec![];
-    for i in 0..t1.len() {
-        out.push(t1[i] - t2[i])
-    }
-    out
+    t1.iter().zip(t2).map(|(x, y)| x - y).collect()
 }
 
 fn int_divide_tuple(t1: &Vec<i64>, s: i64) -> Vec<i64> {
     // Integer-divide a tuple by a scalar, elementwise
-    let mut out: Vec<i64> = vec![];
-    for i in 0..t1.len() {
-        out.push(t1[i] / s)
-    }
-    out
+    t1.iter().map(|x| x / s).collect()
 }
 
 fn get_possible_buttons_for_desired_state(
