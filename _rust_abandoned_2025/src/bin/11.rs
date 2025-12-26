@@ -34,41 +34,71 @@ fn get_cables<'a>(input: &'a str) -> (CableNames<'a>, Cables) {
 static FOLLOW_CABLES_CACHE: LazyLock<Mutex<HashMap<(usize, usize), u64>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
-fn follow_cables(cables: &Cables, start_cable: &usize, end_cable: &usize) -> u64 {
-    if let Some(&result) = FOLLOW_CABLES_CACHE
-        .lock()
-        .unwrap()
-        .get(&(*start_cable, *end_cable))
-    {
-        return result;
-    }
+fn follow_cables(
+    cables: &Cables,
+    start_cable: &usize,
+    end_cable: &usize,
+    fft_cable: Option<&usize>,
+    dac_cable: Option<&usize>,
+) -> u64 {
+    // if let Some(&result) = FOLLOW_CABLES_CACHE
+    //     .lock()
+    //     .unwrap()
+    //     .get(&(*start_cable, *end_cable))
+    // {
+    //     return result;
+    // }
 
     let mut out = 0;
     for c in cables[start_cable].iter() {
         if c == end_cable {
-            out += 1;
+            if fft_cable.is_none() && dac_cable.is_none() {
+                out += 1;
+            }
         } else {
-            out += follow_cables(cables, c, end_cable)
+            out += follow_cables(
+                cables,
+                c,
+                end_cable,
+                if Some(c) == fft_cable {
+                    None
+                } else {
+                    fft_cable
+                },
+                if Some(c) == dac_cable {
+                    None
+                } else {
+                    dac_cable
+                },
+            )
         }
     }
-    FOLLOW_CABLES_CACHE
-        .lock()
-        .unwrap()
-        .insert((*start_cable, *end_cable), out);
+    // FOLLOW_CABLES_CACHE
+    //     .lock()
+    //     .unwrap()
+    //     .insert((*start_cable, *end_cable), out);
     out
 }
 
 pub fn part_one(input: &str) -> Option<u64> {
-    let (cable_names, cables) = get_cables(input);
-    Some(follow_cables(
-        &cables,
-        &get_cable_index(&cable_names, "you"),
-        &get_cable_index(&cable_names, "out"),
-    ))
+    // let (cable_names, cables) = get_cables(input);
+    // Some(follow_cables(
+    //     &cables,
+    //     &get_cable_index(&cable_names, "you"),
+    //     &get_cable_index(&cable_names, "out"),
+    // ))
+    None
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
-    None
+    let (cable_names, cables) = get_cables(input);
+    Some(follow_cables(
+        &cables,
+        &get_cable_index(&cable_names, "svr"),
+        &get_cable_index(&cable_names, "out"),
+        Some(&get_cable_index(&cable_names, "fft")),
+        Some(&get_cable_index(&cable_names, "dac")),
+    ))
 }
 
 #[cfg(test)]
@@ -83,7 +113,9 @@ mod tests {
 
     #[test]
     fn test_part_two() {
-        let result = part_two(&advent_of_code::template::read_file("examples", DAY));
+        let result = part_two(&advent_of_code::template::read_file_part(
+            "examples", DAY, 2,
+        ));
         assert_eq!(result, Some(2));
     }
 }
