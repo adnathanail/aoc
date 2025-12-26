@@ -85,6 +85,15 @@ fn offset_present(
         .collect()
 }
 
+fn no_crossover(present_coords: &PresentCoords, present_placement: &PresentPlacement) -> bool {
+    for val in present_coords {
+        if present_placement.contains(val) {
+            return false;
+        }
+    }
+    true
+}
+
 type PresentPlacement = HashSet<Coord>;
 
 fn attempt_placement(
@@ -92,24 +101,39 @@ fn attempt_placement(
     current_placement: PresentPlacement,
     region_width: usize,
     region_height: usize,
-    present_ids_to_place: Vec<usize>,
+    present_ids_to_place: &[usize],
 ) -> Option<PresentPlacement> {
     if present_ids_to_place.is_empty() {
         return Some(current_placement);
     }
-    // # Short circuit when there aren't enough spaces left on the grid to place
-    // if (len(current_placement) + sum(len(PRESS[pres_id]) for pres_id in present_ids_to_place)) > region_height * region_width:
-    //     return False
+    // Short circuit when there aren't enough spaces left on the grid to place
+    let squares_to_place: usize = present_ids_to_place
+        .iter()
+        .map(|pid| presents[*pid].len())
+        .sum();
+    if (current_placement.len() + squares_to_place) > region_height * region_width {
+        return None;
+    }
     for present_coords in get_all_versions_of_present(&presents[present_ids_to_place[0]]) {
         for x_offset in 0..(region_width - PRESENT_WIDTH_HEIGHT + 1) {
             for y_offset in 0..(region_height - PRESENT_WIDTH_HEIGHT + 1) {
                 let present_to_place = offset_present(&present_coords, x_offset, y_offset);
-                // if present_to_place.diff current_placement == present_to_place {
-                //     // maybe_working_arrangement = attempt_placement(current_placement.union(present_to_place), region_width, region_height, present_ids_to_place[1:])
-                //     // if maybe_working_arrangement {
-                //     //     return maybe_working_arrangement
-                //     // }
-                // }
+                if no_crossover(&present_to_place, &current_placement) {
+                    let ptp_set: PresentPlacement = present_to_place.into_iter().collect();
+                    let current_placement_plus_ptp: PresentPlacement = current_placement
+                        .union(&ptp_set)
+                        .map(|zz| zz.clone())
+                        .collect();
+                    if let Some(maybe_working_arrangement) = attempt_placement(
+                        presents,
+                        current_placement_plus_ptp,
+                        region_width,
+                        region_height,
+                        &present_ids_to_place[1..],
+                    ) {
+                        return Some(maybe_working_arrangement);
+                    }
+                }
             }
         }
     }
@@ -118,9 +142,31 @@ fn attempt_placement(
 
 pub fn part_one(input: &str) -> Option<u64> {
     let (present_coords, regions) = process_input(input);
-    println!("{:?}", present_coords);
-    println!("{:?}", regions);
-    None
+    // println!("{:?}", present_coords);
+    // println!("{:?}", regions);
+    let mut tot = 0;
+    for region in regions {
+        println!("{:?}", region);
+        let (reg_width, reg_height, pts) = region;
+        let mut pids_to_place_this_region: Vec<usize> = vec![];
+        for i in 0..pts.len() {
+            for _ in 0..pts[i] {
+                pids_to_place_this_region.push(i)
+            }
+        }
+        if !attempt_placement(
+            &present_coords,
+            HashSet::new(),
+            reg_width,
+            reg_height,
+            &pids_to_place_this_region,
+        )
+        .is_none()
+        {
+            tot += 1
+        }
+    }
+    Some(tot)
 }
 
 #[cfg(test)]
