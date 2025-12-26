@@ -5,7 +5,7 @@ advent_of_code::solution!(12, 1);
 const PRESENT_WIDTH_HEIGHT: usize = 3;
 const NUM_PRESENTS: usize = 6;
 type Coord = (usize, usize);
-type PresentCoords = Vec<Coord>;
+type PresentCoords = ([Coord; PRESENT_WIDTH_HEIGHT * PRESENT_WIDTH_HEIGHT], usize);
 type Region = (usize, usize, [u64; NUM_PRESENTS]);
 
 fn process_input(input: &str) -> (Vec<PresentCoords>, Vec<Region>) {
@@ -14,15 +14,17 @@ fn process_input(input: &str) -> (Vec<PresentCoords>, Vec<Region>) {
         .iter()
         .map(|present_str| {
             let present_str_split: Vec<&str> = present_str.split("\n").collect();
-            let mut out: PresentCoords = vec![];
+            let mut out = [(0, 0); PRESENT_WIDTH_HEIGHT * PRESENT_WIDTH_HEIGHT];
+            let mut i = 0;
             for y in 0..PRESENT_WIDTH_HEIGHT {
                 for (x, val) in present_str_split[y + 1].chars().enumerate() {
                     if val == '#' {
-                        out.push((x, y))
+                        out[i] = (x, y);
+                        i += 1;
                     }
                 }
             }
-            out
+            (out, i)
         })
         .collect();
     let regions: Vec<Region> = inp_split[inp_split.len() - 1]
@@ -46,18 +48,20 @@ fn process_input(input: &str) -> (Vec<PresentCoords>, Vec<Region>) {
 
 #[hotpath::measure]
 fn rotate_present_right(present_coords: &PresentCoords) -> PresentCoords {
-    present_coords
-        .iter()
-        .map(|coord| (2 - coord.1, coord.0))
-        .collect()
+    let mut out = [(0, 0); PRESENT_WIDTH_HEIGHT * PRESENT_WIDTH_HEIGHT];
+    for i in 0..present_coords.1 {
+        out[i] = (2 - present_coords.0[i].1, present_coords.0[i].0)
+    }
+    (out, present_coords.1)
 }
 
 #[hotpath::measure]
 fn flip_present_horizontally(present_coords: &PresentCoords) -> PresentCoords {
-    present_coords
-        .iter()
-        .map(|coord| (2 - coord.0, coord.1))
-        .collect()
+    let mut out = [(0, 0); PRESENT_WIDTH_HEIGHT * PRESENT_WIDTH_HEIGHT];
+    for i in 0..present_coords.1 {
+        out[i] = (2 - present_coords.0[i].0, present_coords.0[i].1)
+    }
+    (out, present_coords.1)
 }
 
 #[hotpath::measure]
@@ -83,16 +87,20 @@ fn offset_present(
     x_offset: usize,
     y_offset: usize,
 ) -> PresentCoords {
-    present_coords
-        .iter()
-        .map(|coord| (coord.0 + x_offset, coord.1 + y_offset))
-        .collect()
+    let mut out = [(0, 0); PRESENT_WIDTH_HEIGHT * PRESENT_WIDTH_HEIGHT];
+    for i in 0..present_coords.1 {
+        out[i] = (
+            present_coords.0[i].0 + x_offset,
+            present_coords.0[i].1 + y_offset,
+        )
+    }
+    (out, present_coords.1)
 }
 
 #[hotpath::measure]
 fn no_crossover(present_coords: &PresentCoords, present_placement: &PresentPlacement) -> bool {
-    for val in present_coords {
-        if present_placement.contains(val) {
+    for i in 0..present_coords.1 {
+        if present_placement.contains(&present_coords.0[i]) {
             return false;
         }
     }
@@ -116,7 +124,7 @@ fn attempt_placement(
     // Short circuit when there aren't enough spaces left on the grid to place
     let squares_to_place: usize = present_ids_to_place
         .iter()
-        .map(|pid| presents[*pid].len())
+        .map(|pid| presents[*pid].1)
         .sum();
     if (current_placement.len() + squares_to_place) > region_height * region_width {
         return None;
@@ -126,7 +134,7 @@ fn attempt_placement(
             for y_offset in 0..(region_height - PRESENT_WIDTH_HEIGHT + 1) {
                 let present_to_place = offset_present(&present_coords, x_offset, y_offset);
                 if no_crossover(&present_to_place, &current_placement) {
-                    let ptp_set: PresentPlacement = present_to_place.into_iter().collect();
+                    let ptp_set: PresentPlacement = present_to_place.0.into_iter().collect();
                     let current_placement_plus_ptp: PresentPlacement =
                         current_placement.union(&ptp_set).copied().collect();
                     if let Some(maybe_working_arrangement) = attempt_placement(
