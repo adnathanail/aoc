@@ -53,6 +53,7 @@ fn process_joltages_str(joltages_str: &str) -> Joltages {
         .collect()
 }
 
+#[hotpath::measure]
 fn parse_input(input: &str) -> Vec<Machine> {
     // Process input into list of machines
     //   Each machine containing
@@ -76,11 +77,14 @@ fn parse_input(input: &str) -> Vec<Machine> {
         .collect()
 }
 
+#[hotpath::measure]
 fn run_buttons(num_lights: usize, button_tuples_to_use: &Vec<&ButtonWiring>) -> Joltages {
     // Simulate a list of button presses
     let mut out: Vec<i64> = vec![0; num_lights];
     for but in button_tuples_to_use {
-        out = add_tuples(&out, but, 2)
+        for (o, b) in out.iter_mut().zip(but.iter()) {
+            *o = (*o + b) % 2;
+        }
     }
     out
 }
@@ -100,19 +104,18 @@ pub fn part_one(input: &str) -> Option<u64> {
     Some(num_button_presses as u64)
 }
 
-fn add_tuples(t1: &[i64], t2: &[i64], m: i64) -> Vec<i64> {
-    t1.iter().zip(t2).map(|(x, y)| (x + y) % m).collect()
-}
-
+#[hotpath::measure]
 fn subtract_tuples(t1: &[i64], t2: &[i64]) -> Vec<i64> {
     t1.iter().zip(t2).map(|(x, y)| x - y).collect()
 }
 
+#[hotpath::measure]
 fn int_divide_tuple(t1: &[i64], s: i64) -> Vec<i64> {
     // Integer-divide a tuple by a scalar, elementwise
     t1.iter().map(|x| x / s).collect()
 }
 
+#[hotpath::measure]
 fn get_possible_buttons_for_desired_state(
     button_tuples: &[ButtonWiring],
     binary_desired_state: &Joltages,
@@ -129,6 +132,7 @@ fn get_possible_buttons_for_desired_state(
     out
 }
 
+#[hotpath::measure]
 fn get_num_button_presses_for_joltages(
     button_tuples: &Vec<ButtonWiring>,
     joltages: &Joltages,
@@ -190,12 +194,14 @@ mod tests {
     use super::*;
 
     #[test]
+    #[hotpath::main]
     fn test_part_one() {
         let result = part_one(&advent_of_code::template::read_file("examples", DAY));
         assert_eq!(result, Some(7));
     }
 
     #[test]
+    #[hotpath::main]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
         assert_eq!(result, Some(33));
