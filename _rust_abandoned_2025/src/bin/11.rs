@@ -42,10 +42,10 @@ fn get_cables<'a>(input: &'a str) -> (CableNames<'a>, Cables) {
     (cable_names, out)
 }
 
+type FollowCablesInput = (usize, usize, Option<usize>, Option<usize>);
 // Cache for the follow_cables_function
-static FOLLOW_CABLES_CACHE: LazyLock<
-    Mutex<HashMap<(usize, usize, Option<usize>, Option<usize>), u64>>,
-> = LazyLock::new(|| Mutex::new(HashMap::new()));
+static FOLLOW_CABLES_CACHE: LazyLock<Mutex<HashMap<FollowCablesInput, u64>>> =
+    LazyLock::new(|| Mutex::new(HashMap::new()));
 
 fn follow_cables(
     cables: &Cables,
