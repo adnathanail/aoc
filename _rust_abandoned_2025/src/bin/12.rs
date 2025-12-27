@@ -183,7 +183,6 @@ pub fn part_one(input: &str) -> Option<u64> {
 
     let mut tot = 0;
     for region in regions {
-        println!("{:?}", region);
         let (reg_width, reg_height, present_tallies) = region;
 
         // Precompute all masks for this region's dimensions

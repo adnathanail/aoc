@@ -38,8 +38,9 @@ cargo all
 | [Day 9](./src/bin/09.rs) | `118.8µs` | `24.8ms` |
 | [Day 10](./src/bin/10.rs) | `1.2ms` | `7.2s` |
 | [Day 11](./src/bin/11.rs) | `2.8ms` | `2.7ms` |
+| [Day 12](./src/bin/12.rs) | `621.2ms` | `-` |
 
-**Total: 7900.44ms**
+**Total: 8521.64ms**
 <!--- benchmarking table --->
 
 ## Profiling
