@@ -4,8 +4,6 @@ from aocd.models import Puzzle
 puzzle = Puzzle(year=2025, day=1)
 inp = puzzle.input_data
 
-s = time.time()
-
 curr_pos = 50
 num_zeroes = 0
 for row in inp.splitlines():
@@ -21,4 +19,3 @@ for row in inp.splitlines():
             num_zeroes += 1
 
 print(num_zeroes)
-print(time.time() - s)

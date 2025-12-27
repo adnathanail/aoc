@@ -1,7 +1,7 @@
 from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2025, day=3)
-inp = puzzle.examples[0].input_data
+inp = puzzle.input_data
 
 # To find the largest 2 digit number, we just need to find the largest digit
 #   (ensuring there is at least one number to the right of it)
@@ -19,7 +19,7 @@ for row in inp.splitlines():
     first_digit_index = find_largest_number_in_string(row[:len(row) - 1])
     # Largest digit after first digit
     second_digit_index = first_digit_index + find_largest_number_in_string(row[first_digit_index + 1:]) + 1
-    print(row[first_digit_index], row[second_digit_index], int(row[first_digit_index] + row[second_digit_index]))
+    # print(row[first_digit_index], row[second_digit_index], int(row[first_digit_index] + row[second_digit_index]))
     total_joltage += int(row[first_digit_index] + row[second_digit_index])
 
 print(total_joltage)

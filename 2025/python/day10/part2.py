@@ -106,7 +106,7 @@ def button_wiring_to_tuple(buttons, num_lights):
 
 num_button_presses = 0
 for machine in machines:
-    print(machine)
+    # print(machine)
     num_button_presses += get_num_button_presses_for_joltages(tuple(button_wiring_to_tuple(wiring, len(machine["joltages"])) for wiring in machine["button_wirings"]), machine["joltages"])
 
 print(num_button_presses)
