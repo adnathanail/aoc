@@ -2,6 +2,8 @@
 
 Solutions for [Advent of Code](https://adventofcode.com/) in [Rust](https://www.rust-lang.org/).
 
+Main code is in [src/bin](./src/bin/)
+
 Commands
 ```bash
 # Scaffold
@@ -68,11 +70,10 @@ And run
 cargo test --bin 1 --features hotpath --profile profiling
 ```
 
-<!--#[hotpath::measure]-->
-
 ## Usage
 
-### ➡️ Scaffold a day
+<details>
+    <summary>➡️ Scaffold a day</summary>
 
 ```sh
 # example: `cargo scaffold 1`
@@ -92,8 +93,10 @@ Every [solution](https://github.com/fspoettel/advent-of-code-rust/blob/main/src/
 
 > [!TIP]
 > If a day has multiple example inputs, you can use the `read_file_part()` helper in your tests instead of `read_file()`. If this e.g. applies to day 1, you can create a second example file `01-2.txt` and invoke the helper like `let result = part_two(&advent_of_code::template::read_file_part("examples", DAY, 2));`. This supports an arbitrary number of example files.
+</details>
 
-### ➡️ Download input for a day
+<details>
+    <summary>➡️ Download input for a day</summary>
 
 > [!IMPORTANT]
 > This requires [installing the aoc-cli crate](#configure-aoc-cli-integration).
@@ -112,8 +115,10 @@ cargo download <day>
 # 🎄 Successfully wrote input to "data/inputs/01.txt".
 # 🎄 Successfully wrote puzzle to "data/puzzles/01.md".
 ```
+</details>
 
-### ➡️ Run solutions for a day
+<details>
+    <summary>➡️ Run solutions for a day</summary>
 
 ```sh
 # example: `cargo solve 01`
@@ -134,8 +139,10 @@ The `solve` command runs your solution against real puzzle inputs. To run an opt
 > This requires [installing the aoc-cli crate](#configure-aoc-cli-integration).
 
 Append the `--submit <part>` option to the `solve` command to submit your solution for checking.
+</details>
 
-### ➡️ Run all solutions
+<details>
+    <summary>➡️ Run all solutions</summary>
 
 ```sh
 cargo all
@@ -152,8 +159,10 @@ cargo all
 ```
 
 This runs all solutions sequentially and prints output to the command-line. Same as for the `solve` command, the `--release` flag runs an optimized build.
+</details>
 
-### ➡️ Benchmark your solutions
+<details>
+    <summary>➡️ Benchmark your solutions</summary>
 
 ```sh
 # example: `cargo time 8 --store`
@@ -174,23 +183,27 @@ The `cargo time` command allows you to benchmark your code and store timings in 
 
 `cargo time` has three modes of execution:
 
- 1. `cargo time` without arguments incrementally benches solutions that do not have been stored in the readme yet and skips the rest.
- 2. `cargo time <day>` benches a single solution.
- 3. `cargo time --all` benches all solutions.
+1. `cargo time` without arguments incrementally benches solutions that do not have been stored in the readme yet and skips the rest.
+2. `cargo time <day>` benches a single solution.
+3. `cargo time --all` benches all solutions.
 
 By default, `cargo time` does not write to the readme. In order to do so, append the `--store` flag: `cargo time --store`.
 
 > Please note that these are not _scientific_ benchmarks, understand them as a fun approximation. 😉 Timings, especially in the microseconds range, might change a bit between invocations.
+</details>
 
-### ➡️ Run all tests
+<details>
+    <summary>➡️ Run all tests</summary>
 
 ```sh
 cargo test
 ```
 
 To run tests for a specific day, append `--bin <day>`, e.g. `cargo test --bin 01`. You can further scope it down to a specific part, e.g. `cargo test --bin 01 part_one`.
+</details>
 
-### ➡️ Read puzzle description
+<details>
+    <summary>➡️ Read puzzle description</summary>
 
 > [!IMPORTANT]
 > This command requires [installing the aoc-cli crate](#configure-aoc-cli-integration).
@@ -204,17 +217,19 @@ cargo read <day>
 # Fetching puzzle for day 1, 2022...
 # ...the input...
 ```
+</details>
 
-### ➡️ Scaffold, download & read the current aoc day
+<details>
+    <summary>➡️ Scaffold, download & read the current aoc day</summary>
 
 > [!IMPORTANT]
 > This command requires [installing the aoc-cli crate](#configure-aoc-cli-integration).
 
 During december, the `today` shorthand command can be used to:
 
- - scaffold a solution for the current day
- - download its input
- - and read the puzzle
+- scaffold a solution for the current day
+- download its input
+- and read the puzzle
 
 in one go.
 
@@ -239,29 +254,37 @@ cargo today
 # Fetching puzzle for day 1, 2022...
 # ...the input...
 ```
+</details>
 
-### ➡️ Format code
+<details>
+    <summary>➡️ Format code</summary>
 
 ```sh
 cargo fmt
 ```
+</details>
 
-### ➡️ Lint code
+<details>
+    <summary>➡️ Lint code</summary>
 
 ```sh
 cargo clippy
 ```
+</details>
 
 ## Optional template features
 
-### Configure aoc-cli integration
+<details>
+    <summary>Configure aoc-cli integration</summary>
 
 1. Install [`aoc-cli`](https://github.com/scarvalhojr/aoc-cli/) via cargo: `cargo install aoc-cli --version 0.12.0`
 2. Create the file `<home_directory>/.adventofcode.session` and paste your session cookie into it. To retrieve the session cookie, press F12 anywhere on the Advent of Code website to open your browser developer tools. Look in _Cookies_ under the _Application_ or _Storage_ tab, and copy out the `session` cookie value. [^1]
 
 Once installed, you can use the [download command](#download-input--description-for-a-day), the read command, and automatically submit solutions via the [`--submit` flag](#submitting-solutions).
+</details>
 
-### Automatically track ⭐️ progress in the readme
+<details>
+    <summary>Automatically track ⭐️ progress in the readme</summary>
 
 This template includes [a Github action](https://github.com/k2bd/advent-readme-stars) that automatically updates the readme with your advent of code progress.
 
@@ -284,12 +307,16 @@ Go to the _Variables_ tab in your repository settings and create the following v
 -   `AOC_ENABLED`: This variable controls whether the workflow is enabled. Set it to `true` to enable the progress tracker. After you complete AoC or no longer work on it, you can set this to `false` to disable the CI.
 
 ✨ You can now run this action manually via the _Run workflow_ button on the workflow page. If you want the workflow to run automatically, uncomment the `schedule` section in the `readme-stars.yml` workflow file or add a `push` trigger.
+</details>
 
-### Enable code formatting / clippy checks in the CI
+<details>
+    <summary>Enable code formatting / clippy checks in the CI</summary>
 
 Uncomment the respective sections in the `ci.yml` workflow.
+</details>
 
-### Use DHAT to profile heap allocations
+<details>
+    <summary>Use DHAT to profile heap allocations</summary>
 
 If you are not only interested in the runtime of your solution, but also its memory allocation profile, you can use the template's [DHAT](https://valgrind.org/docs/manual/dh-manual.html) integration to analyze it. In order to activate DHAT, call the `solve` command with the `--dhat` flag.
 
@@ -308,13 +335,16 @@ cargo solve 1 --dhat
 The command will output some basic stats to the command-line and generate a `dhat-heap.json` report in the repo root directory.
 
 You can pass the report a tool like [dh-view](https://nnethercote.github.io/dh_view/dh_view.html) to view a detailed breakdown of heap allocations.
+</details>
 
-### Use VS Code to debug your code
+<details>
+    <summary>Use VS Code to debug your code</summary>
 
 1.  Install [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer) and [CodeLLDB](https://marketplace.visualstudio.com/items?itemName=vadimcn.vscode-lldb).
 2.  Set breakpoints in your code. [^3]
 3.  Click _Debug_ next to the unit test or the _main_ function. [^4]
 4.  The debugger will halt your program at the specific line and allow you to inspect the local stack. [^5]
+</details>
 
 ## Useful crates
 
