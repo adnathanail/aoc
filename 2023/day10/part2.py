@@ -119,19 +119,17 @@ def pipe_to_virtual_pipe(pipe_char: str, coord: Coord) -> list[Coord]:
     ]
 
 
-def flood_fill(pipes: set[Coord], start: Coord) -> list[Coord]:
+def flood_fill(pipes: set[Coord], start: Coord) -> set[Coord]:
     to_check = {start}
-    checked = set()
-    out = []
+    out = set()
     while to_check:
         next = to_check.pop()
         print(next, len(to_check))
-        out.append(next)
-        checked.add(next)
+        out.add(next)
         for potential, _delta in get_surrounding_squares(next):
             if (
                 potential not in pipes
-                and potential not in checked
+                and potential not in out
                 and potential not in to_check
             ):
                 to_check.add(potential)
