@@ -1,31 +1,23 @@
 from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2023, day=10)
+inp = puzzle.input_data
+
+def get_grid(inp_str):
+    out = []
+    for row in inp_str.splitlines():
+        out.append([char for char in row])
+    return out
+
+def find_start(grid):
+    for i in range(len(grid)):
+        for j in range(len(grid[i])):
+            if grid[i][j] == "S":
+                return (i, j)
+    raise Exception("Start not found!")
 
 
-inp = """.F----7F7F7F7F-7....
-.|F--7||||||||FJ....
-.||.FJ||||||||L7....
-FJL7L7LJLJ||LJ.L-7..
-L--J.L7...LJS7F-7L7.
-....F-J..F7FJ|L7L7L7
-....L7.F7||L7|.L7L7|
-.....|FJLJ|FJ|F7|.LJ
-....FJL-7.||.||||...
-....L---J.LJ.LJLJ..."""
-
-grid = []
-for row in inp.splitlines():
-    grid.append([char for char in row])
-
-start = None
-for i in range(len(grid)):
-    for j in range(len(grid[i])):
-        if grid[i][j] == "S":
-            start = (i, j)
-
-
-def get_potential_nexts(loc):
+def get_potential_nexts(grid, loc):
     char = grid[loc[0]][loc[1]]
 
     if char == "|":
@@ -44,8 +36,8 @@ def get_potential_nexts(loc):
     return []
 
 
-def get_next_location(loc, prev_loc):
-    potential_nexts = get_potential_nexts(loc)
+def get_next_location(grid, loc, prev_loc):
+    potential_nexts = get_potential_nexts(grid, loc)
 
     potential_nexts.remove(prev_loc)
 
@@ -55,114 +47,32 @@ def get_next_location(loc, prev_loc):
     return potential_nexts[0]
 
 
-curr = start
-
-# Looking in the 4 directions from the start, if one of them has the start as a potential prev(/next),
-# then that is a valid next location from the start
-for delt in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
-    potential_next = (start[0] + delt[0], start[1] + delt[1])
-    potential_next_potential_prevs = get_potential_nexts(potential_next)
-    if start in potential_next_potential_prevs:
-        curr = potential_next
-        prev = start
-
-path = [start]
-
-n = 0
-while grid[curr[0]][curr[1]] != "S":
-    # print("prev", prev)
-    # print("curr", curr)
-    path.append(curr)
-    new = get_next_location(curr, prev)
-    prev = curr
-    curr = new
-    n += 1
-    # print(curr, grid[curr[0]][curr[1]], n)
-
-for loc in path:
-    print(loc, grid[loc[0]][loc[1]])
+def get_next_after_start(grid, start):
+    for delt in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+        potential_next = (start[0] + delt[0], start[1] + delt[1])
+        potential_next_potential_prevs = get_potential_nexts(grid, potential_next)
+        if start in potential_next_potential_prevs:
+            return potential_next
 
 
-def is_on_segment(p, q, r):
-    """
-    Check if point q lies on line segment 'pr'
-    """
-    if q[0] <= max(p[0], r[0]) and q[0] >= min(p[0], r[0]) and q[1] <= max(p[1], r[1]) and q[1] >= min(p[1], r[1]):
-        return True
-    return False
+def get_path(grid):
+    prev = find_start(grid)
+    curr = get_next_after_start(grid, prev)
+    while grid[curr[0]][curr[1]] != "S":
+        yield curr
+        new = get_next_location(grid, curr, prev)
+        prev = curr
+        curr = new
+    yield curr
 
 
-def orientation(p, q, r):
-    """
-    Find orientation of ordered triplet (p, q, r).
-    Returns 0 --> p, q and r are colinear
-            1 --> Clockwise
-            2 --> Counterclockwise
-    """
-    val = (q[1] - p[1]) * (r[0] - q[0]) - (q[0] - p[0]) * (r[1] - q[1])
-    if val == 0:
-        return 0  # colinear
-    elif val > 0:
-        return 1  # clockwise
-    else:
-        return 2  # counterclockwise
+def main():
+    grid = get_grid(inp)
 
+    n = 0
+    for element in get_path(grid):
+        n += 1
 
-def do_intersect(p1, q1, p2, q2):
-    """
-    Check if two line segments 'p1q1' and 'p2q2' intersect.
-    """
-    o1 = orientation(p1, q1, p2)
-    o2 = orientation(p1, q1, q2)
-    o3 = orientation(p2, q2, p1)
-    o4 = orientation(p2, q2, q1)
+    print(max(n // 2, (n+1) // 2))  # I.e. 8 -> 4, 9 -> 5, 10 -> 5, etc.
 
-    # General case
-    if o1 != o2 and o3 != o4:
-        return True
-
-    # Special Cases
-    if o1 == 0 and is_on_segment(p1, p2, q1):
-        return True
-    if o2 == 0 and is_on_segment(p1, q2, q1):
-        return True
-    if o3 == 0 and is_on_segment(p2, p1, q2):
-        return True
-    if o4 == 0 and is_on_segment(p2, q1, q2):
-        return True
-
-    return False
-
-
-def count_inside_points(loop, grid_height, grid_width):
-    inside_count = 0
-
-    for y in range(grid_height):
-        intersections = []
-        for i in range(len(loop) - 1):
-            if do_intersect((0, y), (grid_width, y), loop[i], loop[i + 1]):
-                # Calculate the intersection points
-                if loop[i][1] == loop[i + 1][1]:  # Horizontal line segment
-                    intersections.extend([loop[i][0], loop[i + 1][0]])
-                elif loop[i][0] == loop[i + 1][0]:  # Vertical line segment
-                    intersections.append(loop[i][0])
-                else:  # Diagonal line segment
-                    intersections.append(loop[i][0])
-
-        intersections = list(set(intersections))  # Remove duplicates
-        intersections.sort()
-        for i in range(0, len(intersections), 2):
-            if i + 1 < len(intersections):
-                # Count the grid points between each pair of intersections
-                inside_count += sum(1 for x in range(intersections[i], intersections[i + 1]) if (x, y) not in loop)
-
-    return inside_count
-
-
-# New loop
-loop = path  # Example loop
-loop.append(path[0])
-
-# Calculate points inside
-points_inside = count_inside_points(loop, len(grid), len(grid[0]))
-print(points_inside)
+main()
