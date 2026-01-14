@@ -4,16 +4,6 @@ from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2023, day=10)
 inp = puzzle.input_data
-inp = """FF7FSF7F7F7F7F7F---7
-L|LJ||||||||||||F--J
-FL-7LJLJ||||||LJL-77
-F--JF--7||LJLJIF7FJ-
-L---JF-JLJIIIIFJLJJ7
-|F|F-JF---7IIIL7L|7|
-|FFJF7L7F-JF7IIL---7
-7-L-JL7||F7|L7F-7F7|
-L.L7LFJ|||||FJL7||LJ
-L7JLJL-JLJLJL--JLJ.L"""
 
 pipe_char_delta_lookup = {
     "|": ((-1, 0), (1, 0)),
@@ -71,7 +61,9 @@ def get_next_location(grid: Grid, loc: Coord, prev_loc: Optional[Coord]) -> Coor
 
 def get_surrounding_squares(point: Coord) -> Generator[tuple[Coord, Coord], None, None]:
     for delt in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
-        yield (point[0] + delt[0], point[1] + delt[1]), delt
+        out = (point[0] + delt[0], point[1] + delt[1])
+        if out[0] >= 0 and out[1] >= 0:  # Prevent going out of bounds
+            yield out, delt
 
 
 def detect_start_type(grid: Grid, start: Coord) -> str:
@@ -118,19 +110,20 @@ def pipe_to_virtual_pipe(pipe_char, coord):
 
 
 def flood_fill(pipes: list[Coord], start: Coord) -> Generator[Coord, None, None]:
-    to_check = [start]
-    checked = []
+    to_check = {start}
+    checked = set()
     while to_check:
         next = to_check.pop()
+        print(next, len(to_check))
         yield next
-        checked.append(next)
+        checked.add(next)
         for potential, _delta in get_surrounding_squares(next):
             if (
                 potential not in pipes
                 and potential not in checked
                 and potential not in to_check
             ):
-                to_check.append(potential)
+                to_check.add(potential)
 
 
 def main():
@@ -145,15 +138,12 @@ def main():
     ]
     virtual_pipes = [x for xs in virtual_pipes_unflat for x in xs]
     insides = list(flood_fill(virtual_pipes, (5, 5)))
-    print(4)
 
     # print_grid(len(grid) * 3, len(grid[0]) * 3, virtual_pipes, insides)
-    # print_grid(len(grid), len(grid[0]), pipes)f
     num_tiles = 0
     for item in insides:
         if (item[0] - 1) % 3 == 0 and (item[1] - 1) % 3 == 0:
             num_tiles += 1
-            # print(item, (item[0] - 1) % 3, (item[1] - 1) % 3)
     print(num_tiles)
 
 
