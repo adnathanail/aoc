@@ -4,16 +4,6 @@ from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2023, day=10)
 inp = puzzle.input_data
-# inp = """FF7FSF7F7F7F7F7F---7
-# L|LJ||||||||||||F--J
-# FL-7LJLJ||||||LJL-77
-# F--JF--7||LJLJIF7FJ-
-# L---JF-JLJIIIIFJLJJ7
-# |F|F-JF---7IIIL7L|7|
-# |FFJF7L7F-JF7IIL---7
-# 7-L-JL7||F7|L7F-7F7|
-# L.L7LFJ|||||FJL7||LJ
-# L7JLJL-JLJLJL--JLJ.L"""
 
 pipe_char_delta_lookup = {
     "|": ((-1, 0), (1, 0)),
@@ -33,13 +23,15 @@ type Coord = tuple[int, int]
 
 
 def get_grid(inp_str: str) -> Grid:
+    """Parse input string to 2D array of characters"""
     out: Grid = []
     for row in inp_str.splitlines():
         out.append([char for char in row])
     return out
 
 
-def find_start(grid: Grid):
+def find_start(grid: Grid) -> Coord:
+    """Get coordinate of start character 'S'"""
     for i in range(len(grid)):
         for j in range(len(grid[i])):
             if grid[i][j] == "S":
@@ -48,6 +40,7 @@ def find_start(grid: Grid):
 
 
 def get_potential_nexts(grid: Grid, loc: Coord) -> list[Coord]:
+    """Find adjacent pipe characters, based on the current character"""
     char = grid[loc[0]][loc[1]]
     if char == ".":
         return []
@@ -56,6 +49,11 @@ def get_potential_nexts(grid: Grid, loc: Coord) -> list[Coord]:
 
 
 def get_next_location(grid: Grid, loc: Coord, prev_loc: Optional[Coord]) -> Coord:
+    """
+    Given the current location and previous location, we can decide
+      which of the 2 locations adjacent to the current location should
+      be the "next" location
+    """
     potential_nexts = get_potential_nexts(grid, loc)
 
     if prev_loc is None:  # Pick random direction, if we have no previous_loc
@@ -126,7 +124,6 @@ def flood_fill(pipes: set[Coord], start: Coord, max_y: int, max_x: int) -> set[C
     out = set()
     while to_check:
         next = to_check.pop()
-        # print(next, len(to_check))
         out.add(next)
         for potential, _delta in get_surrounding_squares(next, max_y, max_x):
             if (
@@ -175,47 +172,29 @@ def get_contiguous_points(
 
 
 def main():
+    # Parse grid
     grid = get_grid(inp)
     grid_height, grid_width = len(grid), len(grid[0])
     pipes_coords = get_pipe_coords(grid)
-    # print_grid(grid_height, grid_width, pipes_coords, set())
 
+    # Pick a random empty point
     fill_from_point = find_empty_point(grid_height, grid_width, pipes_coords)
-    # print(fill_from_point)
+    # Fill all adjacent squares from that point (using virtual grid expansion, to allow "paint" to pass through adjacent parallel walls)
     filled_points = get_contiguous_points(grid, pipes_coords, fill_from_point)
-    # print_grid(grid_height, grid_width, pipes_coords, filled_points)
+    # How many points did we fill?
     print(len(filled_points))
 
+    # The original empty point may have been outside the line, so find another empty point, not painted by the first attempt
     new_fill_from_point = find_empty_point(
         grid_height, grid_width, pipes_coords.union(filled_points)
     )
-    # print(new_fill_from_point)
+    # Fill all adjacent squares from the new point
     new_filled_points = get_contiguous_points(grid, pipes_coords, new_fill_from_point)
-    # print_grid(grid_height, grid_width, pipes_coords, new_filled_points)
+    # How many points this time?
     print(len(new_filled_points))
 
-    # virtual_pipes_unflat: list[list[Coord]] = [
-    #     pipe_to_virtual_pipe(grid[pipe[0]][pipe[1]], pipe) for pipe in pipes
-    # ]
-    # virtual_pipes: set[Coord] = {x for xs in virtual_pipes_unflat for x in xs}
-    # insides = flood_fill(
-    #     virtual_pipes,
-    #     (inside_point[0] * 3 + 1, inside_point[1] * 3 + 1),
-    #     len(grid) * 3,
-    #     len(grid[0]) * 3,
-    # )
-
-    # # print_grid(len(grid) * 3, len(grid[0]) * 3, virtual_pipes, insides)
-    # actual_insides = set()
-    # num_tiles = 0
-    # for item in insides:
-    #     if (item[0] - 1) % 3 == 0 and (item[1] - 1) % 3 == 0:
-    #         num_tiles += 1
-    #         actual_insides.add(((item[0] - 1) // 3, (item[1] - 1) // 3))
-    # print_grid(len(grid), len(grid[0]), set(pipes), actual_insides)
-    # print(num_tiles)
-    # print(set(pipes).intersection(actual_insides))
-    # print(actual_insides)
+    # One of those answers will be correct
+    print("Try both above (the smaller one is probably correct)")
 
 
 main()
