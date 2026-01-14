@@ -4,6 +4,16 @@ from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2023, day=10)
 inp = puzzle.input_data
+# inp = """FF7FSF7F7F7F7F7F---7
+# L|LJ||||||||||||F--J
+# FL-7LJLJ||||||LJL-77
+# F--JF--7||LJLJIF7FJ-
+# L---JF-JLJIIIIFJLJJ7
+# |F|F-JF---7IIIL7L|7|
+# |FFJF7L7F-JF7IIL---7
+# 7-L-JL7||F7|L7F-7F7|
+# L.L7LFJ|||||FJL7||LJ
+# L7JLJL-JLJLJL--JLJ.L"""
 
 pipe_char_delta_lookup = {
     "|": ((-1, 0), (1, 0)),
@@ -99,7 +109,7 @@ def print_grid(height: int, width: int, pipes: list[Coord], insides: list[Coord]
         print()
 
 
-def pipe_to_virtual_pipe(pipe_char, coord):
+def pipe_to_virtual_pipe(pipe_char: str, coord: Coord) -> list[Coord]:
     center = (coord[0] * 3 + 1, coord[1] * 3 + 1)
     pipe_char_delts = pipe_char_delta_lookup[pipe_char]
     return [
@@ -109,7 +119,7 @@ def pipe_to_virtual_pipe(pipe_char, coord):
     ]
 
 
-def flood_fill(pipes: list[Coord], start: Coord) -> Generator[Coord, None, None]:
+def flood_fill(pipes: set[Coord], start: Coord) -> Generator[Coord, None, None]:
     to_check = {start}
     checked = set()
     while to_check:
@@ -133,10 +143,10 @@ def main():
 
     pipes = [element for element in get_path(grid, start)]
 
-    virtual_pipes_unflat = [
+    virtual_pipes_unflat: list[list[Coord]] = [
         pipe_to_virtual_pipe(grid[pipe[0]][pipe[1]], pipe) for pipe in pipes
     ]
-    virtual_pipes = [x for xs in virtual_pipes_unflat for x in xs]
+    virtual_pipes: set[Coord] = {x for xs in virtual_pipes_unflat for x in xs}
     insides = list(flood_fill(virtual_pipes, (5, 5)))
 
     # print_grid(len(grid) * 3, len(grid[0]) * 3, virtual_pipes, insides)
