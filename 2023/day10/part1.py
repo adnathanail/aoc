@@ -1,19 +1,28 @@
 from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2023, day=10)
+inp = puzzle.input_data
+# inp = inp = """.....
+# .S-7.
+# .|.|.
+# .L-J.
+# ....."""
 
-grid = []
-for row in puzzle.input_data.splitlines():
-    grid.append([char for char in row])
+def get_grid(inp_str):
+    out = []
+    for row in inp_str.splitlines():
+        out.append([char for char in row])
+    return out
 
-start = None
-for i in range(len(grid)):
-    for j in range(len(grid[i])):
-        if grid[i][j] == "S":
-            start = (i, j)
+def find_start(grid):
+    for i in range(len(grid)):
+        for j in range(len(grid[i])):
+            if grid[i][j] == "S":
+                return (i, j)
+    raise Exception("Start not found!")
 
 
-def get_potential_nexts(loc):
+def get_potential_nexts(grid, loc):
     char = grid[loc[0]][loc[1]]
 
     if char == "|":
@@ -32,8 +41,8 @@ def get_potential_nexts(loc):
     return []
 
 
-def get_next_location(loc, prev_loc):
-    potential_nexts = get_potential_nexts(loc)
+def get_next_location(grid, loc, prev_loc):
+    potential_nexts = get_potential_nexts(grid, loc)
 
     potential_nexts.remove(prev_loc)
 
@@ -43,22 +52,28 @@ def get_next_location(loc, prev_loc):
     return potential_nexts[0]
 
 
-curr = start
+def get_next_after_start(grid, start):
+    for delt in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+        potential_next = (start[0] + delt[0], start[1] + delt[1])
+        potential_next_potential_prevs = get_potential_nexts(grid, potential_next)
+        if start in potential_next_potential_prevs:
+            return potential_next
 
-# Looking in the 4 directions from the start, if one of them has the start as a potential prev(/next),
-# then that is a valid next location from the start
-for delt in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
-    potential_next = (start[0] + delt[0], start[1] + delt[1])
-    potential_next_potential_prevs = get_potential_nexts(potential_next)
-    if start in potential_next_potential_prevs:
-        curr = potential_next
-        prev = start
 
-n = 0
-while grid[curr[0]][curr[1]] != "S":
-    new = get_next_location(curr, prev)
-    prev = curr
-    curr = new
-    n += 1
+def main():
+    grid = get_grid(inp)
+    start = find_start(grid)
 
-print((n // 2) + 1)
+    prev = start
+    curr = get_next_after_start(grid, start)
+
+    n = 0
+    while grid[curr[0]][curr[1]] != "S":
+        new = get_next_location(grid, curr, prev)
+        prev = curr
+        curr = new
+        n += 1
+
+    print((n // 2) + 1)
+
+main()
