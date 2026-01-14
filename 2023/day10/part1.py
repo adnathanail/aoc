@@ -2,11 +2,6 @@ from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2023, day=10)
 inp = puzzle.input_data
-# inp = inp = """.....
-# .S-7.
-# .|.|.
-# .L-J.
-# ....."""
 
 def get_grid(inp_str):
     out = []
@@ -60,20 +55,24 @@ def get_next_after_start(grid, start):
             return potential_next
 
 
-def main():
-    grid = get_grid(inp)
-    start = find_start(grid)
-
-    prev = start
-    curr = get_next_after_start(grid, start)
-
-    n = 0
+def get_path(grid):
+    prev = find_start(grid)
+    curr = get_next_after_start(grid, prev)
     while grid[curr[0]][curr[1]] != "S":
+        yield curr
         new = get_next_location(grid, curr, prev)
         prev = curr
         curr = new
+    yield curr
+
+
+def main():
+    grid = get_grid(inp)
+
+    n = 0
+    for element in get_path(grid):
         n += 1
 
-    print((n // 2) + 1)
+    print(max(n // 2, (n+1) // 2))  # I.e. 8 -> 4, 9 -> 5, 10 -> 5, etc.
 
 main()
