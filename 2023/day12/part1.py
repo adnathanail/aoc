@@ -1,50 +1,42 @@
 from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2023, day=12)
+inp = puzzle.input_data
 
 
-def get_groups_from_line(lines):
-    groups = []
-    curr_group_size = 0
-    for ch in line:
-        if ch == "#":
-            curr_group_size += 1
-        elif curr_group_size > 0:
-            groups.append(curr_group_size)
-            curr_group_size = 0
-    if curr_group_size > 0:
-        groups.append(curr_group_size)
-    return tuple(groups)
+def generate_all_possible_strings(template):
+    if len(template) == 0:
+        return [""]
+    rests = generate_all_possible_strings(template[1:])
+    if template[0] == "?":
+        return ["#" + rest for rest in rests] + ["." + rest for rest in rests]
+    else:
+        return [template[0] + rest for rest in rests]
 
 
-def string_replace(string, index, replacement):
-    return string[:index] + replacement + string[index + 1 :]
+def tally_springs(springs_str):
+    return [
+        len(spring_group)
+        for spring_group in springs_str.split(".")
+        if spring_group != ""
+    ]
 
 
-def get_potential_arrangements(line, groups):
-    # qs = [i for i in range(len(line)) if line[i] == "?"]
-    groups = []
-    curr_group_size = 0
-    for ch in line:
-        if ch == "#":
-            curr_group_size += 1
-        elif curr_group_size > 0:
-            groups.append(curr_group_size)
-            curr_group_size = 0
-    if curr_group_size > 0:
-        groups.append(curr_group_size)
-    return tuple(groups)
+assert tally_springs("##..##") == [2, 2]
 
 
-inp = """???.### 1,1,3
-.??..??...?##. 1,1,3
-?#?#?#?#?#?#?#? 1,3,1,6
-????.#...#... 4,1,1
-????.######..#####. 1,6,5
-?###???????? 3,2,1"""
+def main():
+    total_arrangemenets = 0
+    for row in inp.splitlines():
+        springs, tallies_str = row.split(" ")
+        desired_tallies = [int(x) for x in tallies_str.split(",")]
+        num_arrangements_this_row = 0
+        for spring_str in generate_all_possible_strings(springs):
+            if tally_springs(spring_str) == desired_tallies:
+                num_arrangements_this_row += 1
+        total_arrangemenets += num_arrangements_this_row
+    print(total_arrangemenets)
 
-for line in inp.split("\n"):
-    broken_line = line.split(" ")[0]
-    known_groups = [int(i) for i in line.split(" ")[1].split(",")]
-    print(broken_line, get_potential_arrangements(broken_line, known_groups))
-    break
+
+if __name__ == "__main__":
+    main()
