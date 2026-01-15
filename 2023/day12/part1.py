@@ -4,13 +4,13 @@ from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2023, day=12)
 inp = puzzle.input_data
-# inp = """???.### 1,1,3
-# .??..??...?##. 1,1,3
-# ?#?#?#?#?#?#?#? 1,3,1,6
-# ????.#...#... 4,1,1
-# ????.######..#####. 1,6,5
-# ?###???????? 3,2,1"""
-inp = "?????????#?# 1,1,7"
+inp = """???.### 1,1,3
+.??..??...?##. 1,1,3
+?#?#?#?#?#?#?#? 1,3,1,6
+????.#...#... 4,1,1
+????.######..#####. 1,6,5
+?###???????? 3,2,1"""
+# inp = "?????????#?# 1,1,7"
 
 
 def tally_springs(springs_str: str) -> tuple[int, ...]:
@@ -28,12 +28,13 @@ def parse_row(row_str: str) -> tuple[str, tuple[int, ...]]:
 
 @lru_cache
 def count_possible_strings(
-    template,
+    template: str,
+    template_index: int = 0,
     current_tally: tuple[int, ...] = (0,),
     *,
     aim: tuple[int, ...],
-):
-    if len(template) == 0:
+) -> int:
+    if template_index == len(template):
         return 1 if (current_tally == aim or current_tally == (aim + (0,))) else 0
     if (
         len(current_tally) > 0
@@ -45,10 +46,10 @@ def count_possible_strings(
     ):
         return 0
 
-    if template[0] == "?":
+    if template[template_index] == "?":
         firsts = ["#", "."]
     else:
-        firsts = [template[0]]
+        firsts = [template[template_index]]
     out = 0
     for first in firsts:
         if first == "#":
@@ -58,7 +59,7 @@ def count_possible_strings(
         else:
             new_tally = current_tally
 
-        out += count_possible_strings(template[1:], new_tally, aim=aim)
+        out += count_possible_strings(template, template_index + 1, new_tally, aim=aim)
     return out
 
 
