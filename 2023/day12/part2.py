@@ -92,7 +92,9 @@ def main():
     total_arrangemenets = 0
     for row in inp.splitlines():
         springs, desired_tallies = parse_row(row)
-        arrs_this_row = count_possible_strings(springs, aim=desired_tallies)
+        arrs_this_row = count_possible_strings(
+            "?".join([springs] * 5), aim=desired_tallies * 5
+        )
         total_arrangemenets += arrs_this_row
     print(total_arrangemenets)
 
