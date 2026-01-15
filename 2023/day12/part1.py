@@ -22,19 +22,24 @@ def tally_springs(springs_str):
     ]
 
 
-assert tally_springs("##..##") == [2, 2]
+def parse_row(row_str):
+    springs, tallies_str = row_str.split(" ")
+    return springs, [int(x) for x in tallies_str.split(",")]
+
+
+def count_valid_arrangements(springs: str, desired_tallies: list[int]) -> int:
+    num_arrangements_this_row = 0
+    for spring_str in generate_all_possible_strings(springs):
+        if tally_springs(spring_str) == desired_tallies:
+            num_arrangements_this_row += 1
+    return num_arrangements_this_row
 
 
 def main():
     total_arrangemenets = 0
     for row in inp.splitlines():
-        springs, tallies_str = row.split(" ")
-        desired_tallies = [int(x) for x in tallies_str.split(",")]
-        num_arrangements_this_row = 0
-        for spring_str in generate_all_possible_strings(springs):
-            if tally_springs(spring_str) == desired_tallies:
-                num_arrangements_this_row += 1
-        total_arrangemenets += num_arrangements_this_row
+        springs, desired_tallies = parse_row(row)
+        total_arrangemenets += count_valid_arrangements(springs, desired_tallies)
     print(total_arrangemenets)
 
 
