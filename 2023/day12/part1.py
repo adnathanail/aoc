@@ -36,11 +36,13 @@ def count_possible_strings(
 ) -> int:
     if template_index == len(template):
         return 1 if (current_tally == aim or current_tally == (aim + (0,))) else 0
+
+    current_tally_len = len(current_tally)
     if (
-        len(current_tally) > 0
+        current_tally_len > 0
         and (
-            len(current_tally) > len(aim)
-            or current_tally[len(current_tally) - 1] > aim[len(current_tally) - 1]
+            current_tally_len > len(aim)
+            or current_tally[current_tally_len - 1] > aim[current_tally_len - 1]
         )
         and current_tally[-1] != 0
     ):
