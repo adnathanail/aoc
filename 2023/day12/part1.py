@@ -6,22 +6,28 @@ inp = """???.### 1,1,3
 .??..??...?##. 1,1,3
 ?#?#?#?#?#?#?#? 1,3,1,6
 ????.#...#... 4,1,1
-????.######..#####. 1,6,5
-?###???????? 3,2,1"""
+????.######..#####. 1,6,5"""
 
 
 def generate_all_possible_strings(
     template,
-    current_tally: tuple[int, ...] = tuple(),
-    in_group=False,
+    current_tally: tuple[int, ...] = (0,),
     *,
     aim: tuple[int, ...],
 ):
     if len(template) == 0:
-        return 1 if current_tally == aim else 0
-    if len(current_tally) > 0 and (
-        len(current_tally) > len(aim)
-        or current_tally[len(current_tally) - 1] > aim[len(current_tally) - 1]
+        # print(
+        #     "\t", current_tally, current_tally == aim or current_tally == (aim + (0,))
+        # )
+        return 1 if (current_tally == aim or current_tally == (aim + (0,))) else 0
+    # print(template, current_tally)
+    if (
+        len(current_tally) > 0
+        and (
+            len(current_tally) > len(aim)
+            or current_tally[len(current_tally) - 1] > aim[len(current_tally) - 1]
+        )
+        and current_tally[-1] != 0
     ):
         return 0
 
@@ -32,18 +38,13 @@ def generate_all_possible_strings(
     out = 0
     for first in firsts:
         if first == "#":
-            if in_group:
-                new_tally = current_tally[:-1] + (current_tally[-1] + 1,)
-            else:
-                new_tally = current_tally + (1,)
-            new_in_group = True
+            new_tally = current_tally[:-1] + (current_tally[-1] + 1,)
+        elif current_tally[-1] != 0:
+            new_tally = current_tally + (0,)
         else:
             new_tally = current_tally
-            new_in_group = False
 
-        out += generate_all_possible_strings(
-            template[1:], new_tally, new_in_group, aim=aim
-        )
+        out += generate_all_possible_strings(template[1:], new_tally, aim=aim)
     return out
 
 
@@ -65,12 +66,13 @@ def main():
     for row in inp.splitlines():
         print(row)
         springs, desired_tallies = parse_row(row)
-        # total_arrangemenets += generate_all_possible_strings(
-        #     springs, aim=desired_tallies
-        # )
-        total_arrangemenets += generate_all_possible_strings(
+        # arrs_this_row = generate_all_possible_strings(springs, aim=desired_tallies)
+        arrs_this_row = generate_all_possible_strings(
             "?".join([springs] * 5), aim=desired_tallies * 5
         )
+        print(arrs_this_row)
+        total_arrangemenets += arrs_this_row
+        # break
     print(total_arrangemenets)
 
 
