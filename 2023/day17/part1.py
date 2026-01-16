@@ -7,22 +7,24 @@ from aocd.models import Puzzle
 puzzle = Puzzle(year=2023, day=17)
 inp = puzzle.input_data
 
-# inp = """241343231
-# 321545353"""
-
 inp = """2413432311323
 3215453535623
 3255245654254
-3446585845452
-4546657867536
-1438598798454
-4457876987766
-3637877979653
-4654967986887
-4564679986453
-1224686865563
-2546548887735
-4322674655533"""
+3255245654254"""
+
+# inp = """2413432311323
+# 3215453535623
+# 3255245654254
+# 3446585845452
+# 4546657867536
+# 1438598798454
+# 4457876987766
+# 3637877979653
+# 4654967986887
+# 4564679986453
+# 1224686865563
+# 2546548887735
+# 4322674655533"""
 
 GRID = [[int(x) for x in row] for row in inp.splitlines()]
 GRID_HEIGHT = len(GRID)
@@ -84,91 +86,76 @@ def adj(coord_index: int, current_path: str) -> list[tuple[int, int, str]]:
     return out
 
 
-def dijkstra(src_coord):
+def bfs(src_coord: Coord, targ_coord: Coord) -> tuple[int, str]:
     src_index = coord_to_index(src_coord)
+    targ_index = coord_to_index(targ_coord)
 
     paths_to_explore = []
 
-    dist = [sys.maxsize for _ in range(GRID_WIDTH * GRID_HEIGHT)]
-    path = [tuple() for _ in range(GRID_WIDTH * GRID_HEIGHT)]
-
-    dist[src_index] = 0
-    heapq.heappush(paths_to_explore, (0, src_index, ""))
+    heapq.heappush(paths_to_explore, (0, (src_index,), "S"))
 
     while paths_to_explore:
-        current_path_distance, current_path_element, current_path = heapq.heappop(
+        current_path_distance, current_path_indexes, current_path_chars = heapq.heappop(
             paths_to_explore
         )
-        # print(current_path)
-
-        # If this distance not the latest shortest one, skip it
-        if current_path_distance > dist[current_path_element]:
-            continue
+        print(current_path_distance, current_path_indexes, current_path_chars)
 
         # Explore all neighbors of the current vertex
         for (
             next_path_element,
             current_to_next_distance,
             next_path_direction_char,
-        ) in adj(current_path_element, current_path):
-            # print(
-            #     "\t",
-            #     next_path_element,
-            #     current_to_next_distance,
-            #     next_path_direction_char,
-            #     "\t",
-            #     dist[current_path_element],
-            #     dist[next_path_element],
-            # )
-
-            # If we found a shorter path to v through u, update it
-            if (
-                dist[current_path_element] + current_to_next_distance
-                < dist[next_path_element]
-            ):
-                dist[next_path_element] = (
-                    dist[current_path_element] + current_to_next_distance
+        ) in adj(current_path_indexes[-1], current_path_chars):
+            if next_path_element == targ_index:
+                return (
+                    current_path_distance + current_to_next_distance,
+                    current_path_chars + next_path_direction_char,
                 )
-                path[next_path_element] = current_path + next_path_direction_char
+            if next_path_element not in current_path_indexes:
                 heapq.heappush(
                     paths_to_explore,
                     (
-                        dist[next_path_element],
-                        next_path_element,
-                        current_path + next_path_direction_char,
+                        current_path_distance + current_to_next_distance,
+                        current_path_indexes + (next_path_element,),
+                        current_path_chars + next_path_direction_char,
                     ),
                 )
-
-    return dist, path
-
-
-# def path_to_coords(path: str) -> list[Coord]:
-#     curr = (0, 0)
-#     out = []
-#     for char in path:
-#         if char == "<":
-#             curr = (curr[0] - 1, curr[1])
-#         elif char == ">":
-#             curr = (curr[0] + 1, curr[1])
-#         elif char == "^":
-#             curr = (curr[0], curr[1] - 1)
-#         elif char == "v":
-#             curr = (curr[0], curr[1] + 1)
-#         out.append(curr)
-#     return out
+    raise Exception("No path!")
 
 
-dists, paths = dijkstra((0, 0))
-print(dists)
-print(paths)
-# last_path_coords = path_to_coords(paths[-1])
-# # for item in last_path_coords:
-# #     print(item, last_path_coords.index(item), paths[-1][last_path_coords.index(item)])
-# print(last_path_coords)
-# for y in range(GRID_HEIGHT):
-#     for x in range(GRID_WIDTH):
-#         if (x, y) in last_path_coords:
-#             print(paths[-1][last_path_coords.index((x, y))], end="")
-#         else:
-#             print(GRID[y][x], end="")
+def path_to_coords(path: str) -> list[Coord]:
+    curr = (0, 0)
+    out = []
+    for char in path:
+        if char == "<":
+            curr = (curr[0] - 1, curr[1])
+        elif char == ">":
+            curr = (curr[0] + 1, curr[1])
+        elif char == "^":
+            curr = (curr[0], curr[1] - 1)
+        elif char == "v":
+            curr = (curr[0], curr[1] + 1)
+        out.append(curr)
+    return out
+
+
+dist, path = bfs((0, 0), (8, 1))
+# print(dists)
+# print(paths)
+# # print(dists[-1])
+# for lpk in paths[-1]:
+#     last_path = paths[-1][lpk]
 #     print()
+#     print(last_path)
+#     print(dists[-1][lpk])
+path_coords = path_to_coords(path)
+#     # # for item in last_path_coords:
+#     # #     print(item, last_path_coords.index(item), paths[-1][last_path_coords.index(item)])
+print(path_coords)
+for y in range(GRID_HEIGHT):
+    for x in range(GRID_WIDTH):
+        if (x, y) in path_coords:
+            print(path[path_coords.index((x, y))], end="")
+        else:
+            print(GRID[y][x], end="")
+    print()
