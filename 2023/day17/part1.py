@@ -11,6 +11,8 @@ inp = """2413432311323
 3215453535623
 3255245654254
 3255245654254"""
+START = (0, 0)
+END = (8, 1)
 
 # inp = """2413432311323
 # 3215453535623
@@ -25,6 +27,10 @@ inp = """2413432311323
 # 1224686865563
 # 2546548887735
 # 4322674655533"""
+# START = (0, 0)
+# END = (12, 12)
+# START = (11, 7)
+# END = (GRID_WIDTH - 1, GRID_HEIGHT - 1)
 
 GRID = [[int(x) for x in row] for row in inp.splitlines()]
 GRID_HEIGHT = len(GRID)
@@ -72,16 +78,24 @@ def get_valid_next_directions_from_path(path: str):
     return out
 
 
-# print(get_valid_next_directions_from_path(">>v>>"))
+def manhat_dist(c1: Coord, c2: Coord) -> int:
+    return abs(c1[0] - c2[0]) + abs(c1[1] - c2[1])
 
 
-def adj(coord_index: int, current_path: str) -> list[tuple[int, int, str]]:
+def adj(coord_index: int, current_path: str) -> list[tuple[int, int, str, int]]:
     coord = index_to_coord(coord_index)
     possible_next_directions = get_valid_next_directions_from_path(current_path)
     out = []
     for surr, dir_char in get_surrounding_squares(coord):
         if dir_char in possible_next_directions:
-            out.append((coord_to_index(surr), GRID[surr[1]][surr[0]], dir_char))
+            out.append(
+                (
+                    coord_to_index(surr),
+                    GRID[surr[1]][surr[0]],
+                    dir_char,
+                    manhat_dist(surr, END),
+                )
+            )
 
     return out
 
@@ -92,11 +106,11 @@ def bfs(src_coord: Coord, targ_coord: Coord) -> tuple[int, str]:
 
     paths_to_explore = []
 
-    heapq.heappush(paths_to_explore, (0, (src_index,), "S"))
+    heapq.heappush(paths_to_explore, (0, 0, (src_index,), "S"))
 
     while paths_to_explore:
-        current_path_distance, current_path_indexes, current_path_chars = heapq.heappop(
-            paths_to_explore
+        _priority, current_path_distance, current_path_indexes, current_path_chars = (
+            heapq.heappop(paths_to_explore)
         )
         print(current_path_distance, current_path_indexes, current_path_chars)
 
@@ -105,6 +119,7 @@ def bfs(src_coord: Coord, targ_coord: Coord) -> tuple[int, str]:
             next_path_element,
             current_to_next_distance,
             next_path_direction_char,
+            next_path_element_to_end_manhattan,
         ) in adj(current_path_indexes[-1], current_path_chars):
             if next_path_element == targ_index:
                 return (
@@ -115,6 +130,9 @@ def bfs(src_coord: Coord, targ_coord: Coord) -> tuple[int, str]:
                 heapq.heappush(
                     paths_to_explore,
                     (
+                        current_path_distance
+                        + current_to_next_distance
+                        + next_path_element_to_end_manhattan,
                         current_path_distance + current_to_next_distance,
                         current_path_indexes + (next_path_element,),
                         current_path_chars + next_path_direction_char,
@@ -124,7 +142,7 @@ def bfs(src_coord: Coord, targ_coord: Coord) -> tuple[int, str]:
 
 
 def path_to_coords(path: str) -> list[Coord]:
-    curr = (0, 0)
+    curr = START
     out = []
     for char in path:
         if char == "<":
@@ -139,7 +157,7 @@ def path_to_coords(path: str) -> list[Coord]:
     return out
 
 
-dist, path = bfs((0, 0), (8, 1))
+dist, path = bfs(START, END)
 # print(dists)
 # print(paths)
 # # print(dists[-1])
@@ -152,6 +170,7 @@ path_coords = path_to_coords(path)
 #     # # for item in last_path_coords:
 #     # #     print(item, last_path_coords.index(item), paths[-1][last_path_coords.index(item)])
 print(path_coords)
+print("a", dist, "a")
 for y in range(GRID_HEIGHT):
     for x in range(GRID_WIDTH):
         if (x, y) in path_coords:
