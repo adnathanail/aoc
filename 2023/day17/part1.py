@@ -60,28 +60,33 @@ def adj(coord_index: int) -> list[tuple[int, int]]:
 def dijkstra(src_coord):
     src_index = coord_to_index(src_coord)
 
-    V = GRID_WIDTH * GRID_HEIGHT
+    paths_to_explore = []
 
-    pq = []
-
-    dist = [sys.maxsize] * V
+    dist = [sys.maxsize] * (GRID_WIDTH * GRID_HEIGHT)
 
     dist[src_index] = 0
-    heapq.heappush(pq, (0, src_index))
+    heapq.heappush(paths_to_explore, (0, src_index))
 
-    while pq:
-        d, u = heapq.heappop(pq)
+    while paths_to_explore:
+        current_path_distance, current_path_element = heapq.heappop(paths_to_explore)
 
         # If this distance not the latest shortest one, skip it
-        if d > dist[u]:
+        if current_path_distance > dist[current_path_element]:
             continue
 
         # Explore all neighbors of the current vertex
-        for v, w in adj(u):
+        for next_path_element, current_to_next_distance in adj(current_path_element):
             # If we found a shorter path to v through u, update it
-            if dist[u] + w < dist[v]:
-                dist[v] = dist[u] + w
-                heapq.heappush(pq, (dist[v], v))
+            if (
+                dist[current_path_element] + current_to_next_distance
+                < dist[next_path_element]
+            ):
+                dist[next_path_element] = (
+                    dist[current_path_element] + current_to_next_distance
+                )
+                heapq.heappush(
+                    paths_to_explore, (dist[next_path_element], next_path_element)
+                )
     return dist
 
 
