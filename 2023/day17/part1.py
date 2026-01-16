@@ -35,24 +35,24 @@ def index_to_coord(index: int) -> Coord:
     return (index % GRID_WIDTH, index // GRID_WIDTH)
 
 
-def get_surrounding_squares(coord: Coord) -> list[Coord]:
+def get_surrounding_squares(coord: Coord) -> list[tuple[Coord, str]]:
     out = []
     if coord[0] > 0:
-        out.append((coord[0] - 1, coord[1]))
+        out.append(((coord[0] - 1, coord[1]), "<"))
     if coord[0] < (GRID_WIDTH - 1):
-        out.append((coord[0] + 1, coord[1]))
+        out.append(((coord[0] + 1, coord[1]), ">"))
     if coord[1] > 0:
-        out.append((coord[0], coord[1] - 1))
+        out.append(((coord[0], coord[1] - 1), "^"))
     if coord[1] < (GRID_HEIGHT - 1):
-        out.append((coord[0], coord[1] + 1))
+        out.append(((coord[0], coord[1] + 1), "v"))
     return out
 
 
-def adj(coord_index: int) -> list[tuple[int, int]]:
+def adj(coord_index: int) -> list[tuple[int, int, str]]:
     coord = index_to_coord(coord_index)
     out = []
-    for surr in get_surrounding_squares(coord):
-        out.append((coord_to_index(surr), GRID[surr[1]][surr[0]]))
+    for surr, char in get_surrounding_squares(coord):
+        out.append((coord_to_index(surr), GRID[surr[1]][surr[0]], char))
 
     return out
 
@@ -62,20 +62,27 @@ def dijkstra(src_coord):
 
     paths_to_explore = []
 
-    dist = [sys.maxsize] * (GRID_WIDTH * GRID_HEIGHT)
+    dist = [sys.maxsize for _ in range(GRID_WIDTH * GRID_HEIGHT)]
+    path = [tuple() for _ in range(GRID_WIDTH * GRID_HEIGHT)]
 
     dist[src_index] = 0
-    heapq.heappush(paths_to_explore, (0, src_index))
+    heapq.heappush(paths_to_explore, (0, src_index, ""))
 
     while paths_to_explore:
-        current_path_distance, current_path_element = heapq.heappop(paths_to_explore)
+        current_path_distance, current_path_element, current_path = heapq.heappop(
+            paths_to_explore
+        )
 
         # If this distance not the latest shortest one, skip it
         if current_path_distance > dist[current_path_element]:
             continue
 
         # Explore all neighbors of the current vertex
-        for next_path_element, current_to_next_distance in adj(current_path_element):
+        for (
+            next_path_element,
+            current_to_next_distance,
+            next_path_direction_char,
+        ) in adj(current_path_element):
             # If we found a shorter path to v through u, update it
             if (
                 dist[current_path_element] + current_to_next_distance
@@ -84,10 +91,17 @@ def dijkstra(src_coord):
                 dist[next_path_element] = (
                     dist[current_path_element] + current_to_next_distance
                 )
+                path[next_path_element] = current_path + next_path_direction_char
                 heapq.heappush(
-                    paths_to_explore, (dist[next_path_element], next_path_element)
+                    paths_to_explore,
+                    (
+                        dist[next_path_element],
+                        next_path_element,
+                        current_path + next_path_direction_char,
+                    ),
                 )
-    return dist
+
+    return dist, path
 
 
 print(dijkstra((0, 0)))
