@@ -6,6 +6,10 @@ from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2023, day=17)
 inp = puzzle.input_data
+
+# inp = """241343231
+# 321545353"""
+
 inp = """2413432311323
 3215453535623
 3255245654254
@@ -19,6 +23,7 @@ inp = """2413432311323
 1224686865563
 2546548887735
 4322674655533"""
+
 GRID = [[int(x) for x in row] for row in inp.splitlines()]
 GRID_HEIGHT = len(GRID)
 GRID_WIDTH = len(GRID[0])
@@ -48,11 +53,33 @@ def get_surrounding_squares(coord: Coord) -> list[tuple[Coord, str]]:
     return out
 
 
-def adj(coord_index: int) -> list[tuple[int, int, str]]:
-    coord = index_to_coord(coord_index)
+def get_valid_next_directions_from_path(path: str):
+    if path == "":
+        return ["^", ">", "v", "<"]
     out = []
-    for surr, char in get_surrounding_squares(coord):
-        out.append((coord_to_index(surr), GRID[surr[1]][surr[0]], char))
+    # We can always turn 90 degrees
+    if path[-1] in ["<", ">"]:
+        out += ["^", "v"]
+    else:
+        out += ["<", ">"]
+    # If the last 3 instructions were the same, then we can't do that again
+    if len(path) > 2 and path[-3] == path[-2] == path[-1]:
+        return out
+    # if not, then we can!
+    out.append(path[-1])
+    return out
+
+
+# print(get_valid_next_directions_from_path(">>v>>"))
+
+
+def adj(coord_index: int, current_path: str) -> list[tuple[int, int, str]]:
+    coord = index_to_coord(coord_index)
+    possible_next_directions = get_valid_next_directions_from_path(current_path)
+    out = []
+    for surr, dir_char in get_surrounding_squares(coord):
+        if dir_char in possible_next_directions:
+            out.append((coord_to_index(surr), GRID[surr[1]][surr[0]], dir_char))
 
     return out
 
@@ -72,6 +99,7 @@ def dijkstra(src_coord):
         current_path_distance, current_path_element, current_path = heapq.heappop(
             paths_to_explore
         )
+        # print(current_path)
 
         # If this distance not the latest shortest one, skip it
         if current_path_distance > dist[current_path_element]:
@@ -82,7 +110,17 @@ def dijkstra(src_coord):
             next_path_element,
             current_to_next_distance,
             next_path_direction_char,
-        ) in adj(current_path_element):
+        ) in adj(current_path_element, current_path):
+            # print(
+            #     "\t",
+            #     next_path_element,
+            #     current_to_next_distance,
+            #     next_path_direction_char,
+            #     "\t",
+            #     dist[current_path_element],
+            #     dist[next_path_element],
+            # )
+
             # If we found a shorter path to v through u, update it
             if (
                 dist[current_path_element] + current_to_next_distance
@@ -104,4 +142,33 @@ def dijkstra(src_coord):
     return dist, path
 
 
-print(dijkstra((0, 0)))
+# def path_to_coords(path: str) -> list[Coord]:
+#     curr = (0, 0)
+#     out = []
+#     for char in path:
+#         if char == "<":
+#             curr = (curr[0] - 1, curr[1])
+#         elif char == ">":
+#             curr = (curr[0] + 1, curr[1])
+#         elif char == "^":
+#             curr = (curr[0], curr[1] - 1)
+#         elif char == "v":
+#             curr = (curr[0], curr[1] + 1)
+#         out.append(curr)
+#     return out
+
+
+dists, paths = dijkstra((0, 0))
+print(dists)
+print(paths)
+# last_path_coords = path_to_coords(paths[-1])
+# # for item in last_path_coords:
+# #     print(item, last_path_coords.index(item), paths[-1][last_path_coords.index(item)])
+# print(last_path_coords)
+# for y in range(GRID_HEIGHT):
+#     for x in range(GRID_WIDTH):
+#         if (x, y) in last_path_coords:
+#             print(paths[-1][last_path_coords.index((x, y))], end="")
+#         else:
+#             print(GRID[y][x], end="")
+#     print()
