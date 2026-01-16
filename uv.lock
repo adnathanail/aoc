@@ -4,7 +4,7 @@ requires-python = ">=3.12"
 
 [[package]]
 name = "advent-of-code-data"
-version = "2.0.4"
+version = "2.1.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aocd-example-parser" },
@@ -13,9 +13,9 @@ dependencies = [
     { name = "tzdata", marker = "sys_platform == 'win32'" },
     { name = "urllib3" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/aa/05/bf8b2cf081ad28b31b1ba03f9252ac761e88e55dd27a1378d169ef437402/advent_of_code_data-2.0.4.tar.gz", hash = "sha256:d345dd14e4a123992297d5a22b364d161d4458def9ffb9481797f7aabf138ced", size = 47000, upload-time = "2024-11-20T04:23:40.778Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b1/eb/86b60842b4de007be7f409e5e985fc34f4e3635d175a2940aa0010e90dc2/advent_of_code_data-2.1.1.tar.gz", hash = "sha256:28a85126b06e6225baa475ad0cd7880b75812b89fc890b26d81480997f6bdc6f", size = 48699, upload-time = "2025-12-16T07:13:02.837Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/bf/5f/a9dbeba1e52aee3be263184ca2de9f2fdf1fd8419cb228245f08930618a1/advent_of_code_data-2.0.4-py3-none-any.whl", hash = "sha256:e3abc993ddc8436fae693b212b4b66b399b42b3c4d8b588c025e5b421c307b3d", size = 38888, upload-time = "2024-11-20T04:23:39.102Z" },
+    { url = "https://files.pythonhosted.org/packages/87/13/ef6c589dfb35620c7e2ecc8f1129905382213eda2836538263f308e12d1b/advent_of_code_data-2.1.1-py3-none-any.whl", hash = "sha256:6d92045db4f51820cb0337a3d240873ec586cef16525c686f60250ca97711d6f", size = 39871, upload-time = "2025-12-16T07:13:01.498Z" },
 ]
 
 [[package]]
@@ -33,8 +33,8 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "advent-of-code-data", specifier = ">=2.0.4" },
-    { name = "networkx", specifier = ">=3.4.2" },
+    { name = "advent-of-code-data", specifier = "==2.1.1" },
+    { name = "networkx", specifier = "==3.6.1" },
     { name = "pillow", specifier = ">=11.0.0" },
     { name = "pydot", specifier = ">=3.0.3" },
     { name = "scipy", specifier = ">=1.16.3" },
@@ -43,11 +43,11 @@ requires-dist = [
 
 [[package]]
 name = "aocd-example-parser"
-version = "2023.12.20"
+version = "2025.12.11"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/b9/1e/25ef659cacd321177d54238b3d4035fda044fa8b2f73e367455eac040802/aocd_example_parser-2023.12.20.tar.gz", hash = "sha256:753d336986dd0ebf00ee91a2e36ba5f51faece3bbcea8827b11d6c57435c7407", size = 14179, upload-time = "2024-11-13T05:07:32.507Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f9/ea/f67f4360b9e911e2fc3360aa2e8fb1bd430ab024ef5851b0542b8c6bb2bf/aocd_example_parser-2025.12.11.tar.gz", hash = "sha256:473c68d31a43a171e68d7d51a4de3a55936d6e45529d46fb58574e15beb385ac", size = 14776, upload-time = "2025-12-11T07:27:30.829Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/4e/a5/716c50f2fdedc5916060cd48acf9045c0d13f2c8d3f7fccbc2fdbe3cda01/aocd_example_parser-2023.12.20-py3-none-any.whl", hash = "sha256:5244f01a54c4e18e69d53389410444ea8fde50b27a59101d968631ee078dd9c9", size = 12605, upload-time = "2024-11-13T05:07:30.918Z" },
+    { url = "https://files.pythonhosted.org/packages/0e/9b/d65785ce96052b941e221245dcfe4760fc698b246708c97c6163f898a2c3/aocd_example_parser-2025.12.11-py3-none-any.whl", hash = "sha256:c7c7eb4f85052ea2da60626768c69ac3569aebf68c093ddc96801b8e977307ed", size = 13210, upload-time = "2025-12-11T07:27:29.674Z" },
 ]
 
 [[package]]
@@ -64,11 +64,11 @@ wheels = [
 
 [[package]]
 name = "networkx"
-version = "3.4.2"
+version = "3.6.1"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/fd/1d/06475e1cd5264c0b870ea2cc6fdb3e37177c1e565c43f56ff17a10e3937f/networkx-3.4.2.tar.gz", hash = "sha256:307c3669428c5362aab27c8a1260aa8f47c4e91d3891f48be0141738d8d053e1", size = 2151368, upload-time = "2024-10-21T12:39:38.695Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/6a/51/63fe664f3908c97be9d2e4f1158eb633317598cfa6e1fc14af5383f17512/networkx-3.6.1.tar.gz", hash = "sha256:26b7c357accc0c8cde558ad486283728b65b6a95d85ee1cd66bafab4c8168509", size = 2517025, upload-time = "2025-12-08T17:02:39.908Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b9/54/dd730b32ea14ea797530a4479b2ed46a6fb250f682a9cfb997e968bf0261/networkx-3.4.2-py3-none-any.whl", hash = "sha256:df5d4365b724cf81b8c6a7312509d0c22386097011ad1abe274afd5e9d3bbc5f", size = 1723263, upload-time = "2024-10-21T12:39:36.247Z" },
+    { url = "https://files.pythonhosted.org/packages/9e/c9/b2622292ea83fbb4ec318f5b9ab867d0a28ab43c5717bb85b0a5f6b3b0a4/networkx-3.6.1-py3-none-any.whl", hash = "sha256:d47fbf302e7d9cbbb9e2555a0d267983d2aa476bac30e90dfbe5669bd57f3762", size = 2068504, upload-time = "2025-12-08T17:02:38.159Z" },
 ]
 
 [[package]]

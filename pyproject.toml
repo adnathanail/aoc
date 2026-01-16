@@ -6,8 +6,8 @@ authors = [{name = "Alex Nathanail", email = "adnathanail@hotmail.co.uk"}]
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "advent-of-code-data>=2.0.4",
-    "networkx>=3.4.2",
+    "advent-of-code-data==2.1.1",
+    "networkx==3.6.1",
     "pillow>=11.0.0",
     "pydot>=3.0.3",
     "scipy>=1.16.3",
