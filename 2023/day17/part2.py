@@ -10,8 +10,8 @@ GRID_WIDTH = len(GRID[0])
 END = (GRID_WIDTH - 1, GRID_HEIGHT - 1)
 
 START = (0, 0)
-MIN_JUMP = 1
-MAX_JUMP = 3
+MIN_JUMP = 4
+MAX_JUMP = 10
 
 Coord = tuple[int, int]
 
